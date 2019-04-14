@@ -10,5 +10,8 @@ find_package(Vulkan REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
 target_link_libraries(AlpacaWeb ${Vulkan_LIBRARIES})
 
+add_subdirectory(glm)
+target_link_libraries(AlpacaWeb glm)
+
 add_subdirectory(glfw)
 target_link_libraries(AlpacaWeb glfw)
