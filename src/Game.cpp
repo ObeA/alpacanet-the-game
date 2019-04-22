@@ -5,11 +5,12 @@
 #include "Game.h"
 
 void Game::run() {
-    mainLoop();
-}
-
-void Game::mainLoop() {
-    while (!glfwWindowShouldClose(window.GLFWWindow)) {
-        glfwPollEvents();
+    try {
+        window.run();
     }
+    catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
+        std::cin.get();
+    }
+    std::cin.get();
 }
