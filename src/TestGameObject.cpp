@@ -1,36 +1,5 @@
 #include "TestGameObject.h"
 
-std::array<VkVertexInputAttributeDescription, 3> Vertex::getAttributeDescriptions() {
-	std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions = {};
-
-	attributeDescriptions[0].binding = 0;
-	attributeDescriptions[0].location = 0;
-	attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[0].offset = offsetof(Vertex, pos);
-
-	attributeDescriptions[1].binding = 0;
-	attributeDescriptions[1].location = 1;
-	attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-	attributeDescriptions[1].offset = offsetof(Vertex, color);
-
-	attributeDescriptions[2].binding = 0;
-	attributeDescriptions[2].location = 2;
-	attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-	attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
-
-	return attributeDescriptions;
-}
-
-VkVertexInputBindingDescription Vertex::getBindingDescription() {
-	VkVertexInputBindingDescription bindingDescription = {};
-
-	bindingDescription.binding = 0;
-	bindingDescription.stride = sizeof(Vertex);
-	bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-	return bindingDescription;
-}
-
 void TestGameObject::generate(size_t swapchainImageSize) {
 	createVertexBuffer();
 	createIndexBuffer();
@@ -39,8 +8,9 @@ void TestGameObject::generate(size_t swapchainImageSize) {
 }
 
 void TestGameObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) {
-	position.x = glm::clamp(position.x + (rand() % 2 - .5f) / 50, -3.0f, 3.0f);
-	position.y = glm::clamp(position.y + (rand() % 2 - .5f) / 50, -3.0f, 3.0f);
+	position.x = glm::clamp(position.x + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
+	position.y = glm::clamp(position.y + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
+    position.z = glm::clamp(position.z + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
 
 	static auto startTime = std::chrono::high_resolution_clock::now();
 

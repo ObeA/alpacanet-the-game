@@ -3,6 +3,10 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
+#include "TestGameObject.h"
+#include "GameObject.h"
+#include "Cube.h"
+
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
 	if (func != nullptr) {
@@ -103,6 +107,10 @@ void Window::drawFrame() {
 		object->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f));
 	}
 
+    for (auto& cube : cubes) {
+        cube->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f));
+    }
+
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -181,10 +189,25 @@ void Window::initVulkan() {
 
 	objects.push_back(new TestGameObject(this));
 	objects.push_back(new TestGameObject(this));
+    objects.push_back(new TestGameObject(this));
+    objects.push_back(new TestGameObject(this));
+    objects.push_back(new TestGameObject(this));
+    objects.push_back(new TestGameObject(this));
+    objects.push_back(new TestGameObject(this));
+    objects.push_back(new TestGameObject(this));
 
 	for (auto& object : objects) {
 		object->generate(swapChainImages.size());
 	}
+
+    cubes.push_back(new Cube(this));
+	cubes[0]->position.x = 2;
+
+    for (auto& cube : cubes) {
+        cube->generate(swapChainImages.size());
+    }
+
+
 
 	createCommandBuffers();
 	createSyncObjects();
@@ -256,6 +279,10 @@ void Window::cleanup() {
 	for (auto &object : objects) {
 		object->cleanup(swapChainImages.size());
 	}
+
+    for (auto &cube : cubes) {
+        cube->cleanup(swapChainImages.size());
+    }
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
@@ -971,6 +998,10 @@ void Window::createCommandBuffers() {
 			object->draw(commandBuffers[i], pipelineLayout, i);
 		}
 
+        for (auto& cube : cubes) {
+            cube->draw(commandBuffers[i], pipelineLayout, i);
+        }
+
 		vkCmdEndRenderPass(commandBuffers[i]);
 
 		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
@@ -1041,7 +1072,7 @@ void Window::createDescriptorSetLayout() {
 }
 
 void Window::createDescriptorPool() {
-	const int objectAmount = 2;
+	const int objectAmount = 100;
 	std::array<VkDescriptorPoolSize, objectAmount * 2> poolSizes = {};
 
 

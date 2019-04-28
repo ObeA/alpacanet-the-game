@@ -1,10 +1,11 @@
 cmake_minimum_required(VERSION 3.11)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake")
+set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
 project(AlpacaWeb)
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(AlpacaWeb main.cpp src/Window.cpp src/Window.h src/Game.cpp src/Game.h src/TestGameObject.cpp src/TestGameObject.h)
+add_executable(AlpacaWeb main.cpp src/Window.cpp src/Window.h src/Game.cpp src/Game.h src/TestGameObject.cpp src/TestGameObject.h src/GameObject.cpp src/GameObject.h src/Cube.cpp src/Cube.h)
 
 find_package(Vulkan REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})
