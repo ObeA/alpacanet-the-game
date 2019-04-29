@@ -35,6 +35,13 @@ VkVertexInputBindingDescription Vertex::getBindingDescription() {
     return bindingDescription;
 }
 
+void GameObject::generate(size_t swapchainImageSize) {
+	createVertexBuffer();
+	createIndexBuffer();
+	createUniformBuffers(swapchainImageSize);
+	createDescriptorSet(swapchainImageSize);
+}
+
 void GameObject::draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset) {
 	VkBuffer vertexBuffers[] = { vertexBuffer };
 	VkDeviceSize offsets[] = { 0 };

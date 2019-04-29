@@ -107,10 +107,6 @@ void Window::drawFrame() {
 		object->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f));
 	}
 
-    for (auto& cube : cubes) {
-        cube->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f));
-    }
-
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
@@ -195,16 +191,11 @@ void Window::initVulkan() {
     objects.push_back(new TestGameObject(this));
     objects.push_back(new TestGameObject(this));
     objects.push_back(new TestGameObject(this));
+	objects.push_back(new Cube(this));
 
 	for (auto& object : objects) {
 		object->generate(swapChainImages.size());
 	}
-
-    cubes.push_back(new Cube(this));
-
-    for (auto& cube : cubes) {
-        cube->generate(swapChainImages.size());
-    }
 
 
 
@@ -278,10 +269,6 @@ void Window::cleanup() {
 	for (auto &object : objects) {
 		object->cleanup(swapChainImages.size());
 	}
-
-    for (auto &cube : cubes) {
-        cube->cleanup(swapChainImages.size());
-    }
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
@@ -996,10 +983,6 @@ void Window::createCommandBuffers() {
 		for (auto& object : objects) {
 			object->draw(commandBuffers[i], pipelineLayout, i);
 		}
-
-        for (auto& cube : cubes) {
-            cube->draw(commandBuffers[i], pipelineLayout, i);
-        }
 
 		vkCmdEndRenderPass(commandBuffers[i]);
 

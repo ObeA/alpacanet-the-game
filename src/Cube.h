@@ -24,12 +24,9 @@
 class Window;
 class Cube : public GameObject {
 public:
-    Window *window;
 
     Cube(Window *window) : GameObject(window) {
     }
-
-    void generate(size_t swapchainImageSize);
 
     void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective);
 

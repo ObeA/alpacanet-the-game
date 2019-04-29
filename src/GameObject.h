@@ -31,7 +31,7 @@ public:
     GameObject(Window *window) : window(window) {
     }
 
-    virtual void generate(size_t swapchainImageSize) = 0;
+    virtual void generate(size_t swapchainImageSize);
 
     virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) = 0;
 
@@ -59,6 +59,10 @@ protected:
 	virtual void createVertexBuffer();
 
 	virtual void createIndexBuffer();
+
+	virtual void createUniformBuffers(size_t swapChainImageSize) = 0;
+
+	virtual void createDescriptorSet(size_t swapChainImageSize) = 0;
 private:
 	std::vector<Vertex> vertices;
 	std::vector<uint16_t> indices;

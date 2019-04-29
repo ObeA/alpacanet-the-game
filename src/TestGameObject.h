@@ -24,8 +24,6 @@ public:
 	TestGameObject(Window *window) : GameObject(window) {
 	}
 
-	void generate(size_t swapchainImageSize);
-
 	void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective);
 
 	std::vector<Vertex> getVertices();

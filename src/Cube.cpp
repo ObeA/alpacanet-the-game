@@ -1,12 +1,5 @@
 #include "Cube.h"
 
-void Cube::generate(size_t swapchainImageSize) {
-	createVertexBuffer();
-	createIndexBuffer();
-	createUniformBuffers(swapchainImageSize);
-	createDescriptorSet(swapchainImageSize);
-}
-
 void Cube::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) {
 	position.x = glm::clamp(position.x + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
 	position.y = glm::clamp(position.y + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);

@@ -20,8 +20,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-class TestGameObject;
-class Cube;
+class GameObject;
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -104,8 +103,7 @@ private:
 	VkDeviceMemory depthImageMemory;
 	VkImageView depthImageView;
 
-	std::vector<TestGameObject*> objects;
-    std::vector<Cube*> cubes;
+	std::vector<GameObject*> objects;
 
 	bool framebufferResized = false;
 
