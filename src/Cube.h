@@ -22,22 +22,21 @@
 #include "GameObject.h"
 
 class Window;
-class Cube {
+class Cube : public GameObject {
 public:
     Window *window;
 
-    Cube(Window *window) : window(window) {
+    Cube(Window *window) : GameObject(window) {
     }
 
     void generate(size_t swapchainImageSize);
 
     void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective);
 
-    void cleanup(size_t swapchainImages);
+	std::vector<Vertex> getVertices();
 
-    void draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset);
+	std::vector<uint16_t> getIndices();
 
-    glm::vec3 position = {0.0f,0.0f,0.0f};
     const std::vector<Vertex> vertices = {
             {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
             {{0.5f, -0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
@@ -60,17 +59,6 @@ public:
     };
 
 private:
-    VkBuffer vertexBuffer;
-    VkDeviceMemory vertexBufferMemory;
-    VkBuffer indexBuffer;
-    VkDeviceMemory indexBufferMemory;
-    std::vector<VkBuffer> uniformBuffers;
-    std::vector<VkDeviceMemory> uniformBuffersMemory;
-    std::vector<VkDescriptorSet> descriptorSets;
-
-    void createVertexBuffer();
-
-    void createIndexBuffer();
 
     void createUniformBuffers(size_t swapChainImageSize);
 

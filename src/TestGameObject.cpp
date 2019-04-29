@@ -32,71 +32,6 @@ void TestGameObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspe
 	vkUnmapMemory(window->device, uniformBuffersMemory[currentImage]);
 }
 
-void TestGameObject::cleanup(size_t swapchainImages) {
-	for (size_t i = 0; i < swapchainImages; i++) {
-		vkDestroyBuffer(window->device, uniformBuffers[i], nullptr);
-		vkFreeMemory(window->device, uniformBuffersMemory[i], nullptr);
-	}
-
-	vkDestroyBuffer(window->device, indexBuffer, nullptr);
-	vkFreeMemory(window->device, indexBufferMemory, nullptr);
-
-	vkDestroyBuffer(window->device, vertexBuffer, nullptr);
-	vkFreeMemory(window->device, vertexBufferMemory, nullptr);
-}
-
-void TestGameObject::draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset) {
-	VkBuffer vertexBuffers[] = { vertexBuffer };
-	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(cmdbuffer, 0, 1, vertexBuffers, offsets);
-
-	vkCmdBindIndexBuffer(cmdbuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-
-	vkCmdBindDescriptorSets(cmdbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[bufferOffset], 0, nullptr);
-
-	vkCmdDrawIndexed(cmdbuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
-}
-
-void TestGameObject::createVertexBuffer() {
-	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	window->createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	void* data;
-	vkMapMemory(window->device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, vertices.data(), (size_t)bufferSize);
-	vkUnmapMemory(window->device, stagingBufferMemory);
-
-	window->createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-
-	window->copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-	vkDestroyBuffer(window->device, stagingBuffer, nullptr);
-	vkFreeMemory(window->device, stagingBufferMemory, nullptr);
-}
-
-void TestGameObject::createIndexBuffer() {
-	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	window->createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	void* data;
-	vkMapMemory(window->device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, indices.data(), (size_t)bufferSize);
-	vkUnmapMemory(window->device, stagingBufferMemory);
-
-	window->createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
-
-	window->copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-	vkDestroyBuffer(window->device, stagingBuffer, nullptr);
-	vkFreeMemory(window->device, stagingBufferMemory, nullptr);
-}
-
 void TestGameObject::createUniformBuffers(size_t swapChainImageSize) {
 	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
@@ -152,4 +87,12 @@ void TestGameObject::createDescriptorSet(size_t swapChainImageSize) {
 
 		vkUpdateDescriptorSets(window->device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
+}
+
+std::vector<Vertex> TestGameObject::getVertices() {
+	return vertices;
+}
+
+std::vector<uint16_t> TestGameObject::getIndices() {
+	return indices;
 }

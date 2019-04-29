@@ -32,14 +32,36 @@ public:
     }
 
     virtual void generate(size_t swapchainImageSize) = 0;
-//
-//    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) = 0;
-//
-//    virtual void cleanup(size_t swapchainImages) = 0;
-//
-//    virtual void draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset) = 0;
+
+    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) = 0;
+
+    virtual void cleanup(size_t swapchainImages);
+
+    virtual void draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset);
+
+	virtual std::vector<Vertex> getVertices();
+
+	virtual std::vector<uint16_t> getIndices();
 
     Window *window;
+
+	glm::vec3 position = { 0.0f,0.0f,0.0f };
+
+protected:
+	VkBuffer vertexBuffer;
+	VkDeviceMemory vertexBufferMemory;
+	VkBuffer indexBuffer;
+	VkDeviceMemory indexBufferMemory;
+	std::vector<VkBuffer> uniformBuffers;
+	std::vector<VkDeviceMemory> uniformBuffersMemory;
+	std::vector<VkDescriptorSet> descriptorSets;
+
+	virtual void createVertexBuffer();
+
+	virtual void createIndexBuffer();
+private:
+	std::vector<Vertex> vertices;
+	std::vector<uint16_t> indices;
 };
 
 

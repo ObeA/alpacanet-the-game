@@ -28,12 +28,13 @@ public:
 
 	void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective);
 
-	void cleanup(size_t swapchainImages);
+	std::vector<Vertex> getVertices();
 
-	void draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset);
+	std::vector<uint16_t> getIndices();
 
-	glm::vec3 position = { 0.0f,0.0f,0.0f };
-	const std::vector<Vertex> vertices = {
+	//void draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset);
+
+	std::vector<Vertex> vertices = {
 	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
 	{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
 	{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
@@ -45,23 +46,12 @@ public:
 	{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
 	};
 
-    const std::vector<uint16_t> indices = {
+    std::vector<uint16_t> indices = {
             0, 1, 2, 2, 3, 0,
             4, 5, 6, 6, 7, 4
     };
 
 private:
-	VkBuffer vertexBuffer;
-	VkDeviceMemory vertexBufferMemory;
-	VkBuffer indexBuffer;
-	VkDeviceMemory indexBufferMemory;
-	std::vector<VkBuffer> uniformBuffers;
-	std::vector<VkDeviceMemory> uniformBuffersMemory;
-	std::vector<VkDescriptorSet> descriptorSets;
-
-	void createVertexBuffer();
-
-	void createIndexBuffer();
 
 	void createUniformBuffers(size_t swapChainImageSize);
 
