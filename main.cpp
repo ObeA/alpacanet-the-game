@@ -8,7 +8,11 @@
 
 
 int main() {
+    glm::vec3 alpaca;
+    glm::mat4 henk = glm::translate(glm::mat4(1.0f), alpaca);
+
     std::cout << "hallo";
+
     Game game = Game();
 
     game.run();

@@ -31,7 +31,7 @@ public:
     GameObject(Window *window) : window(window) {
     }
 
-//    virtual void generate(size_t swapchainImageSize);
+    virtual void generate(size_t swapchainImageSize) = 0;
 //
 //    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) = 0;
 //

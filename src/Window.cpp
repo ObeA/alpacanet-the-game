@@ -201,7 +201,6 @@ void Window::initVulkan() {
 	}
 
     cubes.push_back(new Cube(this));
-	cubes[0]->position.x = 2;
 
     for (auto& cube : cubes) {
         cube->generate(swapChainImages.size());

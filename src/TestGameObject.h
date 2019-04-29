@@ -18,11 +18,10 @@
 
 class Window;
 
-class TestGameObject {
+class TestGameObject : public GameObject {
 public:
-    Window *window;
 
-	TestGameObject(Window *window) : window(window) {
+	TestGameObject(Window *window) : GameObject(window) {
 	}
 
 	void generate(size_t swapchainImageSize);
@@ -33,7 +32,7 @@ public:
 
 	void draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset);
 
-	glm::vec3 position;
+	glm::vec3 position = { 0.0f,0.0f,0.0f };
 	const std::vector<Vertex> vertices = {
 	{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
 	{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
