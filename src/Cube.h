@@ -25,7 +25,7 @@ class Window;
 class Cube : public GameObject {
 public:
 
-    Cube(Window *window) : GameObject(window) {
+    Cube(Window *window, Material *material) : GameObject(window, material) {
     }
 
     void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective);

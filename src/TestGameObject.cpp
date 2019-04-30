@@ -1,4 +1,5 @@
 #include "TestGameObject.h"
+#include "Materials/Material.h"
 
 void TestGameObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) {
 	position.x = glm::clamp(position.x + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
@@ -37,7 +38,7 @@ void TestGameObject::createUniformBuffers(size_t swapChainImageSize) {
 }
 
 void TestGameObject::createDescriptorSet(size_t swapChainImageSize) {
-	std::vector<VkDescriptorSetLayout> layouts(swapChainImageSize, window->descriptorSetLayout);
+	std::vector<VkDescriptorSetLayout> layouts(swapChainImageSize, material->descriptorSetLayout);
 	VkDescriptorSetAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool = window->descriptorPool;

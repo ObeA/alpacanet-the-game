@@ -14,13 +14,18 @@
 #include <fstream>
 #include <chrono>
 #include <array>
+#include <cstring>
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Models/Vertex.h"
+#include "util/Utilities.h"
+
 class GameObject;
+class Material;
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -60,7 +65,7 @@ public:
 	VkDescriptorPool descriptorPool;
 	VkImageView textureImageView;
 	VkSampler textureSampler;
-	VkDescriptorSetLayout descriptorSetLayout;
+//	VkDescriptorSetLayout descriptorSetLayout;
     GLFWwindow* window;
 
 	void run();
@@ -68,6 +73,10 @@ public:
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+
+    VkExtent2D getSwapChainExtent();
+
+    VkRenderPass& getRenderPass();
 
 private:
 	VkInstance instance;
@@ -84,8 +93,8 @@ private:
 	VkExtent2D swapChainExtent;
 	std::vector<VkImageView> swapChainImageViews;
 	VkRenderPass renderPass;
-	VkPipelineLayout pipelineLayout;
-	VkPipeline graphicsPipeline;
+//	VkPipelineLayout pipelineLayout;
+//	VkPipeline graphicsPipeline;
 
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	VkCommandPool commandPool;
@@ -104,6 +113,7 @@ private:
 	VkImageView depthImageView;
 
 	std::vector<GameObject*> objects;
+    std::vector<Material*> materials;
 
 	bool framebufferResized = false;
 
@@ -161,7 +171,7 @@ private:
 
 	void createSurface();
 
-	void createGraphicsPipeline();
+//	void createGraphicsPipeline();
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
@@ -177,7 +187,7 @@ private:
 
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
-	void createDescriptorSetLayout();
+//	void createDescriptorSetLayout();
 
 	void createDescriptorPool();
 

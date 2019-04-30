@@ -5,9 +5,16 @@
 #ifndef ALPACAWEB_VERTEX_H
 #define ALPACAWEB_VERTEX_H
 
+#include "../Window.h"
 
-class Vertex {
+struct Vertex {
+    glm::vec3 pos;
+    glm::vec3 color;
+    glm::vec2 texCoord;
 
+    static VkVertexInputBindingDescription getBindingDescription();
+
+    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
 };
 
 

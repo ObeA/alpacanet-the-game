@@ -9,16 +9,6 @@
 
 class Window;
 
-struct Vertex {
-    glm::vec3 pos;
-    glm::vec3 color;
-    glm::vec2 texCoord;
-
-    static VkVertexInputBindingDescription getBindingDescription();
-
-    static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions();
-};
-
 struct UniformBufferObject {
     alignas(16) glm::mat4 model;
     alignas(16) glm::mat4 view;
@@ -28,7 +18,7 @@ struct UniformBufferObject {
 
 class GameObject {
 public:
-    GameObject(Window *window) : window(window) {
+    GameObject(Window *window, Material *material) : window(window), material(material) {
     }
 
     virtual void generate(size_t swapchainImageSize);
@@ -42,8 +32,6 @@ public:
 	virtual std::vector<Vertex> getVertices();
 
 	virtual std::vector<uint16_t> getIndices();
-
-    Window *window;
 
 	glm::vec3 position = { 0.0f,0.0f,0.0f };
 
@@ -63,6 +51,10 @@ protected:
 	virtual void createUniformBuffers(size_t swapChainImageSize) = 0;
 
 	virtual void createDescriptorSet(size_t swapChainImageSize) = 0;
+
+    Window *window;
+
+    Material *material;
 private:
 	std::vector<Vertex> vertices;
 	std::vector<uint16_t> indices;
