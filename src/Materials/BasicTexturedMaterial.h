@@ -9,7 +9,7 @@
 
 class BasicTexturedMaterial: public Material {
 public:
-    BasicTexturedMaterial(Window *window) : Material(window) {
+    BasicTexturedMaterial(Window *window, char* texture) : Material(window), textureLocation(texture) {
     }
 
 	void initialize();
@@ -18,6 +18,7 @@ public:
 
 	void cleanup();
 protected:
+	char* textureLocation;
 	VkImageView textureImageView;
 	VkSampler textureSampler;
 	VkImage textureImage;

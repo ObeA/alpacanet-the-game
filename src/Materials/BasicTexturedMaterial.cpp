@@ -109,7 +109,7 @@ void BasicTexturedMaterial::createDescriptorSet(VkDescriptorBufferInfo &uniformB
 
 void BasicTexturedMaterial::createTextureImage() {
 	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load("assets/textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	stbi_uc* pixels = stbi_load(textureLocation, &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 	if (!pixels) {
