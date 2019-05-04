@@ -1,9 +1,9 @@
-[submodule "glfw"]
+[submodule "external/glfw"]
 	path = external/glfw
 	url = https://github.com/glfw/glfw
-[submodule "glm"]
+[submodule "external/glm"]
 	path = external/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "stb"]
+[submodule "external/stb"]
 	path = external/stb
 	url = https://github.com/nothings/stb
