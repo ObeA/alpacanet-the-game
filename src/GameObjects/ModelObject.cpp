@@ -18,7 +18,7 @@ void ModelObject::loadModel() {
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, "assets/models/chalet.obj")) {
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, modelLocation)) {
         throw std::runtime_error(warn + err);
     }
 

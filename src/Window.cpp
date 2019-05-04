@@ -171,7 +171,7 @@ void Window::initVulkan() {
 	auto cube = new Cube(this, materials[0]);
 	cube->position = glm::vec3(-1, 0, 0);
 
-	auto model = new ModelObject(this, materials[3]);
+	auto model = new ModelObject(this, materials[3], (char*)"assets/models/chalet.obj");
 	model->position = glm::vec3(0, -1, 0);
 
 	auto thing = new TestGameObject(this, materials[1]);

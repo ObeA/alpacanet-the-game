@@ -25,7 +25,7 @@ class Window;
 class ModelObject : public GameObject {
 public:
 
-    ModelObject(Window *window, Material *material) : GameObject(window, material) {
+    ModelObject(Window *window, Material *material, char* location) : GameObject(window, material), modelLocation(location) {
     }
 
     void generate(size_t swapchainImageSize);
@@ -33,6 +33,8 @@ public:
     void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective);
 
 private:
+    char* modelLocation;
+
     void loadModel();
 
     void createUniformBuffers(size_t swapChainImageSize);
