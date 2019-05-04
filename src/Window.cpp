@@ -160,17 +160,23 @@ void Window::initVulkan() {
 	createDescriptorPool();
 
 	materials.push_back(new BasicMaterial(this));
-	materials.push_back(new BasicTexturedMaterial(this));
+	materials.push_back(new BasicTexturedMaterial(this, (char*)"assets/textures/texture.jpg"));
+	materials.push_back(new BasicTexturedMaterial(this, (char*)"assets/textures/banana.jpg"));
 	for (auto& material : materials) {
 		material->initialize();
 	}
 
 	auto cube = new Cube(this, materials[0]);
-	cube->position = glm::vec3(-1, -1, 0);
+	cube->position = glm::vec3(-1, 0, 0);
+
+	auto cube2 = new Cube(this, materials[2]);
+	cube2->position = glm::vec3(0, -1, 0);
 
 	auto thing = new TestGameObject(this, materials[1]);
+    thing->position = glm::vec3(0, 0, -1);
 
 	objects.push_back(cube);
+	objects.push_back(cube2);
 	objects.push_back(thing);
 
 	for (auto& object : objects) {
