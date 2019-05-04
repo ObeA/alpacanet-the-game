@@ -33,6 +33,8 @@ protected:
 
     VkShaderModule createShaderModule(const std::vector<char>& code);
     virtual void createDescriptorSetLayout() = 0;
+
+	void createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shaderStages[]);
 };
 
 
