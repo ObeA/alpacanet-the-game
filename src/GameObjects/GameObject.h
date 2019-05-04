@@ -5,7 +5,7 @@
 #ifndef ALPACAWEB_GAMEOBJECT_H
 #define ALPACAWEB_GAMEOBJECT_H
 
-#include "Window.h"
+#include "../Window.h"
 
 class Window;
 

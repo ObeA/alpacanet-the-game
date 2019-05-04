@@ -1,10 +1,10 @@
-#include "Cube.h"
-#include "Materials/Material.h"
+#include "TestGameObject.h"
+#include "../Materials/Material.h"
 
-void Cube::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) {
+void TestGameObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) {
 	position.x = glm::clamp(position.x + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
 	position.y = glm::clamp(position.y + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
-	position.z = glm::clamp(position.z + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
+    position.z = glm::clamp(position.z + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
 
 	static auto startTime = std::chrono::high_resolution_clock::now();
 
@@ -26,7 +26,7 @@ void Cube::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) {
 	vkUnmapMemory(window->device, uniformBuffersMemory[currentImage]);
 }
 
-void Cube::createUniformBuffers(size_t swapChainImageSize) {
+void TestGameObject::createUniformBuffers(size_t swapChainImageSize) {
 	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
 	uniformBuffers.resize(swapChainImageSize);
@@ -37,10 +37,10 @@ void Cube::createUniformBuffers(size_t swapChainImageSize) {
 	}
 }
 
-std::vector<Vertex> Cube::getVertices() {
+std::vector<Vertex> TestGameObject::getVertices() {
 	return vertices;
 }
 
-std::vector<uint16_t> Cube::getIndices() {
+std::vector<uint16_t> TestGameObject::getIndices() {
 	return indices;
 }

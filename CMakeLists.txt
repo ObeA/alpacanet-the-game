@@ -5,7 +5,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 project(AlpacaWeb)
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(AlpacaWeb main.cpp src/Window.cpp src/Window.h src/Game.cpp src/Game.h src/TestGameObject.cpp src/TestGameObject.h src/GameObject.cpp src/GameObject.h src/Cube.cpp src/Cube.h src/Materials/Material.cpp src/Materials/Material.h src/Materials/BasicMaterial.cpp src/Materials/BasicMaterial.h src/Models/Vertex.cpp src/Models/Vertex.h src/util/Utilities.cpp src/util/Utilities.h src/Materials/BasicTexturedMaterial.cpp src/Materials/BasicTexturedMaterial.h)
+add_executable(AlpacaWeb main.cpp src/Window.cpp src/Window.h src/Game.cpp src/Game.h src/GameObjects/TestGameObject.cpp src/GameObjects/TestGameObject.h src/GameObjects/GameObject.cpp src/GameObjects/GameObject.h src/GameObjects/Cube.cpp src/GameObjects/Cube.h src/Materials/Material.cpp src/Materials/Material.h src/Materials/BasicMaterial.cpp src/Materials/BasicMaterial.h src/Models/Vertex.cpp src/Models/Vertex.h src/util/Utilities.cpp src/util/Utilities.h src/Materials/BasicTexturedMaterial.cpp src/Materials/BasicTexturedMaterial.h)
 
 find_package(Vulkan REQUIRED)
 target_include_directories(${PROJECT_NAME} PUBLIC ${Vulkan_INCLUDE_DIRS})

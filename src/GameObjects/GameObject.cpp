@@ -4,7 +4,7 @@
 
 #include "GameObject.h"
 
-#include "Materials/Material.h"
+#include "../Materials/Material.h"
 
 void GameObject::generate(size_t swapchainImageSize) {
 	createVertexBuffer();
