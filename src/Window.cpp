@@ -8,6 +8,7 @@
 #include "Cube.h"
 #include "Materials/Material.h"
 #include "Materials/BasicMaterial.h"
+#include "Materials/BasicTexturedMaterial.h"
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -168,10 +169,14 @@ void Window::initVulkan() {
 	createDescriptorPool();
 
 	materials.push_back(new BasicMaterial(this));
-	materials[0]->initialize();
+	materials.push_back(new BasicTexturedMaterial(this));
+	for (auto& material : materials) {
+		material->initialize();
+	}
 
-	objects.push_back(new TestGameObject(this, materials[0]));
 	objects.push_back(new Cube(this, materials[0]));
+
+	objects.push_back(new TestGameObject(this, materials[1]));
 
 	for (auto& object : objects) {
 		object->generate(swapChainImages.size());
@@ -820,10 +825,9 @@ void Window::createCommandBuffers() {
 
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-		//TODO: Group objects by pipeline, bind pipeline and draw grouped object
-		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, materials[0]->graphicsPipeline);
-
 		for (auto& object : objects) {
+			//TODO: Group objects by pipeline, bind pipeline and draw grouped objects
+			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->material->graphicsPipeline);
 			object->draw(commandBuffers[i], materials[0]->pipelineLayout, i);
 		}
 

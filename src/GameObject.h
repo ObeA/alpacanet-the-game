@@ -35,6 +35,8 @@ public:
 
 	glm::vec3 position = { 0.0f,0.0f,0.0f };
 
+	Material *material;
+
 protected:
 	VkBuffer vertexBuffer;
 	VkDeviceMemory vertexBufferMemory;
@@ -53,8 +55,6 @@ protected:
 	virtual void createDescriptorSet(size_t swapChainImageSize) = 0;
 
     Window *window;
-
-    Material *material;
 private:
 	std::vector<Vertex> vertices;
 	std::vector<uint16_t> indices;

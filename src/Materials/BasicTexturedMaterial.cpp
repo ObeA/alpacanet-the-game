@@ -1,10 +1,10 @@
 //
-// Created by Leon on 4/30/2019.
+// Created by Leon on 5/4/2019.
 //
 
-#include "BasicMaterial.h"
+#include "BasicTexturedMaterial.h"
 
-void BasicMaterial::createDescriptorSetLayout() {
+void BasicTexturedMaterial::createDescriptorSetLayout() {
     VkDescriptorSetLayoutBinding uboLayoutBinding = {};
     uboLayoutBinding.binding = 0;
     uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -30,9 +30,9 @@ void BasicMaterial::createDescriptorSetLayout() {
     }
 }
 
-void BasicMaterial::createGraphicsPipeline() {
-    auto vertShaderCode = Utilities::readFile("assets/shaders/basic/vert.spv");
-    auto fragShaderCode = Utilities::readFile("assets/shaders/basic/frag.spv");
+void BasicTexturedMaterial::createGraphicsPipeline() {
+    auto vertShaderCode = Utilities::readFile("assets/shaders/basictextured/vert.spv");
+    auto fragShaderCode = Utilities::readFile("assets/shaders/basictextured/frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
@@ -52,13 +52,13 @@ void BasicMaterial::createGraphicsPipeline() {
 
     VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
 
-	createBasicGraphicsPipeline(shaderStages);
+    createBasicGraphicsPipeline(shaderStages);
 
     vkDestroyShaderModule(window->device, fragShaderModule, nullptr);
     vkDestroyShaderModule(window->device, vertShaderModule, nullptr);
 }
 
-void BasicMaterial::createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet) {
+void BasicTexturedMaterial::createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet) {
     std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
 
     VkDescriptorImageInfo imageInfo = {};
