@@ -37,29 +37,6 @@ void TestGameObject::createUniformBuffers(size_t swapChainImageSize) {
 	}
 }
 
-void TestGameObject::createDescriptorSet(size_t swapChainImageSize) {
-	std::vector<VkDescriptorSetLayout> layouts(swapChainImageSize, material->descriptorSetLayout);
-	VkDescriptorSetAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = window->descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImageSize);
-	allocInfo.pSetLayouts = layouts.data();
-
-	descriptorSets.resize(swapChainImageSize);
-	if (vkAllocateDescriptorSets(window->device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate descriptor sets!");
-	}
-
-	for (size_t i = 0; i < swapChainImageSize; i++) {
-		VkDescriptorBufferInfo bufferInfo = {};
-		bufferInfo.buffer = uniformBuffers[i];
-		bufferInfo.offset = 0;
-		bufferInfo.range = sizeof(UniformBufferObject);
-
-		material->createDescriptorSet(bufferInfo, descriptorSets[i]);
-	}
-}
-
 std::vector<Vertex> TestGameObject::getVertices() {
 	return vertices;
 }

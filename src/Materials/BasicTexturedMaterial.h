@@ -12,10 +12,22 @@ public:
     BasicTexturedMaterial(Window *window) : Material(window) {
     }
 
+	void initialize();
+
     void createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet);
+
+	void cleanup();
 protected:
+	VkImageView textureImageView;
+	VkSampler textureSampler;
+	VkImage textureImage;
+	VkDeviceMemory textureImageMemory;
+
     void createGraphicsPipeline();
     virtual void createDescriptorSetLayout();
+	void createTextureImage();
+	void createTextureImageView();
+	void createTextureSampler();
 };
 
 

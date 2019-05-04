@@ -14,9 +14,9 @@ public:
     Material(Window *window) : window(window) {
     }
 
-    void initialize();
+    virtual void initialize();
 
-    void cleanup();
+    virtual void cleanup();
 
     void cleanupSwapChain();
 

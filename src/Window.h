@@ -63,9 +63,6 @@ class Window {
 public:
 	VkDevice device;
 	VkDescriptorPool descriptorPool;
-	VkImageView textureImageView;
-	VkSampler textureSampler;
-//	VkDescriptorSetLayout descriptorSetLayout;
     GLFWwindow* window;
 
 	void run();
@@ -77,6 +74,14 @@ public:
     VkExtent2D getSwapChainExtent();
 
     VkRenderPass& getRenderPass();
+
+	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+
+	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+
+	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+
+	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
 private:
 	VkInstance instance;
@@ -93,8 +98,6 @@ private:
 	VkExtent2D swapChainExtent;
 	std::vector<VkImageView> swapChainImageViews;
 	VkRenderPass renderPass;
-//	VkPipelineLayout pipelineLayout;
-//	VkPipeline graphicsPipeline;
 
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	VkCommandPool commandPool;
@@ -104,9 +107,6 @@ private:
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
-
-	VkImage textureImage;
-	VkDeviceMemory textureImageMemory;
 
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;
@@ -171,8 +171,6 @@ private:
 
 	void createSurface();
 
-//	void createGraphicsPipeline();
-
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
 	void createRenderPass();
@@ -187,27 +185,11 @@ private:
 
 	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
-//	void createDescriptorSetLayout();
-
 	void createDescriptorPool();
-
-	void createTextureImage();
-
-	void createTextureImageView();
-
-	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
 	VkCommandBuffer beginSingleTimeCommands();
 
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
-
-	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-
-	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-
-	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-
-	void createTextureSampler();
 
 	void createDepthResources();
 

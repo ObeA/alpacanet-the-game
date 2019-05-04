@@ -52,7 +52,7 @@ protected:
 
 	virtual void createUniformBuffers(size_t swapChainImageSize) = 0;
 
-	virtual void createDescriptorSet(size_t swapChainImageSize) = 0;
+	void createDescriptorSet(size_t swapChainImageSize);
 
     Window *window;
 private:

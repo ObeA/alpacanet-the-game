@@ -58,8 +58,6 @@ public:
 private:
 
     void createUniformBuffers(size_t swapChainImageSize);
-
-    void createDescriptorSet(size_t swapChainImageSize);
 };
 
 

@@ -37,51 +37,51 @@ void Cube::createUniformBuffers(size_t swapChainImageSize) {
 	}
 }
 
-void Cube::createDescriptorSet(size_t swapChainImageSize) {
-	std::vector<VkDescriptorSetLayout> layouts(swapChainImageSize, material->descriptorSetLayout);
-	VkDescriptorSetAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = window->descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImageSize);
-	allocInfo.pSetLayouts = layouts.data();
-
-	descriptorSets.resize(swapChainImageSize);
-	if (vkAllocateDescriptorSets(window->device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate descriptor sets!");
-	}
-
-	for (size_t i = 0; i < swapChainImageSize; i++) {
-		VkDescriptorBufferInfo bufferInfo = {};
-		bufferInfo.buffer = uniformBuffers[i];
-		bufferInfo.offset = 0;
-		bufferInfo.range = sizeof(UniformBufferObject);
-
-		VkDescriptorImageInfo imageInfo = {};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = window->textureImageView;
-		imageInfo.sampler = window->textureSampler;
-
-		std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
-
-		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorWrites[0].dstSet = descriptorSets[i];
-		descriptorWrites[0].dstBinding = 0;
-		descriptorWrites[0].dstArrayElement = 0;
-		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		descriptorWrites[0].descriptorCount = 1;
-		descriptorWrites[0].pBufferInfo = &bufferInfo;
-
-		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorWrites[1].dstSet = descriptorSets[i];
-		descriptorWrites[1].dstBinding = 1;
-		descriptorWrites[1].dstArrayElement = 0;
-		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		descriptorWrites[1].descriptorCount = 1;
-		descriptorWrites[1].pImageInfo = &imageInfo;
-
-		vkUpdateDescriptorSets(window->device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-	}
-}
+//void Cube::createDescriptorSet(size_t swapChainImageSize) {
+//	std::vector<VkDescriptorSetLayout> layouts(swapChainImageSize, material->descriptorSetLayout);
+//	VkDescriptorSetAllocateInfo allocInfo = {};
+//	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+//	allocInfo.descriptorPool = window->descriptorPool;
+//	allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImageSize);
+//	allocInfo.pSetLayouts = layouts.data();
+//
+//	descriptorSets.resize(swapChainImageSize);
+//	if (vkAllocateDescriptorSets(window->device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+//		throw std::runtime_error("failed to allocate descriptor sets!");
+//	}
+//
+//	for (size_t i = 0; i < swapChainImageSize; i++) {
+//		VkDescriptorBufferInfo bufferInfo = {};
+//		bufferInfo.buffer = uniformBuffers[i];
+//		bufferInfo.offset = 0;
+//		bufferInfo.range = sizeof(UniformBufferObject);
+//
+//		VkDescriptorImageInfo imageInfo = {};
+//		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+//		imageInfo.imageView = window->textureImageView;
+//		imageInfo.sampler = window->textureSampler;
+//
+//		std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
+//
+//		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+//		descriptorWrites[0].dstSet = descriptorSets[i];
+//		descriptorWrites[0].dstBinding = 0;
+//		descriptorWrites[0].dstArrayElement = 0;
+//		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+//		descriptorWrites[0].descriptorCount = 1;
+//		descriptorWrites[0].pBufferInfo = &bufferInfo;
+//
+//		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+//		descriptorWrites[1].dstSet = descriptorSets[i];
+//		descriptorWrites[1].dstBinding = 1;
+//		descriptorWrites[1].dstArrayElement = 0;
+//		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+//		descriptorWrites[1].descriptorCount = 1;
+//		descriptorWrites[1].pImageInfo = &imageInfo;
+//
+//		vkUpdateDescriptorSets(window->device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+//	}
+//}
 
 std::vector<Vertex> Cube::getVertices() {
 	return vertices;
