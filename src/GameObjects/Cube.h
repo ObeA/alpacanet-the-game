@@ -32,7 +32,7 @@ public:
 
 	std::vector<Vertex> getVertices();
 
-	std::vector<uint16_t> getIndices();
+	std::vector<uint32_t> getIndices();
 
     const std::vector<Vertex> vertices = {
             {{-0.5f, -0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
@@ -46,7 +46,7 @@ public:
             {{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
     };
 
-    const std::vector<uint16_t> indices = {
+    const std::vector<uint32_t> indices = {
             0, 1, 3, 3, 1, 2,
             1, 5, 2, 2, 5, 6,
             5, 4, 6, 6, 4, 7,

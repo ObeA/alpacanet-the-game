@@ -31,7 +31,7 @@ public:
 
 	virtual std::vector<Vertex> getVertices();
 
-	virtual std::vector<uint16_t> getIndices();
+	virtual std::vector<uint32_t> getIndices();
 
 	glm::vec3 position = { 0.0f,0.0f,0.0f };
 
@@ -55,9 +55,10 @@ protected:
 	void createDescriptorSet(size_t swapChainImageSize);
 
     Window *window;
+
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
 private:
-	std::vector<Vertex> vertices;
-	std::vector<uint16_t> indices;
 };
 
 

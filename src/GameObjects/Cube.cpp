@@ -41,6 +41,6 @@ std::vector<Vertex> Cube::getVertices() {
 	return vertices;
 }
 
-std::vector<uint16_t> Cube::getIndices() {
+std::vector<uint32_t> Cube::getIndices() {
 	return indices;
 }

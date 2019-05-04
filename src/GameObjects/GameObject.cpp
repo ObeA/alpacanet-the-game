@@ -18,7 +18,7 @@ void GameObject::draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(cmdbuffer, 0, 1, vertexBuffers, offsets);
 
-	vkCmdBindIndexBuffer(cmdbuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(cmdbuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
 
 	vkCmdBindDescriptorSets(cmdbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[bufferOffset], 0, nullptr);
 
@@ -105,6 +105,6 @@ std::vector<Vertex> GameObject::getVertices() {
 	return vertices;
 }
 
-std::vector<uint16_t> GameObject::getIndices() {
+std::vector<uint32_t> GameObject::getIndices() {
 	return indices;
 }

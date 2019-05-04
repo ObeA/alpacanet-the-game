@@ -41,6 +41,6 @@ std::vector<Vertex> TestGameObject::getVertices() {
 	return vertices;
 }
 
-std::vector<uint16_t> TestGameObject::getIndices() {
+std::vector<uint32_t> TestGameObject::getIndices() {
 	return indices;
 }
