@@ -24,6 +24,8 @@ public:
     VkPipelineLayout pipelineLayout;
     VkPipeline graphicsPipeline;
 
+    virtual void createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet) = 0;
+
 protected:
     Window* window;
 
