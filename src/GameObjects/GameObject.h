@@ -21,19 +21,23 @@ public:
     GameObject(Window *window, Material *material) : window(window), material(material) {
     }
 
+	std::vector<VkDescriptorSet> descriptorSets;
+
     virtual void generate(size_t swapchainImageSize);
 
     virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) = 0;
 
     virtual void cleanup(size_t swapchainImages);
 
-    virtual void draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset);
+    virtual void draw(VkCommandBuffer cmdbuffer, size_t bufferOffset);
 
 	virtual std::vector<Vertex> getVertices();
 
 	virtual std::vector<uint32_t> getIndices();
 
-	glm::vec3 position = { 0.0f,0.0f,0.0f };
+	glm::vec3 position = glm::vec3(0.0f);
+
+	glm::vec3 scale = glm::vec3(1.0f);
 
 	Material *material;
 
@@ -44,7 +48,6 @@ protected:
 	VkDeviceMemory indexBufferMemory;
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;
-	std::vector<VkDescriptorSet> descriptorSets;
 
 	virtual void createVertexBuffer();
 

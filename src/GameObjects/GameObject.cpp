@@ -13,14 +13,12 @@ void GameObject::generate(size_t swapchainImageSize) {
 	createDescriptorSet(swapchainImageSize);
 }
 
-void GameObject::draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset) {
+void GameObject::draw(VkCommandBuffer cmdbuffer, size_t bufferOffset) {
 	VkBuffer vertexBuffers[] = { vertexBuffer };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(cmdbuffer, 0, 1, vertexBuffers, offsets);
 
 	vkCmdBindIndexBuffer(cmdbuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-
-	vkCmdBindDescriptorSets(cmdbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[bufferOffset], 0, nullptr);
 
 	vkCmdDrawIndexed(cmdbuffer, static_cast<uint32_t>(getIndices().size()), 1, 0, 0, 0);
 }

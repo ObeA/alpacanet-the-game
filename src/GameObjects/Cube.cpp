@@ -15,6 +15,7 @@ void Cube::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) {
 	ubo.model = glm::mat4(1.0f);
 	ubo.model = glm::translate(ubo.model, position);//position
 	ubo.model = glm::rotate(ubo.model, time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));//rotation
+	ubo.model = glm::scale(ubo.model, scale);
 
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 	ubo.proj = perspective;

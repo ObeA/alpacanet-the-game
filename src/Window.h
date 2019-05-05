@@ -26,6 +26,7 @@
 
 class GameObject;
 class Material;
+class ShadowMaterial;
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -59,6 +60,12 @@ struct SwapChainSupportDetails {
 	std::vector<VkPresentModeKHR> presentModes;
 };
 
+struct FrameBufferAttachment {
+	VkImage image;
+	VkDeviceMemory mem;
+	VkImageView view;
+};
+
 class Window {
 public:
 	VkDevice device;
@@ -74,6 +81,12 @@ public:
     VkExtent2D getSwapChainExtent();
 
     VkRenderPass& getRenderPass();
+
+	VkRenderPass& getOffscreenRenderPass();
+
+	void prepareOffscreenRenderpass();
+
+	void prepareOffscreenFramebuffer();
 
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
@@ -114,6 +127,22 @@ private:
 
 	std::vector<GameObject*> objects;
     std::vector<Material*> materials;
+
+	ShadowMaterial* offScreenMaterial;
+
+	std::vector<VkBuffer> offscreenUniformBuffers;
+	std::vector<VkDeviceMemory> offscreenUniformBuffersMemory;
+
+	struct OffscreenPass {
+		int32_t width, height;
+		VkFramebuffer frameBuffer;
+		FrameBufferAttachment depth;
+		VkRenderPass renderPass;
+		VkSampler depthSampler;
+		VkDescriptorImageInfo descriptor;
+	} offscreenPass;
+
+	std::vector<VkDescriptorSet> offscreenDescriptorSets;
 
 	bool framebufferResized = false;
 
@@ -198,4 +227,10 @@ private:
 	VkFormat findDepthFormat();
 
 	bool hasStencilComponent(VkFormat format);
+
+	void createOffscreenDescriptorSet();
+
+	void createOffscreenUniformBuffers();
+
+	void updateUniformBufferOffscreen(uint32_t currentImage);
 };
