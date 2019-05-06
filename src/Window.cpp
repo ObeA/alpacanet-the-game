@@ -1,5 +1,4 @@
 #include "Window.h"
-#include "GameObjects/TestGameObject.h"
 #include "GameObjects/GameObject.h"
 #include "GameObjects/ModelObject.h"
 #include "GameObjects/Cube.h"
@@ -86,11 +85,13 @@ void Window::drawFrame() {
 		throw std::runtime_error("failed to acquire swap chain image!");
 	}
 
-	for (auto& object : objects) {
-		object->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f));
-	}
+	objects[1]->position = lightPos;
 
 	updateUniformBufferOffscreen(imageIndex);
+
+	for (auto& object : objects) {
+		object->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f), lightPos, uboOffscreen.depthMVP);
+	}
 
 	VkSubmitInfo submitInfo = {};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -173,22 +174,20 @@ void Window::initVulkan() {
 		material->initialize();
 	}
 
-	auto cube = new Cube(this, materials[0]);
-	cube->position = glm::vec3(-1, 0, .5);
+	auto model = new ModelObject(this, materials[2], (char*)"assets/models/cube.obj");
+    model->scale = glm::vec3(.5);
+	model->position = glm::vec3(0, -2, 1);
 
-	auto model = new ModelObject(this, materials[3], (char*)"assets/models/chalet.obj");
-	model->position = glm::vec3(0, -1, .5);
-
-	auto thing = new TestGameObject(this, materials[1]);
-    thing->position = glm::vec3(0, 0, .5);
+	auto model2 = new ModelObject(this, materials[1], (char*)"assets/models/cube.obj");
+    model2->scale = glm::vec3(.5);
+    model2->position = glm::vec3(0, 0, 2);
 
 	auto floor = new Cube(this, materials[0]);
 	floor->scale = glm::vec3(10, 10, 0.1);
 	floor->position = glm::vec3(0, 0, -.1);
 
-	objects.push_back(cube);
 	objects.push_back(model);
-	objects.push_back(thing);
+	objects.push_back(model2);
 	objects.push_back(floor);
 
 	for (auto& object : objects) {
@@ -1354,7 +1353,7 @@ void Window::createOffscreenDescriptorSet() {
 		VkDescriptorBufferInfo bufferInfo = {};
 		bufferInfo.buffer = offscreenUniformBuffers[i];
 		bufferInfo.offset = 0;
-		bufferInfo.range = sizeof(UniformBufferObject);
+		bufferInfo.range = sizeof(uboOffscreen);
 
 		offScreenMaterial->createDescriptorSet(bufferInfo, offscreenDescriptorSets[i]);
 	}
@@ -1367,27 +1366,26 @@ void Window::updateUniformBufferOffscreen(uint32_t currentImage)
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-	glm::vec3 lightPos;
+    lightPos.x = cos(glm::radians(time * 360.0f)) * 1.0f;
+    lightPos.y = 2;
+    lightPos.z = 1.5f + sin(glm::radians(time * 360.0f)) * 1.0f;
 
-	lightPos.x = cos(glm::radians(time * 360.0f)) * .1f;
-	lightPos.y = -1.0f + sin(glm::radians(time * 360.0f)) * .2f;
-	lightPos.z = .5f + sin(glm::radians(time * 360.0f)) * .3f;
+	auto model = glm::mat4(1.0f);
 
-	UniformBufferObject ubo = {};
-	ubo.model = glm::mat4(1.0f);
+	auto view = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0, 1, 0));
+	auto projection = glm::perspective(glm::radians(60.0f), 1.0f, 1.0f, 96.0f);
+	projection[1][1] *= -1;
 
-	ubo.view = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0, 1, 0));
-	ubo.proj = glm::perspective(glm::radians(60.0f), 1.0f, 1.0f, 96.0f);
-	ubo.proj[1][1] *= -1;
+    uboOffscreen.depthMVP = model * view * projection;
 
 	void* data;
-	vkMapMemory(device, offscreenUniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
-	memcpy(data, &ubo, sizeof(ubo));
+	vkMapMemory(device, offscreenUniformBuffersMemory[currentImage], 0, sizeof(uboOffscreen), 0, &data);
+	memcpy(data, &uboOffscreen, sizeof(uboOffscreen));
 	vkUnmapMemory(device, offscreenUniformBuffersMemory[currentImage]);
 }
 
 void Window::createOffscreenUniformBuffers() {
-	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+	VkDeviceSize bufferSize = sizeof(UniformBufferObjectOffscreen);
 
 	offscreenUniformBuffers.resize(swapChainImages.size());
 	offscreenUniformBuffersMemory.resize(swapChainImages.size());

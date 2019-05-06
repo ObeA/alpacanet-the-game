@@ -30,7 +30,7 @@ public:
 
     void generate(size_t swapchainImageSize);
 
-    void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective);
+    void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos, glm::mat4 depthMVP);
 
 private:
     char* modelLocation;

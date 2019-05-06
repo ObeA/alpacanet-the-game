@@ -66,6 +66,10 @@ struct FrameBufferAttachment {
 	VkImageView view;
 };
 
+struct UniformBufferObjectOffscreen {
+    glm::mat4 depthMVP;
+};
+
 class Window {
 public:
 	VkDevice device;
@@ -132,6 +136,9 @@ private:
 
 	std::vector<VkBuffer> offscreenUniformBuffers;
 	std::vector<VkDeviceMemory> offscreenUniformBuffersMemory;
+
+    glm::vec3 lightPos = glm::vec3(0.0f);
+    UniformBufferObjectOffscreen uboOffscreen;
 
 	struct OffscreenPass {
 		int32_t width, height;

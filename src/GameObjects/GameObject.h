@@ -9,10 +9,18 @@
 
 class Window;
 
+//struct UniformBufferObject {
+//    alignas(16) glm::mat4 model;
+//    alignas(16) glm::mat4 view;
+//    alignas(16) glm::mat4 proj;
+//};
+
 struct UniformBufferObject {
-    alignas(16) glm::mat4 model;
-    alignas(16) glm::mat4 view;
-    alignas(16) glm::mat4 proj;
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 projection;
+    glm::mat4 depthBiasMVP;
+    glm::vec3 lightPos;
 };
 
 
@@ -25,7 +33,7 @@ public:
 
     virtual void generate(size_t swapchainImageSize);
 
-    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) = 0;
+    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos, glm::mat4 depthMVP) = 0;
 
     virtual void cleanup(size_t swapchainImages);
 
