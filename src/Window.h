@@ -79,9 +79,13 @@ public:
 
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 
-	VkFormat swapChainImageFormat;
+	//VkFormat swapChainImageFormat;
 
 	Renderer* renderer;
+
+	VkSurfaceKHR surface;
+
+	VkImageView depthImageView;
 
     struct OffscreenPass {
         int32_t width, height;
@@ -116,21 +120,29 @@ public:
 
 	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
+	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+
+	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+
+	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+
+	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+
+	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
 private:
 	VkInstance instance;
 	VkDebugUtilsMessengerEXT debugMessenger;
 	VkQueue graphicsQueue;
 
-	VkSurfaceKHR surface;
 	VkQueue presentQueue;
 
-	VkSwapchainKHR swapChain;
-	std::vector<VkImage> swapChainImages;
-	VkExtent2D swapChainExtent;
-	std::vector<VkImageView> swapChainImageViews;
+	//VkSwapchainKHR swapChain;
+	//std::vector<VkImage> swapChainImages;
+	//VkExtent2D swapChainExtent;
+	//std::vector<VkImageView> swapChainImageViews;
 	//VkRenderPass renderPass;
 
-	std::vector<VkFramebuffer> swapChainFramebuffers;
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 
@@ -141,7 +153,6 @@ private:
 
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;
-	VkImageView depthImageView;
 
 	std::vector<GameObject*> objects;
     std::vector<Material*> materials;
@@ -194,17 +205,7 @@ private:
 
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-
 	void createSwapChain();
-
-	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-
-	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-
-	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-
-	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
 	void createImageViews();
 

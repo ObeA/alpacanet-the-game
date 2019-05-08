@@ -16,6 +16,13 @@ public:
 
 	VkRenderPass renderPass;
 
+	std::vector<VkFramebuffer> swapChainFramebuffers;
+	std::vector<VkImageView> swapChainImageViews;
+	VkSwapchainKHR swapChain;
+	std::vector<VkImage> swapChainImages;
+	VkExtent2D swapChainExtent;
+	VkFormat swapChainImageFormat;
+
 
 	void InitializeRenderer();
 	void cleanup();
@@ -25,6 +32,8 @@ private:
 	VkFormat findDepthFormat();
 	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 	void createFramebuffers();
+	void createImageViews();
+	void createSwapChain();
 };
 
 

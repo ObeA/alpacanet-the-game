@@ -76,7 +76,7 @@ void Window::drawFrame() {
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
 	uint32_t imageIndex;
-	VkResult result = vkAcquireNextImageKHR(device, swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	VkResult result = vkAcquireNextImageKHR(device, renderer->swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
 	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
 		recreateSwapChain();
@@ -91,7 +91,7 @@ void Window::drawFrame() {
 	updateUniformBufferOffscreen(imageIndex);
 
 	for (auto& object : objects) {
-		object->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f), lightPos, uboOffscreen.depthMVP);
+		object->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), renderer->swapChainExtent.width / (float)renderer->swapChainExtent.height, 0.1f, 10.0f), lightPos, uboOffscreen.depthMVP);
 	}
 
 	VkSubmitInfo submitInfo = {};
@@ -121,7 +121,7 @@ void Window::drawFrame() {
 	presentInfo.waitSemaphoreCount = 1;
 	presentInfo.pWaitSemaphores = signalSemaphores;
 
-	VkSwapchainKHR swapChains[] = { swapChain };
+	VkSwapchainKHR swapChains[] = { renderer->swapChain };
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = swapChains;
 	presentInfo.pImageIndices = &imageIndex;
@@ -195,7 +195,7 @@ void Window::initVulkan() {
 	objects.push_back(floor);
 
 	for (auto& object : objects) {
-		object->generate(swapChainImages.size());
+		object->generate(renderer->swapChainImages.size());
 	}
 
 	offScreenMaterial = new ShadowMaterial(this);
@@ -244,10 +244,6 @@ void Window::cleanupSwapChain() {
 	vkDestroyImage(device, depthImage, nullptr);
 	vkFreeMemory(device, depthImageMemory, nullptr);
 
-	for (size_t i = 0; i < swapChainFramebuffers.size(); i++) {
-		vkDestroyFramebuffer(device, swapChainFramebuffers[i], nullptr);
-	}
-
 	vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
     for (auto &material : materials) {
@@ -255,12 +251,6 @@ void Window::cleanupSwapChain() {
     }
 
 	renderer->cleanup();
-
-	for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-		vkDestroyImageView(device, swapChainImageViews[i], nullptr);
-	}
-
-	vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
 
 void Window::cleanup() {
@@ -284,7 +274,7 @@ void Window::cleanup() {
     }
 
 	for (auto &object : objects) {
-		object->cleanup(swapChainImages.size());
+		object->cleanup(renderer->swapChainImages.size());
 	}
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
@@ -516,62 +506,6 @@ QueueFamilyIndices Window::findQueueFamilies(VkPhysicalDevice device) {
 	return indices;
 }
 
-void Window::createSwapChain() {
-	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
-
-	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
-	VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
-	VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
-
-	uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
-
-	if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
-		imageCount = swapChainSupport.capabilities.maxImageCount;
-	}
-
-	VkSwapchainCreateInfoKHR createInfo = {};
-	createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	createInfo.surface = surface;
-
-	createInfo.minImageCount = imageCount;
-	createInfo.imageFormat = surfaceFormat.format;
-	createInfo.imageColorSpace = surfaceFormat.colorSpace;
-	createInfo.imageExtent = extent;
-	createInfo.imageArrayLayers = 1;
-	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-
-	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
-	uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
-
-	if (indices.graphicsFamily != indices.presentFamily) {
-		createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-		createInfo.queueFamilyIndexCount = 2;
-		createInfo.pQueueFamilyIndices = queueFamilyIndices;
-	}
-	else {
-		createInfo.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-		createInfo.queueFamilyIndexCount = 0; // Optional
-		createInfo.pQueueFamilyIndices = nullptr; // Optional
-	}
-
-	createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
-	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-
-	createInfo.presentMode = presentMode;
-	createInfo.clipped = VK_TRUE;
-	createInfo.oldSwapchain = VK_NULL_HANDLE;
-
-	if (vkCreateSwapchainKHR(device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create swap chain!");
-	}
-
-	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, nullptr);
-	swapChainImages.resize(imageCount);
-	vkGetSwapchainImagesKHR(device, swapChain, &imageCount, swapChainImages.data());
-	swapChainImageFormat = surfaceFormat.format;
-	swapChainExtent = extent;
-}
-
 SwapChainSupportDetails Window::querySwapChainSupport(VkPhysicalDevice device) {
 	SwapChainSupportDetails details;
 
@@ -642,14 +576,6 @@ VkExtent2D Window::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities
 	}
 }
 
-void Window::createImageViews() {
-	swapChainImageViews.resize(swapChainImages.size());
-
-	for (uint32_t i = 0; i < swapChainImages.size(); i++) {
-		swapChainImageViews[i] = createImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
-	}
-}
-
 void Window::createLogicalDevice() {
 	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
@@ -716,29 +642,29 @@ VkShaderModule Window::createShaderModule(const std::vector<char>& code) {
 	return shaderModule;
 }
 
-void Window::createFramebuffers() {
-	swapChainFramebuffers.resize(swapChainImageViews.size());
-
-	for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-		std::array<VkImageView, 2> attachments = {
-			swapChainImageViews[i],
-			depthImageView
-		};
-
-		VkFramebufferCreateInfo framebufferInfo = {};
-		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-		framebufferInfo.renderPass = renderer->renderPass;
-		framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-		framebufferInfo.pAttachments = attachments.data();
-		framebufferInfo.width = swapChainExtent.width;
-		framebufferInfo.height = swapChainExtent.height;
-		framebufferInfo.layers = 1;
-
-		if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create framebuffer!");
-		}
-	}
-}
+//void Window::createFramebuffers() {
+//	swapChainFramebuffers.resize(swapChainImageViews.size());
+//
+//	for (size_t i = 0; i < swapChainImageViews.size(); i++) {
+//		std::array<VkImageView, 2> attachments = {
+//			swapChainImageViews[i],
+//			depthImageView
+//		};
+//
+//		VkFramebufferCreateInfo framebufferInfo = {};
+//		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+//		framebufferInfo.renderPass = renderer->renderPass;
+//		framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
+//		framebufferInfo.pAttachments = attachments.data();
+//		framebufferInfo.width = swapChainExtent.width;
+//		framebufferInfo.height = swapChainExtent.height;
+//		framebufferInfo.layers = 1;
+//
+//		if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
+//			throw std::runtime_error("failed to create framebuffer!");
+//		}
+//	}
+//}
 
 void Window::createCommandPool() {
 	QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
@@ -754,7 +680,7 @@ void Window::createCommandPool() {
 }
 
 void Window::createCommandBuffers() {
-	commandBuffers.resize(swapChainFramebuffers.size());
+	commandBuffers.resize(renderer->swapChainFramebuffers.size());
 
 	VkCommandBufferAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -810,9 +736,9 @@ void Window::createCommandBuffers() {
 		VkRenderPassBeginInfo renderPassInfo = {};
 		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 		renderPassInfo.renderPass = renderer->renderPass;
-		renderPassInfo.framebuffer = swapChainFramebuffers[i];
+		renderPassInfo.framebuffer = renderer->swapChainFramebuffers[i];
 		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = swapChainExtent;
+		renderPassInfo.renderArea.extent = renderer->swapChainExtent;
 
 		std::array<VkClearValue, 2> clearValues = {};
 		clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -881,16 +807,16 @@ void Window::createDescriptorPool() {
 	//TODO: Meest matige pool ooit. Wat als een descriptor set een andere layout heeft?
 	for (int i = 0; i < objectAmount; i++) {
 		poolSizes[i * 2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		poolSizes[i * 2].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+		poolSizes[i * 2].descriptorCount = static_cast<uint32_t>(renderer->swapChainImages.size());
 		poolSizes[i * 2 + 1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		poolSizes[i * 2 + 1].descriptorCount = static_cast<uint32_t>(swapChainImages.size());
+		poolSizes[i * 2 + 1].descriptorCount = static_cast<uint32_t>(renderer->swapChainImages.size());
 	}
 
 	VkDescriptorPoolCreateInfo poolInfo = {};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 	poolInfo.pPoolSizes = poolSizes.data();
-	poolInfo.maxSets = static_cast<uint32_t>(swapChainImages.size() * objectAmount);
+	poolInfo.maxSets = static_cast<uint32_t>(renderer->swapChainImages.size() * objectAmount);
 
 	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create descriptor pool!");
@@ -1089,7 +1015,7 @@ VkImageView Window::createImageView(VkImage image, VkFormat format, VkImageAspec
 void Window::createDepthResources() {
 	VkFormat depthFormat = findDepthFormat();
 
-	createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
+	createImage(renderer->swapChainExtent.width, renderer->swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
 	depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 
 	transitionImageLayout(depthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
@@ -1100,7 +1026,7 @@ bool Window::hasStencilComponent(VkFormat format) {
 }
 
 VkExtent2D Window::getSwapChainExtent() {
-    return swapChainExtent;
+    return renderer->swapChainExtent;
 }
 
 VkRenderPass& Window::getRenderPass() {
@@ -1254,19 +1180,19 @@ void Window::prepareOffscreenFramebuffer()
 }
 
 void Window::createOffscreenDescriptorSet() {
-	std::vector<VkDescriptorSetLayout> layouts(swapChainImages.size(), offScreenMaterial->descriptorSetLayout);
+	std::vector<VkDescriptorSetLayout> layouts(renderer->swapChainImages.size(), offScreenMaterial->descriptorSetLayout);
 	VkDescriptorSetAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
 	allocInfo.descriptorPool = descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImages.size());
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(renderer->swapChainImages.size());
 	allocInfo.pSetLayouts = layouts.data();
 
-	offscreenDescriptorSets.resize(swapChainImages.size());
+	offscreenDescriptorSets.resize(renderer->swapChainImages.size());
 	if (vkAllocateDescriptorSets(device, &allocInfo, offscreenDescriptorSets.data()) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate descriptor sets!");
 	}
 
-	for (size_t i = 0; i < swapChainImages.size(); i++) {
+	for (size_t i = 0; i < renderer->swapChainImages.size(); i++) {
 		VkDescriptorBufferInfo bufferInfo = {};
 		bufferInfo.buffer = offscreenUniformBuffers[i];
 		bufferInfo.offset = 0;
@@ -1296,7 +1222,7 @@ void Window::updateUniformBufferOffscreen(uint32_t currentImage)
 	//projection[1][1] *= -1;
 
 	auto view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	auto projection = glm::perspective(glm::radians(90.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+	auto projection = glm::perspective(glm::radians(90.0f), renderer->swapChainExtent.width / (float)renderer->swapChainExtent.height, 0.1f, 10.0f);
     uboOffscreen.depthMVP = model * view * projection;
 
 	void* data;
@@ -1308,10 +1234,10 @@ void Window::updateUniformBufferOffscreen(uint32_t currentImage)
 void Window::createOffscreenUniformBuffers() {
 	VkDeviceSize bufferSize = sizeof(UniformBufferObjectOffscreen);
 
-	offscreenUniformBuffers.resize(swapChainImages.size());
-	offscreenUniformBuffersMemory.resize(swapChainImages.size());
+	offscreenUniformBuffers.resize(renderer->swapChainImages.size());
+	offscreenUniformBuffersMemory.resize(renderer->swapChainImages.size());
 
-	for (size_t i = 0; i < swapChainImages.size(); i++) {
+	for (size_t i = 0; i < renderer->swapChainImages.size(); i++) {
 		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, offscreenUniformBuffers[i], offscreenUniformBuffersMemory[i]);
 	}
 }
