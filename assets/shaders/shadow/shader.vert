@@ -3,15 +3,12 @@
 
 layout (location = 0) in vec3 inPos;
 
-layout(binding = 0) uniform UniformBufferObject {
-    mat4 model;
-    mat4 view;
-    mat4 proj;
-    mat4 depthBias;
-    mat4 lightPos;
+layout (binding = 0) uniform UBO
+{
+    mat4 depthMVP;
 } ubo;
  
 void main()
 {
-	gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition, 1.0);
+	gl_Position = ubo.depthMVP * vec4(inPos, 1.0);
 }

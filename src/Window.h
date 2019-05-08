@@ -27,6 +27,7 @@
 class GameObject;
 class Material;
 class ShadowMaterial;
+class Renderer;
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -76,6 +77,21 @@ public:
 	VkDescriptorPool descriptorPool;
     GLFWwindow* window;
 
+	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+
+	VkFormat swapChainImageFormat;
+
+	Renderer* renderer;
+
+    struct OffscreenPass {
+        int32_t width, height;
+        VkFramebuffer frameBuffer;
+        FrameBufferAttachment depth;
+        VkRenderPass renderPass;
+        VkSampler depthSampler;
+        VkDescriptorImageInfo descriptor;
+    } offscreenPass;
+
 	void run();
 
 	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
@@ -103,7 +119,6 @@ public:
 private:
 	VkInstance instance;
 	VkDebugUtilsMessengerEXT debugMessenger;
-	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	VkQueue graphicsQueue;
 
 	VkSurfaceKHR surface;
@@ -111,10 +126,9 @@ private:
 
 	VkSwapchainKHR swapChain;
 	std::vector<VkImage> swapChainImages;
-	VkFormat swapChainImageFormat;
 	VkExtent2D swapChainExtent;
 	std::vector<VkImageView> swapChainImageViews;
-	VkRenderPass renderPass;
+	//VkRenderPass renderPass;
 
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	VkCommandPool commandPool;
@@ -139,15 +153,6 @@ private:
 
     glm::vec3 lightPos = glm::vec3(0.0f);
     UniformBufferObjectOffscreen uboOffscreen;
-
-	struct OffscreenPass {
-		int32_t width, height;
-		VkFramebuffer frameBuffer;
-		FrameBufferAttachment depth;
-		VkRenderPass renderPass;
-		VkSampler depthSampler;
-		VkDescriptorImageInfo descriptor;
-	} offscreenPass;
 
 	std::vector<VkDescriptorSet> offscreenDescriptorSets;
 
@@ -208,8 +213,6 @@ private:
 	void createSurface();
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
-
-	void createRenderPass();
 
 	void createFramebuffers();
 
