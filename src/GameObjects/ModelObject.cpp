@@ -55,7 +55,7 @@ void ModelObject::loadModel() {
     }
 }
 
-void ModelObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos, glm::mat4 depthMVP) {
+void ModelObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos) {
 //    position.x = glm::clamp(position.x + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
 //    position.y = glm::clamp(position.y + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
 //    position.z = glm::clamp(position.z + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
@@ -75,14 +75,23 @@ void ModelObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspecti
     ubo.projection = perspective;
     ubo.projection[1][1] *= -1;
 
+	//TODO: change when rendered from light
     ubo.lightPos = lightPos;
-
-    ubo.depthBiasMVP = depthMVP;
+    ubo.depthBiasMVP = ubo.view * ubo.projection;
 
     void* data;
     vkMapMemory(window->device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
     memcpy(data, &ubo, sizeof(ubo));
     vkUnmapMemory(window->device, uniformBuffersMemory[currentImage]);
+
+	UniformBufferObjectOffscreen uboOffscreen = {};
+	uboOffscreen.model = ubo.model;
+	uboOffscreen.depthVP = ubo.view * ubo.projection;
+
+	void* offscreenData;
+	vkMapMemory(window->device, offscreenUniformBuffersMemory, 0, sizeof(uboOffscreen), 0, &offscreenData);
+	memcpy(offscreenData, &uboOffscreen, sizeof(uboOffscreen));
+	vkUnmapMemory(window->device, offscreenUniformBuffersMemory);
 }
 
 void ModelObject::createUniformBuffers(size_t swapChainImageSize) {
@@ -94,4 +103,8 @@ void ModelObject::createUniformBuffers(size_t swapChainImageSize) {
     for (size_t i = 0; i < swapChainImageSize; i++) {
         window->createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
     }
+
+	VkDeviceSize offscreenBufferSize = sizeof(UniformBufferObjectOffscreen);
+
+	window->createBuffer(offscreenBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, offscreenUniformBuffer, offscreenUniformBuffersMemory);
 }

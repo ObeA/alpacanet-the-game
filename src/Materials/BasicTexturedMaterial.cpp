@@ -88,10 +88,10 @@ void BasicTexturedMaterial::createGraphicsPipeline() {
 void BasicTexturedMaterial::createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet) {
     std::array<VkWriteDescriptorSet, 3> descriptorWrites = {};
 
-    VkDescriptorImageInfo shadowImageInfo = {};
-    shadowImageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
-    shadowImageInfo.imageView = window->offscreenPass.depth.view;
-    shadowImageInfo.sampler = window->offscreenPass.depthSampler;
+//    VkDescriptorImageInfo shadowImageInfo = {};
+//    shadowImageInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+//    shadowImageInfo.imageView = window->renderer->offscreenDepthImageView;
+//    shadowImageInfo.sampler = window->renderer->offscreenDepthSampler;
 
     VkDescriptorImageInfo imageInfo = {};
     imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
@@ -112,7 +112,7 @@ void BasicTexturedMaterial::createDescriptorSet(VkDescriptorBufferInfo &uniformB
     descriptorWrites[1].dstArrayElement = 0;
     descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     descriptorWrites[1].descriptorCount = 1;
-    descriptorWrites[1].pImageInfo = &shadowImageInfo;
+    descriptorWrites[1].pImageInfo = &imageInfo;
 
     descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     descriptorWrites[2].dstSet = descriptorSet;

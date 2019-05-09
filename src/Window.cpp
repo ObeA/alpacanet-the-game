@@ -88,10 +88,10 @@ void Window::drawFrame() {
 
 	objects[1]->position = lightPos;
 
-	updateUniformBufferOffscreen(imageIndex);
+	updateLight();
 
 	for (auto& object : objects) {
-		object->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), renderer->swapChainExtent.width / (float)renderer->swapChainExtent.height, 0.1f, 10.0f), lightPos, uboOffscreen.depthMVP);
+		object->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), renderer->swapChainExtent.width / (float)renderer->swapChainExtent.height, 0.1f, 10.0f), lightPos);
 	}
 
 	VkSubmitInfo submitInfo = {};
@@ -157,52 +157,35 @@ void Window::initVulkan() {
 	createSurface();
 	pickPhysicalDevice();
 	createLogicalDevice();
-	createSwapChain();
-	createImageViews();
+	createCommandPool();
 
 	renderer = new Renderer(this);
 	renderer->InitializeRenderer();
-
-	createCommandPool();
-	createDepthResources();
-	createFramebuffers();
 	createDescriptorPool();
-
-	prepareOffscreenFramebuffer();
 
 	materials.push_back(new BasicMaterial(this));
 	materials.push_back(new BasicTexturedMaterial(this, (char*)"assets/textures/texture.jpg"));
 	materials.push_back(new BasicTexturedMaterial(this, (char*)"assets/textures/banana.jpg"));
     materials.push_back(new BasicTexturedMaterial(this, (char*)"assets/textures/chalet.jpg"));
+	materials.push_back(new ShadowMaterial(this));
 	for (auto& material : materials) {
 		material->initialize();
 	}
 
-	auto model = new ModelObject(this, materials[2], (char*)"assets/models/cube.obj");
+	auto model = new ModelObject(this, materials[2], materials[4], (char*)"assets/models/cube.obj");
     model->scale = glm::vec3(.5);
 	model->position = glm::vec3(0, -2, 1);
 
-	auto model2 = new ModelObject(this, materials[1], (char*)"assets/models/cube.obj");
+	auto model2 = new ModelObject(this, materials[1], materials[4], (char*)"assets/models/cube.obj");
     model2->scale = glm::vec3(.5);
     model2->position = glm::vec3(0, 0, 2);
 
-	auto floor = new Cube(this, materials[0]);
-	floor->scale = glm::vec3(10, 10, 0.1);
-	floor->position = glm::vec3(0, 0, -.1);
-
 	objects.push_back(model);
 	objects.push_back(model2);
-	objects.push_back(floor);
 
 	for (auto& object : objects) {
 		object->generate(renderer->swapChainImages.size());
 	}
-
-	offScreenMaterial = new ShadowMaterial(this);
-	offScreenMaterial->initialize();
-
-	createOffscreenUniformBuffers();
-	createOffscreenDescriptorSet();
 
 	createCommandBuffers();
 	createSyncObjects();
@@ -219,14 +202,15 @@ void Window::recreateSwapChain() {
 
 	cleanupSwapChain();
 
-	createSwapChain();
-	createImageViews();
-	//TODO: Recreate renderer passes
+	//TODO: recreate in renderer
+	//createSwapChain();
+	//createImageViews();
 	//createRenderPass();
 	//TODO: recreate materials?
 //	createGraphicsPipeline();
-	createDepthResources();
-	createFramebuffers();
+//	createDepthResources();
+	//TODO: recreate in renderer
+	//createFramebuffers();
 	createCommandBuffers();
 }
 
@@ -240,10 +224,6 @@ void Window::mainLoop() {
 }
 
 void Window::cleanupSwapChain() {
-	vkDestroyImageView(device, depthImageView, nullptr);
-	vkDestroyImage(device, depthImage, nullptr);
-	vkFreeMemory(device, depthImageMemory, nullptr);
-
 	vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
 
     for (auto &material : materials) {
@@ -254,17 +234,6 @@ void Window::cleanupSwapChain() {
 }
 
 void Window::cleanup() {
-	vkDestroySampler(device, offscreenPass.depthSampler, nullptr);
-
-	vkDestroyImageView(device, offscreenPass.depth.view, nullptr);
-	vkDestroyImage(device, offscreenPass.depth.image, nullptr);
-	vkFreeMemory(device, offscreenPass.depth.mem, nullptr);
-
-	vkDestroyFramebuffer(device, offscreenPass.frameBuffer, nullptr);
-
-	vkDestroyRenderPass(device, offscreenPass.renderPass, nullptr);
-
-
 	cleanupSwapChain();
 
 	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
@@ -642,30 +611,6 @@ VkShaderModule Window::createShaderModule(const std::vector<char>& code) {
 	return shaderModule;
 }
 
-//void Window::createFramebuffers() {
-//	swapChainFramebuffers.resize(swapChainImageViews.size());
-//
-//	for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-//		std::array<VkImageView, 2> attachments = {
-//			swapChainImageViews[i],
-//			depthImageView
-//		};
-//
-//		VkFramebufferCreateInfo framebufferInfo = {};
-//		framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-//		framebufferInfo.renderPass = renderer->renderPass;
-//		framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
-//		framebufferInfo.pAttachments = attachments.data();
-//		framebufferInfo.width = swapChainExtent.width;
-//		framebufferInfo.height = swapChainExtent.height;
-//		framebufferInfo.layers = 1;
-//
-//		if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
-//			throw std::runtime_error("failed to create framebuffer!");
-//		}
-//	}
-//}
-
 void Window::createCommandPool() {
 	QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
 
@@ -692,8 +637,6 @@ void Window::createCommandBuffers() {
 		throw std::runtime_error("failed to allocate command buffers!");
 	}
 
-	VkClearValue clearValues[2];
-
 	for (size_t i = 0; i < commandBuffers.size(); i++) {
 		VkCommandBufferBeginInfo beginInfo = {};
 		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -704,16 +647,17 @@ void Window::createCommandBuffers() {
 			throw std::runtime_error("failed to begin recording command buffer!");
 		}
 
-		clearValues[0].depthStencil = { 1.0f, 0 };
+		std::array<VkClearValue, 2> clearValues = {};
+		clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+		clearValues[1].depthStencil = { 1.0f, 0 };
 
 		VkRenderPassBeginInfo renderPassBeginInfo = {};
 		renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassBeginInfo.renderPass = offscreenPass.renderPass;
-		renderPassBeginInfo.framebuffer = offscreenPass.frameBuffer;
-		renderPassBeginInfo.renderArea.extent.width = offscreenPass.width;
-		renderPassBeginInfo.renderArea.extent.height = offscreenPass.height;
-		renderPassBeginInfo.clearValueCount = 1;
-		renderPassBeginInfo.pClearValues = clearValues;
+		renderPassBeginInfo.renderPass = renderer->offscreenRenderPass;
+		renderPassBeginInfo.framebuffer = renderer->offscreenFrameBuffer;
+		renderPassBeginInfo.renderArea.extent = renderer->swapChainExtent;
+		renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+		renderPassBeginInfo.pClearValues = clearValues.data();
 
 		vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -725,11 +669,12 @@ void Window::createCommandBuffers() {
 			0.0f,
 			1.75f);
 
-		vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, offScreenMaterial->graphicsPipeline);
-		for (auto& object : objects) {
-			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, offScreenMaterial->pipelineLayout, 0, 1, &offscreenDescriptorSets[i], 0, NULL);
-			object->draw(commandBuffers[i], i);
-		}
+        for (auto& object : objects) {
+            //TODO: Group objects by pipeline, bind pipeline and draw grouped objects
+            vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->shadowMaterial->graphicsPipeline);
+            vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->shadowMaterial->pipelineLayout, 0, 1, &object->offscreenDescriptorSets, 0, nullptr);
+            object->draw(commandBuffers[i], i);
+        }
 
 		vkCmdEndRenderPass(commandBuffers[i]);
 
@@ -740,7 +685,7 @@ void Window::createCommandBuffers() {
 		renderPassInfo.renderArea.offset = { 0, 0 };
 		renderPassInfo.renderArea.extent = renderer->swapChainExtent;
 
-		std::array<VkClearValue, 2> clearValues = {};
+		clearValues = {};
 		clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
 		clearValues[1].depthStencil = { 1.0f, 0 };
 
@@ -1012,15 +957,6 @@ VkImageView Window::createImageView(VkImage image, VkFormat format, VkImageAspec
 	return imageView;
 }
 
-void Window::createDepthResources() {
-	VkFormat depthFormat = findDepthFormat();
-
-	createImage(renderer->swapChainExtent.width, renderer->swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
-	depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
-
-	transitionImageLayout(depthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
-}
-
 bool Window::hasStencilComponent(VkFormat format) {
 	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
@@ -1033,215 +969,18 @@ VkRenderPass& Window::getRenderPass() {
     return renderer->renderPass;
 }
 
-void Window::prepareOffscreenRenderpass()
-{
-	VkAttachmentDescription attachmentDescription{};
-	attachmentDescription.format = VK_FORMAT_D16_UNORM;
-	attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
-	attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;							// Clear depth at beginning of the render pass
-	attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;						// We will read from depth, so it's important to store the depth attachment results
-	attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	attachmentDescription.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;					// We don't care about initial layout of the attachment
-	attachmentDescription.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;// Attachment will be transitioned to shader read at render pass end
-
-	VkAttachmentReference depthReference = {};
-	depthReference.attachment = 0;
-	depthReference.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;			// Attachment will be used as depth/stencil during render pass
-
-	VkSubpassDescription subpass = {};
-	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 0;													// No color attachments
-	subpass.pDepthStencilAttachment = &depthReference;									// Reference to our depth attachment
-
-	// Use subpass dependencies for layout transitions
-	std::array<VkSubpassDependency, 2> dependencies;
-
-	dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependencies[0].dstSubpass = 0;
-	dependencies[0].srcStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	dependencies[0].dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-	dependencies[0].srcAccessMask = VK_ACCESS_SHADER_READ_BIT;
-	dependencies[0].dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-	dependencies[0].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-	dependencies[1].srcSubpass = 0;
-	dependencies[1].dstSubpass = VK_SUBPASS_EXTERNAL;
-	dependencies[1].srcStageMask = VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
-	dependencies[1].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-	dependencies[1].srcAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
-	dependencies[1].dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-	dependencies[1].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
-
-	VkRenderPassCreateInfo renderPassCreateInfo = {};
-	renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-	renderPassCreateInfo.attachmentCount = 1;
-	renderPassCreateInfo.pAttachments = &attachmentDescription;
-	renderPassCreateInfo.subpassCount = 1;
-	renderPassCreateInfo.pSubpasses = &subpass;
-	renderPassCreateInfo.dependencyCount = static_cast<uint32_t>(dependencies.size());
-	renderPassCreateInfo.pDependencies = dependencies.data();
-
-	if (vkCreateRenderPass(device, &renderPassCreateInfo, nullptr, &offscreenPass.renderPass) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create offscreen render pass!");
-	}
-}
-
-// Setup the offscreen framebuffer for rendering the scene from light's point-of-view to
-// The depth attachment of this framebuffer will then be used to sample from in the fragment shader of the shadowing pass
-void Window::prepareOffscreenFramebuffer()
-{
-	offscreenPass.width = 2048;
-	offscreenPass.height = 2048;
-
-	VkFormat fbColorFormat = VK_FORMAT_R8G8B8A8_UNORM;
-
-	// For shadow mapping we only need a depth attachment
-	VkImageCreateInfo image = {};
-	image.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-	image.imageType = VK_IMAGE_TYPE_2D;
-	image.extent.width = offscreenPass.width;
-	image.extent.height = offscreenPass.height;
-	image.extent.depth = 1;
-	image.mipLevels = 1;
-	image.arrayLayers = 1;
-	image.samples = VK_SAMPLE_COUNT_1_BIT;
-	image.tiling = VK_IMAGE_TILING_OPTIMAL;
-	image.format = VK_FORMAT_D16_UNORM;																// Depth stencil attachment
-	image.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;		// We will sample directly from the depth attachment for the shadow mapping
-	if (vkCreateImage(device, &image, nullptr, &offscreenPass.depth.image) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create offscreen image!");
-	}
-
-	VkMemoryAllocateInfo memAlloc = {};
-	memAlloc.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-	VkMemoryRequirements memReqs;
-	vkGetImageMemoryRequirements(device, offscreenPass.depth.image, &memReqs);
-	memAlloc.allocationSize = memReqs.size;
-	memAlloc.memoryTypeIndex = findMemoryType(memReqs.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	if (vkAllocateMemory(device, &memAlloc, nullptr, &offscreenPass.depth.mem) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate offscreen pass memory!");
-	}
-	if (vkBindImageMemory(device, offscreenPass.depth.image, offscreenPass.depth.mem, 0) != VK_SUCCESS) {
-		throw std::runtime_error("failed to bind offscreen image memory!");
-	}
-
-	VkImageViewCreateInfo depthStencilView = {};
-	depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	depthStencilView.format = VK_FORMAT_D16_UNORM;
-	depthStencilView.subresourceRange = {};
-	depthStencilView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
-	depthStencilView.subresourceRange.baseMipLevel = 0;
-	depthStencilView.subresourceRange.levelCount = 1;
-	depthStencilView.subresourceRange.baseArrayLayer = 0;
-	depthStencilView.subresourceRange.layerCount = 1;
-	depthStencilView.image = offscreenPass.depth.image;
-	if (vkCreateImageView(device, &depthStencilView, nullptr, &offscreenPass.depth.view) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create offscreen depth view image");
-	}
-
-	// Create sampler to sample from to depth attachment 
-	// Used to sample in the fragment shader for shadowed rendering
-	VkSamplerCreateInfo sampler{};
-	sampler.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	sampler.maxAnisotropy = 1.0f;
-	sampler.magFilter = VK_FILTER_LINEAR;
-	sampler.minFilter = VK_FILTER_LINEAR;
-	sampler.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
-	sampler.addressModeU = VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
-	sampler.addressModeV = sampler.addressModeU;
-	sampler.addressModeW = sampler.addressModeU;
-	sampler.mipLodBias = 0.0f;
-	sampler.maxAnisotropy = 1.0f;
-	sampler.minLod = 0.0f;
-	sampler.maxLod = 1.0f;
-	sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
-
-	if (vkCreateSampler(device, &sampler, nullptr, &offscreenPass.depthSampler) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create offscreen depth sampler!");
-	}
-
-	prepareOffscreenRenderpass();
-
-	// Create frame buffer
-	VkFramebufferCreateInfo framebufferInfo = {};
-	framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-	framebufferInfo.renderPass = offscreenPass.renderPass;
-	framebufferInfo.attachmentCount = 1;
-	framebufferInfo.pAttachments = &offscreenPass.depth.view;
-	framebufferInfo.width = offscreenPass.width;
-	framebufferInfo.height = offscreenPass.height;
-	framebufferInfo.layers = 1;
-
-	if (vkCreateFramebuffer(device, &framebufferInfo, nullptr, &offscreenPass.frameBuffer) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create offscreen framebuffer!");
-	}
-}
-
-void Window::createOffscreenDescriptorSet() {
-	std::vector<VkDescriptorSetLayout> layouts(renderer->swapChainImages.size(), offScreenMaterial->descriptorSetLayout);
-	VkDescriptorSetAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(renderer->swapChainImages.size());
-	allocInfo.pSetLayouts = layouts.data();
-
-	offscreenDescriptorSets.resize(renderer->swapChainImages.size());
-	if (vkAllocateDescriptorSets(device, &allocInfo, offscreenDescriptorSets.data()) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate descriptor sets!");
-	}
-
-	for (size_t i = 0; i < renderer->swapChainImages.size(); i++) {
-		VkDescriptorBufferInfo bufferInfo = {};
-		bufferInfo.buffer = offscreenUniformBuffers[i];
-		bufferInfo.offset = 0;
-		bufferInfo.range = sizeof(uboOffscreen);
-
-		offScreenMaterial->createDescriptorSet(bufferInfo, offscreenDescriptorSets[i]);
-	}
-}
-
-void Window::updateUniformBufferOffscreen(uint32_t currentImage)
+void Window::updateLight()
 {
 	static auto startTime = std::chrono::high_resolution_clock::now();
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-    lightPos.x = cos(glm::radians(time * 360.0f)) * 1.0f;
-    lightPos.y = 2;
-    lightPos.z = 1.5f + sin(glm::radians(time * 360.0f)) * 1.0f;
-
-	auto model = glm::mat4(1.0f);
-
-	//auto view = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0, 1, 0));
-	//auto projection = glm::perspective(glm::radians(60.0f), 1.0f, 1.0f, 96.0f);
-    float near_plane = 1.0f, far_plane = 7.5f;
-	//auto projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
-	//projection[1][1] *= -1;
-
-	auto view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	auto projection = glm::perspective(glm::radians(90.0f), renderer->swapChainExtent.width / (float)renderer->swapChainExtent.height, 0.1f, 10.0f);
-    uboOffscreen.depthMVP = model * view * projection;
-
-	void* data;
-	vkMapMemory(device, offscreenUniformBuffersMemory[currentImage], 0, sizeof(uboOffscreen), 0, &data);
-	memcpy(data, &uboOffscreen, sizeof(uboOffscreen));
-	vkUnmapMemory(device, offscreenUniformBuffersMemory[currentImage]);
-}
-
-void Window::createOffscreenUniformBuffers() {
-	VkDeviceSize bufferSize = sizeof(UniformBufferObjectOffscreen);
-
-	offscreenUniformBuffers.resize(renderer->swapChainImages.size());
-	offscreenUniformBuffersMemory.resize(renderer->swapChainImages.size());
-
-	for (size_t i = 0; i < renderer->swapChainImages.size(); i++) {
-		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, offscreenUniformBuffers[i], offscreenUniformBuffersMemory[i]);
-	}
+	lightPos.x = cos(glm::radians(time * 360.0f)) * 1.0f;
+	lightPos.y = 2;
+	lightPos.z = 1.5f + sin(glm::radians(time * 360.0f)) * 1.0f;
 }
 
 VkRenderPass& Window::getOffscreenRenderPass() {
-	return offscreenPass.renderPass;
+	return renderer->offscreenRenderPass;
 }

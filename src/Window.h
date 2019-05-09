@@ -68,7 +68,8 @@ struct FrameBufferAttachment {
 };
 
 struct UniformBufferObjectOffscreen {
-    glm::mat4 depthMVP;
+    glm::mat4 depthVP;
+	glm::mat4 model;
 };
 
 class Window {
@@ -79,22 +80,9 @@ public:
 
 	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 
-	//VkFormat swapChainImageFormat;
-
 	Renderer* renderer;
 
 	VkSurfaceKHR surface;
-
-	VkImageView depthImageView;
-
-    struct OffscreenPass {
-        int32_t width, height;
-        VkFramebuffer frameBuffer;
-        FrameBufferAttachment depth;
-        VkRenderPass renderPass;
-        VkSampler depthSampler;
-        VkDescriptorImageInfo descriptor;
-    } offscreenPass;
 
 	void run();
 
@@ -106,11 +94,9 @@ public:
 
     VkRenderPass& getRenderPass();
 
+	void updateLight();
+
 	VkRenderPass& getOffscreenRenderPass();
-
-	void prepareOffscreenRenderpass();
-
-	void prepareOffscreenFramebuffer();
 
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
@@ -137,12 +123,6 @@ private:
 
 	VkQueue presentQueue;
 
-	//VkSwapchainKHR swapChain;
-	//std::vector<VkImage> swapChainImages;
-	//VkExtent2D swapChainExtent;
-	//std::vector<VkImageView> swapChainImageViews;
-	//VkRenderPass renderPass;
-
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 
@@ -151,21 +131,10 @@ private:
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
 
-	VkImage depthImage;
-	VkDeviceMemory depthImageMemory;
-
 	std::vector<GameObject*> objects;
     std::vector<Material*> materials;
 
-	ShadowMaterial* offScreenMaterial;
-
-	std::vector<VkBuffer> offscreenUniformBuffers;
-	std::vector<VkDeviceMemory> offscreenUniformBuffersMemory;
-
     glm::vec3 lightPos = glm::vec3(0.0f);
-    UniformBufferObjectOffscreen uboOffscreen;
-
-	std::vector<VkDescriptorSet> offscreenDescriptorSets;
 
 	bool framebufferResized = false;
 
@@ -205,17 +174,11 @@ private:
 
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 
-	void createSwapChain();
-
-	void createImageViews();
-
 	void createLogicalDevice();
 
 	void createSurface();
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
-
-	void createFramebuffers();
 
 	void createCommandPool();
 
@@ -231,17 +194,5 @@ private:
 
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
 
-	void createDepthResources();
-
-	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-
-	VkFormat findDepthFormat();
-
 	bool hasStencilComponent(VkFormat format);
-
-	void createOffscreenDescriptorSet();
-
-	void createOffscreenUniformBuffers();
-
-	void updateUniformBufferOffscreen(uint32_t currentImage);
 };

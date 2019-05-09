@@ -26,14 +26,16 @@ struct UniformBufferObject {
 
 class GameObject {
 public:
-    GameObject(Window *window, Material *material) : window(window), material(material) {
+    GameObject(Window *window, Material *material , Material *shadowMaterial) : window(window), material(material), shadowMaterial(shadowMaterial) {
     }
 
 	std::vector<VkDescriptorSet> descriptorSets;
 
+	VkDescriptorSet offscreenDescriptorSets;
+
     virtual void generate(size_t swapchainImageSize);
 
-    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos, glm::mat4 depthMVP) = 0;
+    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos) = 0;
 
     virtual void cleanup(size_t swapchainImages);
 
@@ -48,14 +50,18 @@ public:
 	glm::vec3 scale = glm::vec3(1.0f);
 
 	Material *material;
+	Material *shadowMaterial;
 
 protected:
 	VkBuffer vertexBuffer;
 	VkDeviceMemory vertexBufferMemory;
 	VkBuffer indexBuffer;
 	VkDeviceMemory indexBufferMemory;
+
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;
+	VkBuffer offscreenUniformBuffer;
+	VkDeviceMemory offscreenUniformBuffersMemory;
 
 	virtual void createVertexBuffer();
 
