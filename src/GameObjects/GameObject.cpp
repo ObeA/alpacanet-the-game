@@ -13,14 +13,12 @@ void GameObject::generate(size_t swapchainImageSize) {
 	createDescriptorSet(swapchainImageSize);
 }
 
-void GameObject::draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset) {
+void GameObject::draw(VkCommandBuffer cmdbuffer, size_t bufferOffset) {
 	VkBuffer vertexBuffers[] = { vertexBuffer };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(cmdbuffer, 0, 1, vertexBuffers, offsets);
 
 	vkCmdBindIndexBuffer(cmdbuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
-
-	vkCmdBindDescriptorSets(cmdbuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[bufferOffset], 0, nullptr);
 
 	vkCmdDrawIndexed(cmdbuffer, static_cast<uint32_t>(getIndices().size()), 1, 0, 0, 0);
 }
@@ -99,6 +97,24 @@ void GameObject::createDescriptorSet(size_t swapChainImageSize) {
 
 		material->createDescriptorSet(bufferInfo, descriptorSets[i]);
 	}
+
+	std::vector<VkDescriptorSetLayout> offscreenLayouts(swapChainImageSize, shadowMaterial->descriptorSetLayout);
+	VkDescriptorSetAllocateInfo offscreenAllocInfo = {};
+	offscreenAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	offscreenAllocInfo.descriptorPool = window->descriptorPool;
+	offscreenAllocInfo.descriptorSetCount = 1;
+	offscreenAllocInfo.pSetLayouts = offscreenLayouts.data();
+
+	if (vkAllocateDescriptorSets(window->device, &offscreenAllocInfo, &offscreenDescriptorSets) != VK_SUCCESS) {
+		throw std::runtime_error("failed to allocate descriptor sets!");
+	}
+
+	VkDescriptorBufferInfo bufferInfo = {};
+	bufferInfo.buffer = offscreenUniformBuffer;
+	bufferInfo.offset = 0;
+	bufferInfo.range = sizeof(UniformBufferObjectOffscreen);
+
+	shadowMaterial->createDescriptorSet(bufferInfo, offscreenDescriptorSets);
 }
 
 std::vector<Vertex> GameObject::getVertices() {

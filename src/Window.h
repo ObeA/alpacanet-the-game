@@ -26,6 +26,8 @@
 
 class GameObject;
 class Material;
+class ShadowMaterial;
+class Renderer;
 
 const int WIDTH = 800;
 const int HEIGHT = 600;
@@ -59,11 +61,28 @@ struct SwapChainSupportDetails {
 	std::vector<VkPresentModeKHR> presentModes;
 };
 
+struct FrameBufferAttachment {
+	VkImage image;
+	VkDeviceMemory mem;
+	VkImageView view;
+};
+
+struct UniformBufferObjectOffscreen {
+    glm::mat4 depthVP;
+	glm::mat4 model;
+};
+
 class Window {
 public:
 	VkDevice device;
 	VkDescriptorPool descriptorPool;
     GLFWwindow* window;
+
+	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+
+	Renderer* renderer;
+
+	VkSurfaceKHR surface;
 
 	void run();
 
@@ -75,6 +94,10 @@ public:
 
     VkRenderPass& getRenderPass();
 
+	void updateLight();
+
+	VkRenderPass& getOffscreenRenderPass();
+
 	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
 	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
@@ -83,23 +106,23 @@ public:
 
 	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
+	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+
+	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+
+	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+
+	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+
+	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+
 private:
 	VkInstance instance;
 	VkDebugUtilsMessengerEXT debugMessenger;
-	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
 	VkQueue graphicsQueue;
 
-	VkSurfaceKHR surface;
 	VkQueue presentQueue;
 
-	VkSwapchainKHR swapChain;
-	std::vector<VkImage> swapChainImages;
-	VkFormat swapChainImageFormat;
-	VkExtent2D swapChainExtent;
-	std::vector<VkImageView> swapChainImageViews;
-	VkRenderPass renderPass;
-
-	std::vector<VkFramebuffer> swapChainFramebuffers;
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 
@@ -108,12 +131,10 @@ private:
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
 
-	VkImage depthImage;
-	VkDeviceMemory depthImageMemory;
-	VkImageView depthImageView;
-
 	std::vector<GameObject*> objects;
     std::vector<Material*> materials;
+
+    glm::vec3 lightPos = glm::vec3(0.0f);
 
 	bool framebufferResized = false;
 
@@ -153,29 +174,11 @@ private:
 
 	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
 
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-
-	void createSwapChain();
-
-	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-
-	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-
-	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-
-	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
-
-	void createImageViews();
-
 	void createLogicalDevice();
 
 	void createSurface();
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
-
-	void createRenderPass();
-
-	void createFramebuffers();
 
 	void createCommandPool();
 
@@ -190,12 +193,6 @@ private:
 	VkCommandBuffer beginSingleTimeCommands();
 
 	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
-
-	void createDepthResources();
-
-	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
-
-	VkFormat findDepthFormat();
 
 	bool hasStencilComponent(VkFormat format);
 };

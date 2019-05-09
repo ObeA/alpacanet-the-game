@@ -25,12 +25,12 @@ class Window;
 class ModelObject : public GameObject {
 public:
 
-    ModelObject(Window *window, Material *material, char* location) : GameObject(window, material), modelLocation(location) {
+    ModelObject(Window *window, Material *material, Material *shadowMaterial, char* location) : GameObject(window, material, shadowMaterial), modelLocation(location) {
     }
 
     void generate(size_t swapchainImageSize);
 
-    void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective);
+    void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos);
 
 private:
     char* modelLocation;

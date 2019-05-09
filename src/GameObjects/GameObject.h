@@ -9,42 +9,59 @@
 
 class Window;
 
+//struct UniformBufferObject {
+//    alignas(16) glm::mat4 model;
+//    alignas(16) glm::mat4 view;
+//    alignas(16) glm::mat4 proj;
+//};
+
 struct UniformBufferObject {
-    alignas(16) glm::mat4 model;
-    alignas(16) glm::mat4 view;
-    alignas(16) glm::mat4 proj;
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 projection;
+    glm::mat4 depthBiasMVP;
+    glm::vec3 lightPos;
 };
 
 
 class GameObject {
 public:
-    GameObject(Window *window, Material *material) : window(window), material(material) {
+    GameObject(Window *window, Material *material , Material *shadowMaterial) : window(window), material(material), shadowMaterial(shadowMaterial) {
     }
+
+	std::vector<VkDescriptorSet> descriptorSets;
+
+	VkDescriptorSet offscreenDescriptorSets;
 
     virtual void generate(size_t swapchainImageSize);
 
-    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective) = 0;
+    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos) = 0;
 
     virtual void cleanup(size_t swapchainImages);
 
-    virtual void draw(VkCommandBuffer cmdbuffer, VkPipelineLayout pipelineLayout, size_t bufferOffset);
+    virtual void draw(VkCommandBuffer cmdbuffer, size_t bufferOffset);
 
 	virtual std::vector<Vertex> getVertices();
 
 	virtual std::vector<uint32_t> getIndices();
 
-	glm::vec3 position = { 0.0f,0.0f,0.0f };
+	glm::vec3 position = glm::vec3(0.0f);
+
+	glm::vec3 scale = glm::vec3(1.0f);
 
 	Material *material;
+	Material *shadowMaterial;
 
 protected:
 	VkBuffer vertexBuffer;
 	VkDeviceMemory vertexBufferMemory;
 	VkBuffer indexBuffer;
 	VkDeviceMemory indexBufferMemory;
+
 	std::vector<VkBuffer> uniformBuffers;
 	std::vector<VkDeviceMemory> uniformBuffersMemory;
-	std::vector<VkDescriptorSet> descriptorSets;
+	VkBuffer offscreenUniformBuffer;
+	VkDeviceMemory offscreenUniformBuffersMemory;
 
 	virtual void createVertexBuffer();
 
