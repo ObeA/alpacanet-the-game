@@ -1,8 +1,4 @@
-//
-// Created by Leon on 5/4/2019.
-//
-
-#include "BasicTexturedMaterial.h"
+#include "basic_textured_material.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -58,8 +54,8 @@ void BasicTexturedMaterial::createDescriptorSetLayout() {
 }
 
 void BasicTexturedMaterial::createGraphicsPipeline() {
-    auto vertShaderCode = Utilities::readFile("assets/shaders/basictextured/vert.spv");
-    auto fragShaderCode = Utilities::readFile("assets/shaders/basictextured/frag.spv");
+    auto vertShaderCode = FileUtilities::readFile("assets/shaders/basictextured/vert.spv");
+    auto fragShaderCode = FileUtilities::readFile("assets/shaders/basictextured/frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);

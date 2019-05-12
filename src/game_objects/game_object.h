@@ -1,11 +1,6 @@
-//
-// Created by Leon on 4/28/2019.
-//
+#pragma once
 
-#ifndef ALPACAWEB_GAMEOBJECT_H
-#define ALPACAWEB_GAMEOBJECT_H
-
-#include "../Window.h"
+#include "../window.h"
 
 class Window;
 
@@ -46,7 +41,6 @@ public:
 	virtual std::vector<uint32_t> getIndices();
 
 	glm::vec3 position = glm::vec3(0.0f);
-
 	glm::vec3 scale = glm::vec3(1.0f);
 
 	Material *material;
@@ -77,6 +71,3 @@ protected:
     std::vector<uint32_t> indices;
 private:
 };
-
-
-#endif //ALPACAWEB_GAMEOBJECT_H

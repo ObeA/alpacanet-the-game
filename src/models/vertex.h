@@ -1,11 +1,6 @@
-//
-// Created by Leon on 4/30/2019.
-//
+#pragma once
 
-#ifndef ALPACAWEB_VERTEX_H
-#define ALPACAWEB_VERTEX_H
-
-#include "../Window.h"
+#include "../window.h"
 
 struct Vertex {
     glm::vec3 pos;
@@ -17,6 +12,3 @@ struct Vertex {
 
     static std::array<VkVertexInputAttributeDescription, 4> getAttributeDescriptions();
 };
-
-
-#endif //ALPACAWEB_VERTEX_H

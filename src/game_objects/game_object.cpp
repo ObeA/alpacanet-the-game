@@ -1,10 +1,6 @@
-//
-// Created by Leon on 4/28/2019.
-//
+#include "game_object.h"
 
-#include "GameObject.h"
-
-#include "../Materials/Material.h"
+#include "../materials/material.h"
 
 void GameObject::generate(size_t swapchainImageSize) {
 	createVertexBuffer();

@@ -1,8 +1,4 @@
-//
-// Created by Leon on 5/4/2019.
-//
-
-#include "ModelObject.h"
+#include "model_object.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>

@@ -1,8 +1,4 @@
-//
-// Created by Leon on 4/30/2019.
-//
-
-#include "BasicMaterial.h"
+#include "basic_material.h"
 
 void BasicMaterial::createDescriptorSetLayout() {
     VkDescriptorSetLayoutBinding uboLayoutBinding = {};
@@ -31,8 +27,8 @@ void BasicMaterial::createDescriptorSetLayout() {
 }
 
 void BasicMaterial::createGraphicsPipeline() {
-    auto vertShaderCode = Utilities::readFile("assets/shaders/basic/vert.spv");
-    auto fragShaderCode = Utilities::readFile("assets/shaders/basic/frag.spv");
+    auto vertShaderCode = FileUtilities::readFile("assets/shaders/basic/vert.spv");
+    auto fragShaderCode = FileUtilities::readFile("assets/shaders/basic/frag.spv");
 
     VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);

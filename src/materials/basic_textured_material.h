@@ -1,11 +1,6 @@
-//
-// Created by Leon on 5/4/2019.
-//
+#pragma once
 
-#ifndef ALPACAWEB_BASICTEXTUREDMATERIAL_H
-#define ALPACAWEB_BASICTEXTUREDMATERIAL_H
-
-#include "Material.h"
+#include "material.h"
 
 class BasicTexturedMaterial: public Material {
 public:
@@ -30,6 +25,3 @@ protected:
 	void createTextureImageView();
 	void createTextureSampler();
 };
-
-
-#endif //ALPACAWEB_BASICTEXTUREDMATERIAL_H

@@ -1,17 +1,12 @@
-//
-// Created by Leon on 5/8/2019.
-//
+#pragma once
 
-#ifndef ALPACAWEB_RENDERER_H
-#define ALPACAWEB_RENDERER_H
-
-#include "Window.h"
+#include "window.h"
 
 class Window;
 
 class Renderer {
 public:
-	Renderer(Window *window) : window(window) {
+	explicit Renderer(Window *window) : window(window) {
 	}
 
 	VkRenderPass renderPass;
@@ -26,9 +21,8 @@ public:
 	VkFormat swapChainImageFormat;
 
     VkFramebuffer offscreenFrameBuffer;
-
-
-	void InitializeRenderer();
+    
+	void initializeRenderer();
 	void cleanup();
 private:
 	VkImageView depthImageView;
@@ -55,6 +49,3 @@ private:
 	void createDepthResources();
 	void createDepthResourcesOffscreen();
 };
-
-
-#endif //ALPACAWEB_RENDERER_H

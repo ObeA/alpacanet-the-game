@@ -1,12 +1,12 @@
-#include "Window.h"
-#include "GameObjects/GameObject.h"
-#include "GameObjects/ModelObject.h"
-#include "GameObjects/Cube.h"
-#include "Materials/Material.h"
-#include "Materials/BasicMaterial.h"
-#include "Materials/BasicTexturedMaterial.h"
-#include "Materials/ShadowMaterial.h"
-#include "Renderer.h"
+#include "window.h"
+#include "game_objects/game_object.h"
+#include "game_objects/model_object.h"
+#include "game_objects/cube.h"
+#include "materials/material.h"
+#include "materials/basic_material.h"
+#include "materials/basic_textured_material.h"
+#include "materials/shadow_material.h"
+#include "renderer.h"
 
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
@@ -160,7 +160,7 @@ void Window::initVulkan() {
 	createCommandPool();
 
 	renderer = new Renderer(this);
-	renderer->InitializeRenderer();
+    renderer->initializeRenderer();
 	createDescriptorPool();
 
 	materials.push_back(new BasicMaterial(this));
@@ -726,7 +726,7 @@ void Window::createSyncObjects() {
 			vkCreateSemaphore(device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
 			vkCreateFence(device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
 
-			throw std::runtime_error("failed to create synchronization objects for a frame!");
+			throw std::runtime_error("failed to create synchronization game_objects for a frame!");
 		}
 	}
 }

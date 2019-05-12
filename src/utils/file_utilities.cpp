@@ -1,10 +1,6 @@
-//
-// Created by Leon on 4/30/2019.
-//
+#include "file_utilities.h"
 
-#include "Utilities.h"
-
-std::vector<char> Utilities::readFile(const std::string &filename) {
+std::vector<char> FileUtilities::readFile(const std::string &filename) {
     std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
     if (!file.is_open()) {

@@ -1,4 +1,4 @@
-#include "ShadowMaterial.h"
+#include "shadow_material.h"
 
 void ShadowMaterial::createDescriptorSetLayout() {
 	VkDescriptorSetLayoutBinding uboLayoutBinding = {};
@@ -34,8 +34,8 @@ void ShadowMaterial::createDescriptorSetLayout() {
 }
 
 void ShadowMaterial::createGraphicsPipeline() {
-	auto vertShaderCode = Utilities::readFile("assets/shaders/shadow/vert.spv");
-	auto fragShaderCode = Utilities::readFile("assets/shaders/shadow/frag.spv");
+	auto vertShaderCode = FileUtilities::readFile("assets/shaders/shadow/vert.spv");
+	auto fragShaderCode = FileUtilities::readFile("assets/shaders/shadow/frag.spv");
 
 	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
 	VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);

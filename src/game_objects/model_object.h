@@ -1,9 +1,4 @@
-//
-// Created by Leon on 5/4/2019.
-//
-
-#ifndef ALPACAWEB_MODELOBJECT_H
-#define ALPACAWEB_MODELOBJECT_H
+#pragma once
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -19,7 +14,7 @@
 #include <algorithm>
 #include <cstring>
 
-#include "GameObject.h"
+#include "game_object.h"
 
 class Window;
 class ModelObject : public GameObject {
@@ -39,6 +34,3 @@ private:
 
     void createUniformBuffers(size_t swapChainImageSize);
 };
-
-
-#endif //ALPACAWEB_MODELOBJECT_H

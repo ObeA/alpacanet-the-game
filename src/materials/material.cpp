@@ -1,8 +1,4 @@
-//
-// Created by Leon on 4/30/2019.
-//
-
-#include "Material.h"
+#include "material.h"
 
 void Material::initialize() {
     createDescriptorSetLayout();

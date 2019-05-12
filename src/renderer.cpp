@@ -1,10 +1,6 @@
-//
-// Created by Leon on 5/8/2019.
-//
+#include "renderer.h"
 
-#include "Renderer.h"
-
-void Renderer::InitializeRenderer() {
+void Renderer::initializeRenderer() {
     createSwapChain();
     createImageViews();
 

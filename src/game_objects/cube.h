@@ -1,9 +1,4 @@
-//
-// Created by Leon on 4/28/2019.
-//
-
-#ifndef ALPACAWEB_CUBE_H
-#define ALPACAWEB_CUBE_H
+#pragma once
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -19,9 +14,11 @@
 #include <algorithm>
 #include <cstring>
 
-#include "GameObject.h"
+#include "game_object.h"
+#include "../models/vertex.h"
 
 class Window;
+
 class Cube : public GameObject {
 public:
 
@@ -56,9 +53,5 @@ public:
     };
 
 private:
-
     void createUniformBuffers(size_t swapChainImageSize);
 };
-
-
-#endif //ALPACAWEB_CUBE_H

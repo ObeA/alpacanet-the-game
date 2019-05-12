@@ -1,11 +1,6 @@
-//
-// Created by Leon on 4/30/2019.
-//
+#pragma once
 
-#ifndef ALPACAWEB_MATERIAL_H
-#define ALPACAWEB_MATERIAL_H
-
-#include "../Window.h"
+#include "../window.h"
 
 class Window;
 
@@ -36,6 +31,3 @@ protected:
 
 	void createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shaderStages[]);
 };
-
-
-#endif //ALPACAWEB_MATERIAL_H

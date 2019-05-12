@@ -1,11 +1,6 @@
-//
-// Created by Leon on 4/30/2019.
-//
+#pragma once
 
-#ifndef ALPACAWEB_BASICMATERIAL_H
-#define ALPACAWEB_BASICMATERIAL_H
-
-#include "Material.h"
+#include "material.h"
 
 class BasicMaterial: public Material {
 public:
@@ -17,6 +12,3 @@ protected:
     void createGraphicsPipeline();
     virtual void createDescriptorSetLayout();
 };
-
-
-#endif //ALPACAWEB_BASICMATERIAL_H

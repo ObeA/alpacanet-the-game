@@ -21,8 +21,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Models/Vertex.h"
-#include "util/Utilities.h"
+#include "models/vertex.h"
+#include "utils/file_utilities.h"
 
 class GameObject;
 class Material;
