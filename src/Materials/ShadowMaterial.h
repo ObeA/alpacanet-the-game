@@ -1,6 +1,6 @@
 #pragma once
 
-#include "material.h"
+#include "Material.h"
 
 class ShadowMaterial : public Material {
 public:

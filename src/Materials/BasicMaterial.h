@@ -5,7 +5,7 @@
 #ifndef ALPACAWEB_BASICMATERIAL_H
 #define ALPACAWEB_BASICMATERIAL_H
 
-#include "material.h"
+#include "Material.h"
 
 class BasicMaterial: public Material {
 public:

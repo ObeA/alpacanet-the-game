@@ -5,7 +5,7 @@
 #ifndef ALPACAWEB_BASICTEXTUREDMATERIAL_H
 #define ALPACAWEB_BASICTEXTUREDMATERIAL_H
 
-#include "material.h"
+#include "Material.h"
 
 class BasicTexturedMaterial: public Material {
 public:
