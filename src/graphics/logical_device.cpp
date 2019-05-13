@@ -3,13 +3,25 @@
 LogicalDevice::LogicalDevice(Instance* instance, PhysicalDevice* physicalDevice, Surface* surface)
         : instance(instance),
           physicalDevice(physicalDevice),
-          surface(surface),
-          indices(findQueueFamilies()) {
+          surface(surface) {
     createLogicalDevice();
+    createCommandPool();
 }
 
 LogicalDevice::~LogicalDevice() {
+    vkDestroyCommandPool(device, commandPool, nullptr);
     vkDestroyDevice(device, nullptr);
+}
+
+void LogicalDevice::createCommandPool() {
+    VkCommandPoolCreateInfo poolInfo = {};
+    poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    poolInfo.queueFamilyIndex = physicalDevice->getGraphicsFamilyIndex();
+    poolInfo.flags = 0; // Optional
+
+    if (vkCreateCommandPool(device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
+        throw std::runtime_error("failed to create command pool!");
+    }
 }
 
 void LogicalDevice::createLogicalDevice() {
@@ -59,13 +71,18 @@ const VkDevice& LogicalDevice::getDevice() const {
     return device;
 }
 
-const VkQueue& LogicalDevice::GetGraphicsQueue() const {
+const VkQueue& LogicalDevice::getGraphicsQueue() const {
     return graphicsQueue;
 }
 
-const VkQueue& LogicalDevice::GetPresentQueue() const {
+const VkQueue& LogicalDevice::getPresentQueue() const {
     return presentQueue;
 }
 
+const VkCommandPool& LogicalDevice::getCommandPool() const {
+    return commandPool;
+}
 
-
+PhysicalDevice* LogicalDevice::getPhysicalDevice() {
+    return physicalDevice;
+}

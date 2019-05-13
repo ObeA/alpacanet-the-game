@@ -10,11 +10,12 @@ public:
     LogicalDevice(Instance* instance, PhysicalDevice* physicalDevice, Surface* surface);
     ~LogicalDevice();
 
-    VkDevice& getDevice() const;
+    PhysicalDevice* getPhysicalDevice();
 
-    const VkQueue& GetGraphicsQueue() const;
-    const VkQueue& GetPresentQueue() const;
-
+    const VkDevice& getDevice() const;
+    const VkQueue& getGraphicsQueue() const;
+    const VkQueue& getPresentQueue() const;
+    const VkCommandPool& getCommandPool() const;
 
 private:
     Instance* instance;
@@ -24,9 +25,11 @@ private:
     VkDevice device;
     VkQueue graphicsQueue;
     VkQueue presentQueue;
+    VkCommandPool commandPool;
 
     QueueFamilyIndices indices;
 
     void createLogicalDevice();
+    void createCommandPool();
 };
 

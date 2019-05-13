@@ -1,29 +1,31 @@
 #include "buffer.h"
 #include "../graphics.h"
 
-Buffer::Buffer(Graphics* graphics,
+Buffer::Buffer(LogicalDevice* device,
                VkDeviceSize size,
                VkBufferUsageFlags usageFlags,
-               VkMemoryPropertyFlags propertyFlags)
-        : graphics(graphics),
+               VkMemoryPropertyFlags propertyFlags,
+               void* data = nullptr)
+        : device(device),
           size(size),
           usageFlags(usageFlags),
           propertyFlags(propertyFlags),
           buffer(VK_NULL_HANDLE),
           memory(VK_NULL_HANDLE) {
     createBuffer();
+
+    if (data != nullptr) {
+        copyFrom(data);
+    }
 }
 
 Buffer::~Buffer() {
-    auto device = graphics->getLogicalDevice()->getDevice();
-
-    vkDestroyBuffer(device, buffer, nullptr);
-    vkFreeMemory(device, memory, nullptr);
+    vkDestroyBuffer(device->getDevice(), buffer, nullptr);
+    vkFreeMemory(device->getDevice(), memory, nullptr);
 }
 
 void Buffer::createBuffer() {
-    auto physicalDevice = graphics->getPhysicalDevice();
-    auto device = graphics->getLogicalDevice();
+    auto physicalDevice = device->getPhysicalDevice();
 
     VkBufferCreateInfo bufferInfo = {};
     bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -49,4 +51,28 @@ void Buffer::createBuffer() {
     }
 
     vkBindBufferMemory(device->getDevice(), buffer, memory, 0);
+}
+
+void Buffer::copyFrom(void* data) {
+    void* mappedMemory;
+    vkMapMemory(device->getDevice(), memory, 0, size, 0, &mappedMemory);
+    memcpy(mappedMemory, data, size);
+    vkUnmapMemory(device->getDevice(), memory);
+}
+
+void Buffer::copyTo(Buffer* other) {
+    VkCommandBufferAllocateInfo allocInfo = {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandPool = device->getCommandPool();
+    allocInfo.commandBufferCount = 1;
+
+    VkCommandBuffer commandBuffer;
+    vkAllocateCommandBuffers(device->getDevice(), &allocInfo, &commandBuffer);
+
+    VkCommandBufferBeginInfo beginInfo = {};
+    beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    beginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+    vkBeginCommandBuffer(commandBuffer, &beginInfo);
 }

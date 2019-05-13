@@ -6,14 +6,13 @@
 
 class Buffer {
 public:
-    Buffer(Graphics* graphics, VkDeviceSize size, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags properties);
+    Buffer(LogicalDevice* device, VkDeviceSize size, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags properties, void* data = nullptr);
     ~Buffer();
 
-protected:
-
+    void copyTo(Buffer* other);
 
 private:
-    Graphics* graphics;
+    LogicalDevice* device;
 
     VkBuffer buffer;
     VkDeviceMemory memory;
@@ -23,5 +22,6 @@ private:
     VkMemoryPropertyFlags propertyFlags;
 
     void createBuffer();
+    void copyFrom(void* data);
 };
 

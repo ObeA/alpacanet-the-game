@@ -2,6 +2,7 @@
 
 #include "../window.h"
 #include "../game.h"
+#include "../graphics/buffers/buffer.h"
 
 //struct UniformBufferObject {
 //    alignas(16) glm::mat4 model;
@@ -17,10 +18,12 @@ struct UniformBufferObject {
     glm::vec3 lightPos;
 };
 
+class Game;
+
 class GameObject {
 public:
-    GameObject(Game* game, Material* material, Material* shadowMaterial) : game(game), material(material), shadowMaterial(shadowMaterial) {
-    }
+    GameObject(Game* game, Material* material, Material* shadowMaterial, size_t swapchainImageSize);
+    ~GameObject();
 
 	std::vector<VkDescriptorSet> descriptorSets;
 
@@ -47,8 +50,8 @@ public:
 protected:
     Game* game;
 
-	VkBuffer vertexBuffer;
-	VkDeviceMemory vertexBufferMemory;
+	Buffer* vertexBuffer;
+	Buffer* indexBuffer;
 	VkBuffer indexBuffer;
 	VkDeviceMemory indexBufferMemory;
 
@@ -56,6 +59,8 @@ protected:
 	std::vector<VkDeviceMemory> uniformBuffersMemory;
 	VkBuffer offscreenUniformBuffer;
 	VkDeviceMemory offscreenUniformBuffersMemory;
+
+    size_t swapchainImageSize;
 
 	virtual void createVertexBuffer();
 
