@@ -2,15 +2,11 @@
 
 #include "../window.h"
 
-class Window;
-
 class Material {
 public:
-    Material(Window *window) : window(window) {
-    }
+    Material() = default;
 
     virtual void initialize();
-
     virtual void cleanup();
 
     void cleanupSwapChain();
@@ -22,8 +18,6 @@ public:
     virtual void createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet) = 0;
 
 protected:
-    Window* window;
-
     virtual void createGraphicsPipeline() = 0;
 
     VkShaderModule createShaderModule(const std::vector<char>& code);

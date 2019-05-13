@@ -34,33 +34,6 @@ const int HEIGHT = 600;
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-const std::vector<const char*> validationLayers = {
-	"VK_LAYER_LUNARG_standard_validation"
-};
-
-#ifdef NDEBUG
-const bool enableValidationLayers = false;
-#else
-const bool enableValidationLayers = true;
-#endif
-
-const std::vector<const char*> deviceExtensions = {
-	VK_KHR_SWAPCHAIN_EXTENSION_NAME
-};
-
-struct QueueFamilyIndices {
-	std::optional<uint32_t> graphicsFamily;
-	std::optional<uint32_t> presentFamily;
-
-	bool isComplete();
-};
-
-struct SwapChainSupportDetails {
-	VkSurfaceCapabilitiesKHR capabilities;
-	std::vector<VkSurfaceFormatKHR> formats;
-	std::vector<VkPresentModeKHR> presentModes;
-};
-
 struct FrameBufferAttachment {
 	VkImage image;
 	VkDeviceMemory mem;
@@ -74,15 +47,14 @@ struct UniformBufferObjectOffscreen {
 
 class Window {
 public:
-	VkDevice device;
-	VkDescriptorPool descriptorPool;
+    Window();
+    ~Window();
+
     GLFWwindow* window;
 
-	VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
+	VkDescriptorPool descriptorPool;
 
 	Renderer* renderer;
-
-	VkSurfaceKHR surface;
 
 	void run();
 
@@ -106,22 +78,12 @@ public:
 
 	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
-	QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
-
-	SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
-
-	VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
-
-	VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
-
 	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
-private:
-	VkInstance instance;
-	VkDebugUtilsMessengerEXT debugMessenger;
-	VkQueue graphicsQueue;
+	VkExtent2D getExtents() const;
 
-	VkQueue presentQueue;
+private:
+    VkExtent2D extents;
 
 	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
@@ -152,31 +114,7 @@ private:
 
 	void cleanup();
 
-	void createInstance();
-
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
-
-	bool checkValidationLayerSupport();
-
-	std::vector<const char*> getRequiredExtensions();
-
-	static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
-		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-		VkDebugUtilsMessageTypeFlagsEXT messageType,
-		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData,
-		void* pUserData);
-
-	void setupDebugMessenger();
-
-	void pickPhysicalDevice();
-
-	bool isDeviceSuitable(VkPhysicalDevice device);
-
-	bool checkDeviceExtensionSupport(VkPhysicalDevice device);
-
-	void createLogicalDevice();
-
-	void createSurface();
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 

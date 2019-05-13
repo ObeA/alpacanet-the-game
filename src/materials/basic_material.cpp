@@ -1,4 +1,5 @@
 #include "basic_material.h"
+#include "../managers/vulkan_manager.h"
 
 void BasicMaterial::createDescriptorSetLayout() {
     VkDescriptorSetLayoutBinding uboLayoutBinding = {};
@@ -15,13 +16,14 @@ void BasicMaterial::createDescriptorSetLayout() {
     shadowSamplerLayoutBinding.pImmutableSamplers = nullptr;
     shadowSamplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-    std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, shadowSamplerLayoutBinding};
+    std::array<VkDescriptorSetLayoutBinding, 2> bindings = {uboLayoutBinding, shadowSamplerLayoutBinding};
     VkDescriptorSetLayoutCreateInfo layoutInfo = {};
     layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
     layoutInfo.pBindings = bindings.data();
 
-    if (vkCreateDescriptorSetLayout(window->device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
+    if (vkCreateDescriptorSetLayout(VulkanManager::getInstance().getDevice(), &layoutInfo, nullptr,
+                                    &descriptorSetLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create descriptor set layout!");
     }
 }
@@ -46,15 +48,15 @@ void BasicMaterial::createGraphicsPipeline() {
     fragShaderStageInfo.module = fragShaderModule;
     fragShaderStageInfo.pName = "main";
 
-    VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+    VkPipelineShaderStageCreateInfo shaderStages[] = {vertShaderStageInfo, fragShaderStageInfo};
 
-	createBasicGraphicsPipeline(shaderStages);
+    createBasicGraphicsPipeline(shaderStages);
 
-    vkDestroyShaderModule(window->device, fragShaderModule, nullptr);
-    vkDestroyShaderModule(window->device, vertShaderModule, nullptr);
+    vkDestroyShaderModule(VulkanManager::getInstance().getDevice(), fragShaderModule, nullptr);
+    vkDestroyShaderModule(VulkanManager::getInstance().getDevice(), vertShaderModule, nullptr);
 }
 
-void BasicMaterial::createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet) {
+void BasicMaterial::createDescriptorSet(VkDescriptorBufferInfo& uniformBufferInfo, VkDescriptorSet& descriptorSet) {
     std::array<VkWriteDescriptorSet, 1> descriptorWrites = {};
 
     descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -65,5 +67,11 @@ void BasicMaterial::createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInf
     descriptorWrites[0].descriptorCount = 1;
     descriptorWrites[0].pBufferInfo = &uniformBufferInfo;
 
-    vkUpdateDescriptorSets(window->device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+    vkUpdateDescriptorSets(
+            VulkanManager::getInstance().getDevice(),
+            static_cast<uint32_t>(descriptorWrites.size()),
+            descriptorWrites.data(),
+            0,
+            nullptr
+    );
 }

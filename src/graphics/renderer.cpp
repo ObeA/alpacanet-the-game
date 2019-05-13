@@ -1,43 +1,46 @@
 #include "renderer.h"
 
-void Renderer::initializeRenderer() {
+
+Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice, PhysicalDevice* physicalDevice)
+    : window(window), surface(surface), logicalDevice(logicalDevice), physicalDevice(physicalDevice) {
     createSwapChain();
     createImageViews();
 
-
-	initializeRenderPass();
-	initializeOffscreenRenderPass();
+    initializeRenderPass();
+    initializeOffscreenRenderPass();
 
     createDepthResources();
-	createDepthResourcesOffscreen(); 
-	
-	createOffscreenFramebuffers();
+    createDepthResourcesOffscreen();
+
+    createOffscreenFramebuffers();
     createFramebuffers();
 }
 
-void Renderer::cleanup() {
-    vkDestroySampler(window->device, offscreenDepthSampler, nullptr);
-    vkDestroyImageView(window->device, offscreenDepthImageView, nullptr);
-    vkDestroyImage(window->device, offscreenDepthImage, nullptr);
-    vkFreeMemory(window->device, offscreenDepthImageMemory, nullptr);
-    vkDestroyFramebuffer(window->device, offscreenFrameBuffer, nullptr);
-    vkDestroyRenderPass(window->device, offscreenRenderPass, nullptr);
+Renderer::~Renderer() {
+    auto device = logicalDevice->getDevice();
 
-	vkDestroyImageView(window->device, depthImageView, nullptr);
-	vkDestroyImage(window->device, depthImage, nullptr);
-	vkFreeMemory(window->device, depthImageMemory, nullptr);
+    vkDestroySampler(device, offscreenDepthSampler, nullptr);
+    vkDestroyImageView(device, offscreenDepthImageView, nullptr);
+    vkDestroyImage(device, offscreenDepthImage, nullptr);
+    vkFreeMemory(device, offscreenDepthImageMemory, nullptr);
+    vkDestroyFramebuffer(device, offscreenFrameBuffer, nullptr);
+    vkDestroyRenderPass(device, offscreenRenderPass, nullptr);
 
-	for (size_t i = 0; i < swapChainFramebuffers.size(); i++) {
-		vkDestroyFramebuffer(window->device, swapChainFramebuffers[i], nullptr);
+	vkDestroyImageView(device, depthImageView, nullptr);
+	vkDestroyImage(device, depthImage, nullptr);
+	vkFreeMemory(device, depthImageMemory, nullptr);
+
+	for (auto& swapChainFramebuffer : swapChainFramebuffers) {
+		vkDestroyFramebuffer(device, swapChainFramebuffer, nullptr);
 	}
 
-	vkDestroyRenderPass(window->device, renderPass, nullptr);
+	vkDestroyRenderPass(device, renderPass, nullptr);
 
-	for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-		vkDestroyImageView(window->device, swapChainImageViews[i], nullptr);
+	for (auto& swapChainImageView : swapChainImageViews) {
+		vkDestroyImageView(device, swapChainImageView, nullptr);
 	}
 
-	vkDestroySwapchainKHR(window->device, swapChain, nullptr);
+	vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
 
 void Renderer::initializeRenderPass() {
@@ -93,7 +96,7 @@ void Renderer::initializeRenderPass() {
 	renderPassInfo.dependencyCount = 1;
 	renderPassInfo.pDependencies = &dependency;
 
-	if (vkCreateRenderPass(window->device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
+	if (vkCreateRenderPass(logicalDevice->getDevice(), &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");
 	}
 }
@@ -151,7 +154,7 @@ void Renderer::initializeOffscreenRenderPass() {
 	renderPassInfo.dependencyCount = 1;
 	renderPassInfo.pDependencies = &dependency;
 
-	if (vkCreateRenderPass(window->device, &renderPassInfo, nullptr, &offscreenRenderPass) != VK_SUCCESS) {
+	if (vkCreateRenderPass(logicalDevice->getDevice(), &renderPassInfo, nullptr, &offscreenRenderPass) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");
 	}
 }
@@ -167,7 +170,7 @@ VkFormat Renderer::findDepthFormat() {
 VkFormat Renderer::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
 	for (VkFormat format : candidates) {
 		VkFormatProperties props;
-		vkGetPhysicalDeviceFormatProperties(window->physicalDevice, format, &props);
+		vkGetPhysicalDeviceFormatProperties(physicalDevice->getDevice(), format, &props);
 
 		if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
 			return format;
@@ -198,7 +201,7 @@ void Renderer::createFramebuffers() {
 		framebufferInfo.height = swapChainExtent.height;
 		framebufferInfo.layers = 1;
 
-		if (vkCreateFramebuffer(window->device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
+		if (vkCreateFramebuffer(logicalDevice->getDevice(), &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
 			throw std::runtime_error("failed to create framebuffer!");
 		}
 	}
@@ -220,7 +223,7 @@ void Renderer::createOffscreenFramebuffers() {
     sampler.maxLod = 1.0f;
     sampler.borderColor = VK_BORDER_COLOR_FLOAT_OPAQUE_WHITE;
 
-    if (vkCreateSampler(window->device, &sampler, nullptr, &offscreenDepthSampler) != VK_SUCCESS) {
+    if (vkCreateSampler(logicalDevice->getDevice(), &sampler, nullptr, &offscreenDepthSampler) != VK_SUCCESS) {
         throw std::runtime_error("failed to create offscreen depth sampler!");
     }
 
@@ -238,7 +241,7 @@ void Renderer::createOffscreenFramebuffers() {
 	framebufferInfo.height = swapChainExtent.height;
 	framebufferInfo.layers = 1;
 
-	if (vkCreateFramebuffer(window->device, &framebufferInfo, nullptr, &offscreenFrameBuffer) != VK_SUCCESS) {
+	if (vkCreateFramebuffer(logicalDevice->getDevice(), &framebufferInfo, nullptr, &offscreenFrameBuffer) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create framebuffer!");
 	}	
 }
@@ -254,23 +257,23 @@ void Renderer::createImageViews() {
 	offscreenImageView = window->createImageView(offscreenImage, VK_FORMAT_B8G8R8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
-
 void Renderer::createSwapChain() {
-	SwapChainSupportDetails swapChainSupport = window->querySwapChainSupport(window->physicalDevice);
+	VkSurfaceFormatKHR surfaceFormat = surface->getFormat();
+	VkPresentModeKHR presentMode = surface->getPresentMode();
+	auto capabilities = surface->getCapabilities();
+	VkExtent2D extent = surface->hasLimitedExtents()
+	        ? capabilities.currentExtent
+	        : window->getExtents();
 
-	VkSurfaceFormatKHR surfaceFormat = window->chooseSwapSurfaceFormat(swapChainSupport.formats);
-	VkPresentModeKHR presentMode = window->chooseSwapPresentMode(swapChainSupport.presentModes);
-	VkExtent2D extent = window->chooseSwapExtent(swapChainSupport.capabilities);
+	uint32_t imageCount = capabilities.minImageCount + 1;
 
-	uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
-
-	if (swapChainSupport.capabilities.maxImageCount > 0 && imageCount > swapChainSupport.capabilities.maxImageCount) {
-		imageCount = swapChainSupport.capabilities.maxImageCount;
+	if (capabilities.maxImageCount > 0 && imageCount > capabilities.maxImageCount) {
+		imageCount = capabilities.maxImageCount;
 	}
 
 	VkSwapchainCreateInfoKHR createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-	createInfo.surface = window->surface;
+	createInfo.surface = surface->getSurface();
 
 	createInfo.minImageCount = imageCount;
 	createInfo.imageFormat = surfaceFormat.format;
@@ -279,10 +282,9 @@ void Renderer::createSwapChain() {
 	createInfo.imageArrayLayers = 1;
 	createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-	QueueFamilyIndices indices = window->findQueueFamilies(window->physicalDevice);
-	uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
+	uint32_t queueFamilyIndices[] = { physicalDevice->getGraphicsFamilyIndex(), physicalDevice->getPresentFamilyIndex() };
 
-	if (indices.graphicsFamily != indices.presentFamily) {
+	if (physicalDevice->getGraphicsFamilyIndex() != physicalDevice->getPresentFamilyIndex()) {
 		createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
 		createInfo.queueFamilyIndexCount = 2;
 		createInfo.pQueueFamilyIndices = queueFamilyIndices;
@@ -293,20 +295,20 @@ void Renderer::createSwapChain() {
 		createInfo.pQueueFamilyIndices = nullptr; // Optional
 	}
 
-	createInfo.preTransform = swapChainSupport.capabilities.currentTransform;
+	createInfo.preTransform = capabilities.currentTransform;
 	createInfo.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
 
 	createInfo.presentMode = presentMode;
 	createInfo.clipped = VK_TRUE;
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
 
-	if (vkCreateSwapchainKHR(window->device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
+	if (vkCreateSwapchainKHR(logicalDevice->getDevice(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create swap chain!");
 	}
 
-	vkGetSwapchainImagesKHR(window->device, swapChain, &imageCount, nullptr);
+	vkGetSwapchainImagesKHR(logicalDevice->getDevice(), swapChain, &imageCount, nullptr);
 	swapChainImages.resize(imageCount);
-	vkGetSwapchainImagesKHR(window->device, swapChain, &imageCount, swapChainImages.data());
+	vkGetSwapchainImagesKHR(logicalDevice->getDevice(), swapChain, &imageCount, swapChainImages.data());
 	swapChainImageFormat = surfaceFormat.format;
 	swapChainExtent = extent;
 }

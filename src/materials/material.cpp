@@ -1,4 +1,5 @@
 #include "material.h"
+#include "../managers/vulkan_manager.h"
 
 void Material::initialize() {
     createDescriptorSetLayout();
@@ -6,12 +7,14 @@ void Material::initialize() {
 }
 
 void Material::cleanup() {
-    vkDestroyDescriptorSetLayout(window->device, descriptorSetLayout, nullptr);
+    vkDestroyDescriptorSetLayout(VulkanManager::getInstance().getDevice(), descriptorSetLayout, nullptr);
 }
 
 void Material::cleanupSwapChain() {
-    vkDestroyPipeline(window->device, graphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(window->device, pipelineLayout, nullptr);
+    auto& device = VulkanManager::getInstance().getDevice();
+
+    vkDestroyPipeline(device, graphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 }
 
 VkShaderModule Material::createShaderModule(const std::vector<char>& code) {
@@ -21,7 +24,7 @@ VkShaderModule Material::createShaderModule(const std::vector<char>& code) {
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
     VkShaderModule shaderModule;
-    if (vkCreateShaderModule(window->device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+    if (vkCreateShaderModule(VulkanManager::getInstance().getDevice(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
         throw std::runtime_error("failed to create shader module!");
     }
 

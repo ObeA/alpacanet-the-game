@@ -1,13 +1,11 @@
 #pragma once
 
-#include "window.h"
-
-class Window;
+#include "logical_device.h"
 
 class Renderer {
 public:
-	explicit Renderer(Window *window) : window(window) {
-	}
+	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice, PhysicalDevice* physicalDevice);
+	~Renderer();
 
 	VkRenderPass renderPass;
 
@@ -21,10 +19,12 @@ public:
 	VkFormat swapChainImageFormat;
 
     VkFramebuffer offscreenFrameBuffer;
-    
-	void initializeRenderer();
-	void cleanup();
 private:
+    Window* window;
+    Surface* surface;
+    LogicalDevice* logicalDevice;
+    PhysicalDevice* physicalDevice;
+
 	VkImageView depthImageView;
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;
@@ -37,7 +37,6 @@ private:
 	VkImage offscreenImage;
 	VkDeviceMemory offscreenImageMemory;
 
-	Window* window;
 	void initializeRenderPass();
 	void initializeOffscreenRenderPass();
 	VkFormat findDepthFormat();

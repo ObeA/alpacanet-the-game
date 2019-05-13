@@ -1,7 +1,5 @@
 #include "game_object.h"
 
-#include "../materials/material.h"
-
 void GameObject::generate(size_t swapchainImageSize) {
 	createVertexBuffer();
 	createIndexBuffer();
@@ -20,16 +18,19 @@ void GameObject::draw(VkCommandBuffer cmdbuffer, size_t bufferOffset) {
 }
 
 void GameObject::cleanup(size_t swapchainImages) {
+    auto graphics = game->getGraphics();
+    auto device = graphics->getLogicalDevice()->getDevice();
+
 	for (size_t i = 0; i < swapchainImages; i++) {
-		vkDestroyBuffer(window->device, uniformBuffers[i], nullptr);
-		vkFreeMemory(window->device, uniformBuffersMemory[i], nullptr);
+		vkDestroyBuffer(device, uniformBuffers[i], nullptr);
+		vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
 	}
 
-	vkDestroyBuffer(window->device, indexBuffer, nullptr);
-	vkFreeMemory(window->device, indexBufferMemory, nullptr);
+	vkDestroyBuffer(device, indexBuffer, nullptr);
+	vkFreeMemory(device, indexBufferMemory, nullptr);
 
-	vkDestroyBuffer(window->device, vertexBuffer, nullptr);
-	vkFreeMemory(window->device, vertexBufferMemory, nullptr);
+	vkDestroyBuffer(device, vertexBuffer, nullptr);
+	vkFreeMemory(device, vertexBufferMemory, nullptr);
 }
 
 void GameObject::createVertexBuffer() {

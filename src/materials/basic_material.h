@@ -4,11 +4,11 @@
 
 class BasicMaterial: public Material {
 public:
-    BasicMaterial(Window *window) : Material(window) {
+    explicit BasicMaterial() : Material() {
     }
 
-    void createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet);
+    void createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet) override;
 protected:
-    void createGraphicsPipeline();
-    virtual void createDescriptorSetLayout();
+    void createGraphicsPipeline() override;
+    void createDescriptorSetLayout() override;
 };

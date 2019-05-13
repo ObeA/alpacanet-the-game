@@ -1,8 +1,7 @@
 #pragma once
 
 #include "../window.h"
-
-class Window;
+#include "../game.h"
 
 //struct UniformBufferObject {
 //    alignas(16) glm::mat4 model;
@@ -18,10 +17,9 @@ struct UniformBufferObject {
     glm::vec3 lightPos;
 };
 
-
 class GameObject {
 public:
-    GameObject(Window *window, Material *material , Material *shadowMaterial) : window(window), material(material), shadowMaterial(shadowMaterial) {
+    GameObject(Game* game, Material* material, Material* shadowMaterial) : game(game), material(material), shadowMaterial(shadowMaterial) {
     }
 
 	std::vector<VkDescriptorSet> descriptorSets;
@@ -47,6 +45,8 @@ public:
 	Material *shadowMaterial;
 
 protected:
+    Game* game;
+
 	VkBuffer vertexBuffer;
 	VkDeviceMemory vertexBufferMemory;
 	VkBuffer indexBuffer;
@@ -65,9 +65,6 @@ protected:
 
 	void createDescriptorSet(size_t swapChainImageSize);
 
-    Window *window;
-
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;
-private:
 };

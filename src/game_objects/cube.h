@@ -22,7 +22,7 @@ class Window;
 class Cube : public GameObject {
 public:
 
-    Cube(Window *window, Material *material, Material *shadowMaterial) : GameObject(window, material, shadowMaterial) {
+    Cube(Game *game, Material *material, Material *shadowMaterial) : GameObject(window, material, shadowMaterial) {
     }
 
     void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos);
