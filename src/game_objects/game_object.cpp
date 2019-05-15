@@ -1,32 +1,30 @@
 #include "game_object.h"
 
-GameObject::GameObject(Game* game, Material* material, Material* shadowMaterial, size_t swapchainImageSize)
-    : game(game), material(material), shadowMaterial(shadowMaterial), swapchainImageSize(swapchainImageSize) {
+GameObject::GameObject(Game* game, Material* material, Material* shadowMaterial)
+    : game(game), material(material), shadowMaterial(shadowMaterial) {
     createVertexBuffer();
     createIndexBuffer();
-    createUniformBuffers(swapchainImageSize);
-    createDescriptorSet(swapchainImageSize);
+
+    auto numberOfSwapchainImages = game->getGraphics()->getRenderer()->getSwapchain()->getImages().size();
+    createUniformBuffers(numberOfSwapchainImages);
+    createDescriptorSet(numberOfSwapchainImages);
 }
 
 GameObject::~GameObject() {
-    auto graphics = game->getGraphics();
-    auto device = graphics->getLogicalDevice()->getDevice();
-
-    for (size_t i = 0; i < swapchainImageSize; i++) {
-        vkDestroyBuffer(device, uniformBuffers[i], nullptr);
-        vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
+    for (auto buffer : uniformBuffers) {
+        delete buffer;
     }
+    delete offscreenUniformBuffer;
 
     delete indexBuffer;
     delete vertexBuffer;
 }
 
 void GameObject::draw(VkCommandBuffer cmdbuffer, size_t bufferOffset) {
-	VkBuffer vertexBuffers[] = { vertexBuffer };
+	VkBuffer vertexBuffers[] = { vertexBuffer->getBuffer() };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(cmdbuffer, 0, 1, vertexBuffers, offsets);
-
-	vkCmdBindIndexBuffer(cmdbuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT32);
+	vkCmdBindIndexBuffer(cmdbuffer, indexBuffer->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 
 	vkCmdDrawIndexed(cmdbuffer, static_cast<uint32_t>(getIndices().size()), 1, 0, 0, 0);
 }
@@ -77,18 +75,18 @@ void GameObject::createDescriptorSet(size_t swapChainImageSize) {
 	std::vector<VkDescriptorSetLayout> layouts(swapChainImageSize, material->descriptorSetLayout);
 	VkDescriptorSetAllocateInfo allocInfo = {};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = window->descriptorPool;
+	allocInfo.descriptorPool = game->getGraphics()->getRenderer()->getDescriptorPool();
 	allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImageSize);
 	allocInfo.pSetLayouts = layouts.data();
 
 	descriptorSets.resize(swapChainImageSize);
-	if (vkAllocateDescriptorSets(window->device, &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
+	if (vkAllocateDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate descriptor sets!");
 	}
 
 	for (size_t i = 0; i < swapChainImageSize; i++) {
 		VkDescriptorBufferInfo bufferInfo = {};
-		bufferInfo.buffer = uniformBuffers[i];
+		bufferInfo.buffer = uniformBuffers[i]->getBuffer();
 		bufferInfo.offset = 0;
 		bufferInfo.range = sizeof(UniformBufferObject);
 
@@ -98,16 +96,16 @@ void GameObject::createDescriptorSet(size_t swapChainImageSize) {
 	std::vector<VkDescriptorSetLayout> offscreenLayouts(swapChainImageSize, shadowMaterial->descriptorSetLayout);
 	VkDescriptorSetAllocateInfo offscreenAllocInfo = {};
 	offscreenAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	offscreenAllocInfo.descriptorPool = window->descriptorPool;
+	offscreenAllocInfo.descriptorPool = game->getGraphics()->getRenderer()->getDescriptorPool();
 	offscreenAllocInfo.descriptorSetCount = 1;
 	offscreenAllocInfo.pSetLayouts = offscreenLayouts.data();
 
-	if (vkAllocateDescriptorSets(window->device, &offscreenAllocInfo, &offscreenDescriptorSets) != VK_SUCCESS) {
+	if (vkAllocateDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), &offscreenAllocInfo, &offscreenDescriptorSets) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate descriptor sets!");
 	}
 
 	VkDescriptorBufferInfo bufferInfo = {};
-	bufferInfo.buffer = offscreenUniformBuffer;
+	bufferInfo.buffer = offscreenUniformBuffer->getBuffer();
 	bufferInfo.offset = 0;
 	bufferInfo.range = sizeof(UniformBufferObjectOffscreen);
 

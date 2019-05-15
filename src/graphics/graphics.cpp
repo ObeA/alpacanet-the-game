@@ -5,7 +5,8 @@ Graphics::Graphics()
           window(),
           physicalDevice(&instance, &surface),
           surface(&instance, &window, &physicalDevice),
-          logicalDevice(&instance, &physicalDevice, &surface) {
+          logicalDevice(&instance, &physicalDevice, &surface),
+          renderer(&window, &surface, &logicalDevice, &physicalDevice) {
 
 }
 
@@ -23,4 +24,8 @@ LogicalDevice* Graphics::getLogicalDevice() {
 
 PhysicalDevice* Graphics::getPhysicalDevice() {
     return &physicalDevice;
+}
+
+Renderer* Graphics::getRenderer() {
+    return &renderer;
 }

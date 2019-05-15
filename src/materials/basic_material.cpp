@@ -1,5 +1,4 @@
 #include "basic_material.h"
-#include "../managers/vulkan_manager.h"
 
 void BasicMaterial::createDescriptorSetLayout() {
     VkDescriptorSetLayoutBinding uboLayoutBinding = {};
@@ -22,7 +21,7 @@ void BasicMaterial::createDescriptorSetLayout() {
     layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
     layoutInfo.pBindings = bindings.data();
 
-    if (vkCreateDescriptorSetLayout(VulkanManager::getInstance().getDevice(), &layoutInfo, nullptr,
+    if (vkCreateDescriptorSetLayout(graphics->getLogicalDevice()->getDevice(), &layoutInfo, nullptr,
                                     &descriptorSetLayout) != VK_SUCCESS) {
         throw std::runtime_error("failed to create descriptor set layout!");
     }
@@ -52,8 +51,8 @@ void BasicMaterial::createGraphicsPipeline() {
 
     createBasicGraphicsPipeline(shaderStages);
 
-    vkDestroyShaderModule(VulkanManager::getInstance().getDevice(), fragShaderModule, nullptr);
-    vkDestroyShaderModule(VulkanManager::getInstance().getDevice(), vertShaderModule, nullptr);
+    vkDestroyShaderModule(graphics->getLogicalDevice()->getDevice(), fragShaderModule, nullptr);
+    vkDestroyShaderModule(graphics->getLogicalDevice()->getDevice(), vertShaderModule, nullptr);
 }
 
 void BasicMaterial::createDescriptorSet(VkDescriptorBufferInfo& uniformBufferInfo, VkDescriptorSet& descriptorSet) {
@@ -68,7 +67,7 @@ void BasicMaterial::createDescriptorSet(VkDescriptorBufferInfo& uniformBufferInf
     descriptorWrites[0].pBufferInfo = &uniformBufferInfo;
 
     vkUpdateDescriptorSets(
-            VulkanManager::getInstance().getDevice(),
+            graphics->getLogicalDevice()->getDevice(),
             static_cast<uint32_t>(descriptorWrites.size()),
             descriptorWrites.data(),
             0,

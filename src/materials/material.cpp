@@ -1,5 +1,4 @@
 #include "material.h"
-#include "../managers/vulkan_manager.h"
 
 void Material::initialize() {
     createDescriptorSetLayout();
@@ -7,11 +6,11 @@ void Material::initialize() {
 }
 
 void Material::cleanup() {
-    vkDestroyDescriptorSetLayout(VulkanManager::getInstance().getDevice(), descriptorSetLayout, nullptr);
+    vkDestroyDescriptorSetLayout(graphics->getLogicalDevice()->getDevice(), descriptorSetLayout, nullptr);
 }
 
 void Material::cleanupSwapChain() {
-    auto& device = VulkanManager::getInstance().getDevice();
+    auto& device = graphics->getLogicalDevice()->getDevice();
 
     vkDestroyPipeline(device, graphicsPipeline, nullptr);
     vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
@@ -24,7 +23,7 @@ VkShaderModule Material::createShaderModule(const std::vector<char>& code) {
     createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
     VkShaderModule shaderModule;
-    if (vkCreateShaderModule(VulkanManager::getInstance().getDevice(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+    if (vkCreateShaderModule(graphics->getLogicalDevice()->getDevice(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
         throw std::runtime_error("failed to create shader module!");
     }
 
@@ -48,7 +47,7 @@ void Material::createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shade
 	inputAssembly.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
 	inputAssembly.primitiveRestartEnable = VK_FALSE;
 
-	auto swapChainExtent = window->getSwapChainExtent();
+	auto swapChainExtent = graphics->getRenderer()->getSwapchain()->getExtents();
 
 	VkViewport viewport = {};
 	viewport.x = 0.0f;
@@ -127,7 +126,7 @@ void Material::createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shade
 	pipelineLayoutInfo.pushConstantRangeCount = 0; // Optional
 	pipelineLayoutInfo.pPushConstantRanges = nullptr; // Optional
 
-	if (vkCreatePipelineLayout(window->device, &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+	if (vkCreatePipelineLayout(graphics->getLogicalDevice()->getDevice(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create pipeline layout!");
 	}
 
@@ -144,12 +143,12 @@ void Material::createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shade
 	pipelineInfo.pColorBlendState = &colorBlending;
 	pipelineInfo.pDynamicState = nullptr; // Optional
 	pipelineInfo.layout = pipelineLayout;
-	pipelineInfo.renderPass = window->getRenderPass();
+	pipelineInfo.renderPass = graphics->getRenderer()->getRenderPass();
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE; // Optional
 	pipelineInfo.basePipelineIndex = -1; // Optional
 
-	if (vkCreateGraphicsPipelines(window->device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
+	if (vkCreateGraphicsPipelines(graphics->getLogicalDevice()->getDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
 }

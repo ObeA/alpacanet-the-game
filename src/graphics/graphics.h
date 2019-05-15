@@ -16,12 +16,13 @@ public:
     Window* getWindow();
     LogicalDevice* getLogicalDevice();
     PhysicalDevice* getPhysicalDevice();
+    Renderer* getRenderer();
 private:
     Instance instance;
     Window window;
     Surface surface;
     PhysicalDevice physicalDevice;
     LogicalDevice logicalDevice;
-
+    Renderer renderer;
 };
 

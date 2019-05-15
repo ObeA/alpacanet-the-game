@@ -3,11 +3,6 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
-void ModelObject::generate(size_t swapchainImageSize) {
-    loadModel();
-    GameObject::generate(swapchainImageSize);
-}
-
 void ModelObject::loadModel() {
     tinyobj::attrib_t attrib;
     std::vector<tinyobj::shape_t> shapes;
@@ -75,32 +70,31 @@ void ModelObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspecti
     ubo.lightPos = lightPos;
     ubo.depthBiasMVP = ubo.view * ubo.projection;
 
+    auto device = game->getGraphics()->getLogicalDevice()->getDevice();
     void* data;
-    vkMapMemory(window->device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
+    vkMapMemory(device, uniformBuffers[currentImage]->getMemory(), 0, sizeof(ubo), 0, &data);
     memcpy(data, &ubo, sizeof(ubo));
-    vkUnmapMemory(window->device, uniformBuffersMemory[currentImage]);
+    vkUnmapMemory(device, uniformBuffers[currentImage]->getMemory());
 
 	UniformBufferObjectOffscreen uboOffscreen = {};
 	uboOffscreen.model = ubo.model;
 	uboOffscreen.depthVP = ubo.view * ubo.projection;
 
 	void* offscreenData;
-	vkMapMemory(window->device, offscreenUniformBuffersMemory, 0, sizeof(uboOffscreen), 0, &offscreenData);
+	vkMapMemory(device, offscreenUniformBuffer->getMemory(), 0, sizeof(uboOffscreen), 0, &offscreenData);
 	memcpy(offscreenData, &uboOffscreen, sizeof(uboOffscreen));
-	vkUnmapMemory(window->device, offscreenUniformBuffersMemory);
+	vkUnmapMemory(device, offscreenUniformBuffer->getMemory());
 }
 
 void ModelObject::createUniformBuffers(size_t swapChainImageSize) {
     VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-
     uniformBuffers.resize(swapChainImageSize);
-    uniformBuffersMemory.resize(swapChainImageSize);
 
+    auto device = game->getGraphics()->getLogicalDevice();
     for (size_t i = 0; i < swapChainImageSize; i++) {
-        window->createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
+        uniformBuffers.emplace_back(new UniformBuffer(device, bufferSize));
     }
 
 	VkDeviceSize offscreenBufferSize = sizeof(UniformBufferObjectOffscreen);
-
-	window->createBuffer(offscreenBufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, offscreenUniformBuffer, offscreenUniformBuffersMemory);
+    offscreenUniformBuffer = new UniformBuffer(device, offscreenBufferSize);
 }

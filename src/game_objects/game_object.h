@@ -3,6 +3,8 @@
 #include "../window.h"
 #include "../game.h"
 #include "../graphics/buffers/buffer.h"
+#include "../materials/material.h"
+#include "../graphics/buffers/uniform_buffer.h"
 
 //struct UniformBufferObject {
 //    alignas(16) glm::mat4 model;
@@ -22,18 +24,14 @@ class Game;
 
 class GameObject {
 public:
-    GameObject(Game* game, Material* material, Material* shadowMaterial, size_t swapchainImageSize);
+    GameObject(Game* game, Material* material, Material* shadowMaterial);
     ~GameObject();
 
 	std::vector<VkDescriptorSet> descriptorSets;
 
 	VkDescriptorSet offscreenDescriptorSets;
 
-    virtual void generate(size_t swapchainImageSize);
-
     virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos) = 0;
-
-    virtual void cleanup(size_t swapchainImages);
 
     virtual void draw(VkCommandBuffer cmdbuffer, size_t bufferOffset);
 
@@ -52,15 +50,9 @@ protected:
 
 	Buffer* vertexBuffer;
 	Buffer* indexBuffer;
-	VkBuffer indexBuffer;
-	VkDeviceMemory indexBufferMemory;
 
-	std::vector<VkBuffer> uniformBuffers;
-	std::vector<VkDeviceMemory> uniformBuffersMemory;
-	VkBuffer offscreenUniformBuffer;
-	VkDeviceMemory offscreenUniformBuffersMemory;
-
-    size_t swapchainImageSize;
+	std::vector<UniformBuffer*> uniformBuffers;
+	UniformBuffer* offscreenUniformBuffer;
 
 	virtual void createVertexBuffer();
 

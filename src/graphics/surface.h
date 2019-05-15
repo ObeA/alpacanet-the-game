@@ -5,6 +5,8 @@
 #include "instance.h"
 #include "physical_device.h"
 
+class PhysicalDevice;
+
 class Surface {
 public:
     Surface(Instance* instance, Window* window, PhysicalDevice* physicalDevice);

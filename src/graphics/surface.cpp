@@ -39,6 +39,10 @@ bool Surface::hasLimitedExtents() const {
     return capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max();
 }
 
+VkSurfaceCapabilitiesKHR Surface::getCapabilities() const {
+    return capabilities;
+}
+
 void Surface::fetchCapabilities() {
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physicalDevice->getDevice(), surface, &capabilities);
 }

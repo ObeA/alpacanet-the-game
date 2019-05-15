@@ -24,11 +24,6 @@
 #include "models/vertex.h"
 #include "utils/file_utilities.h"
 
-class GameObject;
-class Material;
-class ShadowMaterial;
-class Renderer;
-
 const int WIDTH = 800;
 const int HEIGHT = 600;
 
@@ -54,23 +49,9 @@ public:
 
 	VkDescriptorPool descriptorPool;
 
-	Renderer* renderer;
-
 	void run();
 
-	void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-
-	void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-
-    VkExtent2D getSwapChainExtent();
-
-    VkRenderPass& getRenderPass();
-
 	void updateLight();
-
-	VkRenderPass& getOffscreenRenderPass();
-
-	VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
 	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
@@ -78,23 +59,17 @@ public:
 
 	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
-	VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
-
 	VkExtent2D getExtents() const;
 
 private:
     VkExtent2D extents;
 
-	VkCommandPool commandPool;
 	std::vector<VkCommandBuffer> commandBuffers;
 
 	std::vector<VkSemaphore> imageAvailableSemaphores;
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
-
-	std::vector<GameObject*> objects;
-    std::vector<Material*> materials;
 
     glm::vec3 lightPos = glm::vec3(0.0f);
 
@@ -118,13 +93,9 @@ private:
 
 	VkShaderModule createShaderModule(const std::vector<char>& code);
 
-	void createCommandPool();
-
 	void createCommandBuffers();
 
 	void createSyncObjects();
-
-	uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 	void createDescriptorPool();
 

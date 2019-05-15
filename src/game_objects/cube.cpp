@@ -21,20 +21,19 @@ void Cube::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm
 	ubo.projection = perspective;
 	ubo.projection[1][1] *= -1;
 
+	auto device = game->getGraphics()->getLogicalDevice()->getDevice();
 	void* data;
-	vkMapMemory(window->device, uniformBuffersMemory[currentImage], 0, sizeof(ubo), 0, &data);
+	vkMapMemory(device, uniformBuffers[currentImage]->getMemory(), 0, sizeof(ubo), 0, &data);
 	memcpy(data, &ubo, sizeof(ubo));
-	vkUnmapMemory(window->device, uniformBuffersMemory[currentImage]);
+	vkUnmapMemory(device, uniformBuffers[currentImage]->getMemory());
 }
 
 void Cube::createUniformBuffers(size_t swapChainImageSize) {
 	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-
 	uniformBuffers.resize(swapChainImageSize);
-	uniformBuffersMemory.resize(swapChainImageSize);
 
 	for (size_t i = 0; i < swapChainImageSize; i++) {
-		window->createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
+        uniformBuffers.push_back(new UniformBuffer(game->getGraphics()->getLogicalDevice(), bufferSize));
 	}
 }
 

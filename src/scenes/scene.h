@@ -3,6 +3,8 @@
 #include "../game_objects/game_object.h"
 #include "../game_objects/camera.h"
 
+class GameObject;
+
 class Scene {
 public:
     virtual ~Scene() =0;

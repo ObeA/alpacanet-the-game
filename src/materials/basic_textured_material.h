@@ -4,7 +4,7 @@
 
 class BasicTexturedMaterial: public Material {
 public:
-    BasicTexturedMaterial(Window *window, char* texture) : Material(window), textureLocation(texture) {
+    BasicTexturedMaterial(Graphics* graphics, char* texture) : Material(graphics), textureLocation(texture) {
     }
 
 	void initialize();

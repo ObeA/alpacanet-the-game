@@ -16,26 +16,12 @@ void Window::run() {
 	cleanup();
 }
 
-void Window::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
-	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
-
-	VkBufferCopy copyRegion = {};
-	copyRegion.size = size;
-	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
-
-	endSingleTimeCommands(commandBuffer);
-}
-
 void Window::drawFrame() {
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
 	uint32_t imageIndex;
 	VkResult result = vkAcquireNextImageKHR(device, renderer->swapChain, std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-		recreateSwapChain();
-		return;
-	}
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 		throw std::runtime_error("failed to acquire swap chain image!");
 	}
@@ -81,13 +67,7 @@ void Window::drawFrame() {
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr; // Optional
 
-	result = vkQueuePresentKHR(presentQueue, &presentInfo);
-
-	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-		framebufferResized = false;
-		recreateSwapChain();
-	}
-	else if (result != VK_SUCCESS) {
+	if (vkQueuePresentKHR(presentQueue, &presentInfo) != VK_SUCCESS) {
 		throw std::runtime_error("failed to present swap chain image!");
 	}
 
@@ -106,8 +86,6 @@ void Window::initWindow() {
 }
 
 void Window::initVulkan() {
-	createCommandPool();
-
 	/*renderer = new Renderer(this);
     renderer->initializeRenderer();
 	createDescriptorPool();
@@ -341,30 +319,6 @@ void Window::createSyncObjects() {
 	}
 }
 
-void Window::createDescriptorPool() {
-	const int objectAmount = 100;
-	std::array<VkDescriptorPoolSize, objectAmount * 2> poolSizes = {};
-
-
-	//TODO: Meest matige pool ooit. Wat als een descriptor set een andere layout heeft?
-	for (int i = 0; i < objectAmount; i++) {
-		poolSizes[i * 2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		poolSizes[i * 2].descriptorCount = static_cast<uint32_t>(renderer->swapChainImages.size());
-		poolSizes[i * 2 + 1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		poolSizes[i * 2 + 1].descriptorCount = static_cast<uint32_t>(renderer->swapChainImages.size());
-	}
-
-	VkDescriptorPoolCreateInfo poolInfo = {};
-	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-	poolInfo.pPoolSizes = poolSizes.data();
-	poolInfo.maxSets = static_cast<uint32_t>(renderer->swapChainImages.size() * objectAmount);
-
-	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create descriptor pool!");
-	}
-}
-
 void Window::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
 	VkImageCreateInfo imageInfo = {};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -534,40 +488,13 @@ void Window::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout
 	endSingleTimeCommands(commandBuffer);
 }
 
-VkImageView Window::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
-	VkImageViewCreateInfo viewInfo = {};
-	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	viewInfo.image = image;
-	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	viewInfo.format = format;
-	viewInfo.subresourceRange.aspectMask = aspectFlags;
-	viewInfo.subresourceRange.baseMipLevel = 0;
-	viewInfo.subresourceRange.levelCount = 1;
-	viewInfo.subresourceRange.baseArrayLayer = 0;
-	viewInfo.subresourceRange.layerCount = 1;
 
-	VkImageView imageView;
-	if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create texture image view!");
-	}
-
-	return imageView;
-}
 
 bool Window::hasStencilComponent(VkFormat format) {
 	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
-VkExtent2D Window::getSwapChainExtent() {
-    return renderer->swapChainExtent;
-}
-
-VkRenderPass& Window::getRenderPass() {
-    return renderer->renderPass;
-}
-
-void Window::updateLight()
-{
+void Window::updateLight() {
 	static auto startTime = std::chrono::high_resolution_clock::now();
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
@@ -576,10 +503,6 @@ void Window::updateLight()
 	lightPos.x = cos(glm::radians(time * 360.0f)) * 1.0f;
 	lightPos.y = 2;
 	lightPos.z = 1.5f + sin(glm::radians(time * 360.0f)) * 1.0f;
-}
-
-VkRenderPass& Window::getOffscreenRenderPass() {
-	return renderer->offscreenRenderPass;
 }
 
 VkExtent2D Window::getExtents() const {

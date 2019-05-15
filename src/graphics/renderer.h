@@ -1,6 +1,7 @@
 #pragma once
 
 #include "logical_device.h"
+#include "pipeline/swapchain.h"
 
 class Renderer {
 public:
@@ -13,17 +14,18 @@ public:
 
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	std::vector<VkImageView> swapChainImageViews;
-	VkSwapchainKHR swapChain;
-	std::vector<VkImage> swapChainImages;
-	VkExtent2D swapChainExtent;
-	VkFormat swapChainImageFormat;
 
     VkFramebuffer offscreenFrameBuffer;
+
+    Swapchain* getSwapchain();
+    const VkDescriptorPool& getDescriptorPool() const;
+    const VkRenderPass& getRenderPass() const;
 private:
     Window* window;
     Surface* surface;
     LogicalDevice* logicalDevice;
     PhysicalDevice* physicalDevice;
+    Swapchain swapchain;
 
 	VkImageView depthImageView;
 	VkImage depthImage;
@@ -37,6 +39,10 @@ private:
 	VkImage offscreenImage;
 	VkDeviceMemory offscreenImageMemory;
 
+	VkDescriptorPool descriptorPool;
+
+    void createDescriptorPool();
+
 	void initializeRenderPass();
 	void initializeOffscreenRenderPass();
 	VkFormat findDepthFormat();
@@ -44,7 +50,6 @@ private:
 	void createFramebuffers();
 	void createOffscreenFramebuffers();
 	void createImageViews();
-	void createSwapChain();
 	void createDepthResources();
 	void createDepthResourcesOffscreen();
 };

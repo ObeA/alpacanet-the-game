@@ -16,6 +16,9 @@ public:
     const VkQueue& getGraphicsQueue() const;
     const VkQueue& getPresentQueue() const;
     const VkCommandPool& getCommandPool() const;
+    const VkDescriptorPool& getDescriptorPool() const;
+
+    VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
 private:
     Instance* instance;
@@ -26,10 +29,12 @@ private:
     VkQueue graphicsQueue;
     VkQueue presentQueue;
     VkCommandPool commandPool;
+    VkDescriptorPool descriptorPool;
 
     QueueFamilyIndices indices;
 
     void createLogicalDevice();
     void createCommandPool();
+    void createDescriptorPool();
 };
 
