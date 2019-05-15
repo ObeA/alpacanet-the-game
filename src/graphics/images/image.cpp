@@ -1,4 +1,5 @@
 #include "image.h"
+#include "../buffers/buffer.h"
 
 Image::Image(LogicalDevice* logicalDevice, VkExtent2D extents, VkFormat format, VkImageTiling tiling,
              VkImageUsageFlags usage, VkMemoryPropertyFlags properties)
@@ -39,4 +40,8 @@ void Image::createImage(VkImageTiling tiling,  VkImageUsageFlags usage, VkMemory
     }
 
     vkBindImageMemory(device->getDevice(), image, memory, 0);
+}
+
+void Image::copyFrom(const Buffer& buffer) {
+
 }
