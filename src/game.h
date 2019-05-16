@@ -8,6 +8,8 @@
 #include "graphics/logical_device.h"
 #include "graphics/graphics.h"
 
+class Scene;
+
 class Game {
 public:
     Game();

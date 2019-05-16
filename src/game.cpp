@@ -32,7 +32,7 @@ void Game::run() {
 }
 
 void Game::setup() {
-    auto mainScene = new MainScene();
+    auto mainScene = new MainScene(this);
 
     scenes.push_back(mainScene);
     current_scene = mainScene;

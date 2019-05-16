@@ -33,7 +33,7 @@ private:
 
     VkPhysicalDevice physicalDevice;
 
-    void pickPhysicalDevice() const;
+    void pickPhysicalDevice();
     QueueFamilyIndices findQueueFamilies();
 };
 

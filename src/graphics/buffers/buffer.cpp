@@ -5,7 +5,7 @@ Buffer::Buffer(LogicalDevice* device,
                VkDeviceSize size,
                VkBufferUsageFlags usageFlags,
                VkMemoryPropertyFlags propertyFlags,
-               void* data = nullptr)
+               void* data)
         : device(device),
           size(size),
           usageFlags(usageFlags),

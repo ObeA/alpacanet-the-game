@@ -6,7 +6,7 @@ PhysicalDevice::PhysicalDevice(Instance* instance, Surface* surface)
     pickPhysicalDevice();
 }
 
-void PhysicalDevice::pickPhysicalDevice() const {
+void PhysicalDevice::pickPhysicalDevice() {
     uint32_t deviceCount = 0;
     vkEnumeratePhysicalDevices(instance->getInstance(), &deviceCount, nullptr);
 

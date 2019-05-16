@@ -1,10 +1,11 @@
 #pragma once
 
 #include "material.h"
+#include "../game.h"
 
 class ShadowMaterial : public Material {
 public:
-	ShadowMaterial(Window *window) : Material(window) {
+	ShadowMaterial(Graphics* graphics) : Material(graphics) {
 	}
 
 	void createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet);

@@ -10,7 +10,7 @@ Surface::Surface(Instance* instance, Window* window, PhysicalDevice* physicalDev
     createSurface();
     format = getBestFormat();
     presentMode = getBestPresentMode();
-    capabilities = fetchCapabilities();
+    fetchCapabilities();
 }
 
 Surface::~Surface() {

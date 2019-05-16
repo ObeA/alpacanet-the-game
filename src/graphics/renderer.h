@@ -8,10 +8,6 @@ public:
 	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice, PhysicalDevice* physicalDevice);
 	~Renderer();
 
-	VkRenderPass renderPass;
-
-	VkRenderPass offscreenRenderPass;
-
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	std::vector<VkImageView> swapChainImageViews;
 
@@ -20,6 +16,7 @@ public:
     Swapchain* getSwapchain();
     const VkDescriptorPool& getDescriptorPool() const;
     const VkRenderPass& getRenderPass() const;
+    const VkRenderPass& getOffscreenRenderPass() const;
 private:
     Window* window;
     Surface* surface;
@@ -30,6 +27,9 @@ private:
 	VkImageView depthImageView;
 	VkImage depthImage;
 	VkDeviceMemory depthImageMemory;
+
+    VkRenderPass renderPass;
+    VkRenderPass offscreenRenderPass;
 
 	VkImageView offscreenDepthImageView;
 	VkImage offscreenDepthImage;
