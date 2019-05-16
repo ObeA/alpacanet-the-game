@@ -35,14 +35,10 @@ Renderer::~Renderer() {
 
     vkDestroySampler(device, offscreenDepthSampler, nullptr);
     vkDestroyImageView(device, offscreenDepthImageView, nullptr);
-    vkDestroyImage(device, offscreenDepthImage, nullptr);
-    vkFreeMemory(device, offscreenDepthImageMemory, nullptr);
     vkDestroyFramebuffer(device, offscreenFrameBuffer, nullptr);
     vkDestroyRenderPass(device, offscreenRenderPass, nullptr);
 
     vkDestroyImageView(device, depthImageView, nullptr);
-    vkDestroyImage(device, depthImage, nullptr);
-    vkFreeMemory(device, depthImageMemory, nullptr);
 
     for (auto& swapChainFramebuffer : swapChainFramebuffers) {
         vkDestroyFramebuffer(device, swapChainFramebuffer, nullptr);
@@ -300,37 +296,33 @@ void Renderer::createImageViews() {
                                                                 VK_IMAGE_ASPECT_COLOR_BIT);
     }
 
-    window->createImage(swapchain.getExtents().width, swapchain.getExtents().height, VK_FORMAT_B8G8R8A8_UNORM,
-                        VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
-                        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, offscreenImage, offscreenImageMemory);
-    offscreenImageView = logicalDevice->createImageView(offscreenImage, VK_FORMAT_B8G8R8A8_UNORM,
+	offscreenImage = new Image(logicalDevice, swapchain.getExtents(), VK_FORMAT_B8G8R8A8_UNORM,
+		VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    offscreenImageView = logicalDevice->createImageView(offscreenImage->getImage(), VK_FORMAT_B8G8R8A8_UNORM,
                                                         VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
 void Renderer::createDepthResources() {
     VkFormat depthFormat = findDepthFormat();
 
-    window->createImage(swapchain.getExtents().width, swapchain.getExtents().height, depthFormat,
-                        VK_IMAGE_TILING_OPTIMAL,
-                        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage,
-                        depthImageMemory);
-    depthImageView = logicalDevice->createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
-
-    window->transitionImageLayout(depthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED,
-                                  VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
+	depthImage = new Image(logicalDevice, swapchain.getExtents(), depthFormat,
+		VK_IMAGE_TILING_OPTIMAL,
+		VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	depthImageView = logicalDevice->createImageView(depthImage->getImage(), depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+	depthImage->transitionLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 }
 
 void Renderer::createDepthResourcesOffscreen() {
     VkFormat depthFormat = findDepthFormat();
 
-    window->createImage(swapchain.getExtents().width, swapchain.getExtents().height, depthFormat,
-                        VK_IMAGE_TILING_OPTIMAL,
-                        VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
-                        offscreenDepthImage, offscreenDepthImageMemory);
-    offscreenDepthImageView = logicalDevice->createImageView(offscreenDepthImage, depthFormat,
+	offscreenDepthImage = new Image(logicalDevice, swapchain.getExtents(), depthFormat,
+		VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    offscreenDepthImageView = logicalDevice->createImageView(offscreenDepthImage->getImage(), depthFormat,
                                                              VK_IMAGE_ASPECT_DEPTH_BIT);
 
-    window->transitionImageLayout(offscreenDepthImage, depthFormat, VK_IMAGE_LAYOUT_UNDEFINED,
+    offscreenDepthImage->transitionLayout(VK_IMAGE_LAYOUT_UNDEFINED,
                                   VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 }
 

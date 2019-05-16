@@ -49,15 +49,15 @@ public:
 
 	VkDescriptorPool descriptorPool;
 
-	void run();
+	//void run();
 
-	void updateLight();
+	//void updateLight();
 
-	void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+	//void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
-	void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+	//void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
-	void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+	//void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
 	VkExtent2D getExtents() const;
 
@@ -81,19 +81,19 @@ private:
 
 	bool framebufferResized = false;
 
-	void drawFrame();
+	//void drawFrame();
 
-	void mainLoop();
+	//void mainLoop();
 
-	void cleanupSwapChain();
+	//void cleanupSwapChain();
 
-	void cleanup();
+	//void cleanup();
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
-	VkShaderModule createShaderModule(const std::vector<char>& code);
+	//VkShaderModule createShaderModule(const std::vector<char>& code);
 
-	void createCommandBuffers();
+	//void createCommandBuffers();
 
-	void createSyncObjects();
+	//void createSyncObjects();
 };

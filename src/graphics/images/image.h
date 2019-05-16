@@ -4,6 +4,8 @@
 #include "../logical_device.h"
 #include "../buffers/buffer.h"
 
+class Buffer;
+
 class Image {
 public:
     Image(LogicalDevice* logicalDevice, VkExtent2D extents, VkFormat format, VkImageTiling tiling,

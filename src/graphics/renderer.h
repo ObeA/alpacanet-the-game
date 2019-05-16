@@ -3,6 +3,7 @@
 #include "logical_device.h"
 #include "pipeline/swapchain.h"
 #include "../scenes/scene.h"
+#include "images/image.h"
 
 class Scene;
 
@@ -33,19 +34,16 @@ private:
     Swapchain swapchain;
 
 	VkImageView depthImageView;
-	VkImage depthImage;
-	VkDeviceMemory depthImageMemory;
+	Image* depthImage;
 
     VkRenderPass renderPass;
     VkRenderPass offscreenRenderPass;
 
 	VkImageView offscreenDepthImageView;
-	VkImage offscreenDepthImage;
-	VkDeviceMemory offscreenDepthImageMemory;
+	Image* offscreenDepthImage;
 	VkSampler offscreenDepthSampler;
 	VkImageView offscreenImageView;
-	VkImage offscreenImage;
-	VkDeviceMemory offscreenImageMemory;
+	Image* offscreenImage;
 
 	VkDescriptorPool descriptorPool;
     std::vector<VkCommandBuffer> commandBuffers;

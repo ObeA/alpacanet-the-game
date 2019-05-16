@@ -136,14 +136,13 @@ void Window::pollEvents() {
 //	renderer->cleanup();
 //}
 
-void Window::cleanup() {
-	cleanupSwapChain();
+Window::~Window() {
+	//cleanupSwapChain();
 
 	glfwDestroyWindow(window);
 
 	glfwTerminate();
 }
-
 
 
 void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
