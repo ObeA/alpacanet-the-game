@@ -1,16 +1,17 @@
 #include "renderer.h"
+#include "../scenes/scene.h"
 
 
-Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice, PhysicalDevice* physicalDevice)
+Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice)
         : window(window),
           surface(surface),
           logicalDevice(logicalDevice),
-          physicalDevice(physicalDevice),
           swapchain(logicalDevice,
                     surface,
                     surface->hasLimitedExtents()
                     ? surface->getCapabilities().currentExtent
-                    : window->getExtents()) {
+                    : window->getExtents()),
+          scene(nullptr) {
     createImageViews();
     createDescriptorPool();
 
@@ -22,6 +23,7 @@ Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevic
 
     createOffscreenFramebuffers();
     createFramebuffers();
+
 }
 
 Renderer::~Renderer() {
@@ -179,7 +181,7 @@ VkFormat Renderer::findSupportedFormat(const std::vector<VkFormat>& candidates, 
                                        VkFormatFeatureFlags features) {
     for (VkFormat format : candidates) {
         VkFormatProperties props;
-        vkGetPhysicalDeviceFormatProperties(physicalDevice->getDevice(), format, &props);
+        vkGetPhysicalDeviceFormatProperties(logicalDevice->getPhysicalDevice()->getDevice(), format, &props);
 
         if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features) {
             return format;
@@ -324,6 +326,95 @@ void Renderer::createDepthResourcesOffscreen() {
                                   VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL);
 }
 
+void Renderer::createCommandbuffers() {
+    commandBuffers.resize(swapChainFramebuffers.size());
+
+    VkCommandBufferAllocateInfo allocInfo = {};
+    allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    allocInfo.commandPool = logicalDevice->getCommandPool();
+    allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
+
+    if (vkAllocateCommandBuffers(logicalDevice->getDevice(), &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+        throw std::runtime_error("failed to allocate command buffers!");
+    }
+
+    for (size_t i = 0; i < commandBuffers.size(); i++) {
+        VkCommandBufferBeginInfo beginInfo = {};
+        beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+        beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+        beginInfo.pInheritanceInfo = nullptr; // Optional
+
+        if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
+            throw std::runtime_error("failed to begin recording command buffer!");
+        }
+
+        std::array<VkClearValue, 2> clearValues = {};
+        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+        clearValues[1].depthStencil = { 1.0f, 0 };
+
+        VkRenderPassBeginInfo renderPassBeginInfo = {};
+        renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassBeginInfo.renderPass = offscreenRenderPass;
+        renderPassBeginInfo.framebuffer = offscreenFrameBuffer;
+        renderPassBeginInfo.renderArea.extent = swapchain.getExtents();
+        renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassBeginInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        // Set depth bias (aka "Polygon offset")
+        // Required to avoid shadow mapping artifacts
+        vkCmdSetDepthBias(
+                commandBuffers[i],
+                1.25f,
+                0.0f,
+                1.75f);
+
+        for (auto& object : scene->getActiveObjects()) {
+            //TODO: Group objects by pipeline, bind pipeline and draw grouped objects
+            vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->shadowMaterial->graphicsPipeline);
+            vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->shadowMaterial->pipelineLayout, 0, 1, &object->offscreenDescriptorSets, 0, nullptr);
+            object->draw(commandBuffers[i], i);
+        }
+
+        vkCmdEndRenderPass(commandBuffers[i]);
+
+        VkRenderPassBeginInfo renderPassInfo = {};
+        renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassInfo.renderPass = renderPass;
+        renderPassInfo.framebuffer = swapChainFramebuffers[i];
+        renderPassInfo.renderArea.offset = { 0, 0 };
+        renderPassInfo.renderArea.extent = swapchain.getExtents();
+
+        clearValues = {};
+        clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
+        clearValues[1].depthStencil = { 1.0f, 0 };
+
+        renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
+        renderPassInfo.pClearValues = clearValues.data();
+
+        vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        for (auto& object : scene->getActiveObjects()) {
+            //TODO: Group objects by pipeline, bind pipeline and draw grouped objects
+            vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->material->graphicsPipeline);
+            vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->material->pipelineLayout, 0, 1, &object->descriptorSets[i], 0, nullptr);
+            object->draw(commandBuffers[i], i);
+        }
+
+        vkCmdEndRenderPass(commandBuffers[i]);
+
+        if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
+            throw std::runtime_error("failed to record command buffer!");
+        }
+    }
+}
+
+void render() {
+
+}
+
 const VkDescriptorPool& Renderer::getDescriptorPool() const {
     return descriptorPool;
 }
@@ -338,4 +429,10 @@ const VkRenderPass& Renderer::getRenderPass() const {
 
 const VkRenderPass& Renderer::getOffscreenRenderPass() const {
     return offscreenRenderPass;
+}
+
+void Renderer::setScene(Scene* scene) {
+    this->scene = scene;
+
+    createCommandbuffers();
 }

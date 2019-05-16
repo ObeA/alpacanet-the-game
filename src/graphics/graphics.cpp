@@ -3,29 +3,34 @@
 Graphics::Graphics()
         : instance(),
           window(),
-          physicalDevice(&instance, &surface),
-          surface(&instance, &window, &physicalDevice),
-          logicalDevice(&instance, &physicalDevice, &surface),
-          renderer(&window, &surface, &logicalDevice, &physicalDevice) {
+          physicalDevice(new PhysicalDevice(instance, surface)),
+          surface(new Surface(instance, window, physicalDevice)),
+          logicalDevice(new LogicalDevice(instance, physicalDevice, surface)),
+          renderer(new Renderer(window, surface, logicalDevice)) {
 
 }
 
 Graphics::~Graphics() {
-
+    delete window;
+    delete physicalDevice;
+    delete surface;
+    delete logicalDevice;
+    delete renderer;
+    delete instance;
 }
 
 Window* Graphics::getWindow() {
-    return &window;
+    return window;
 }
 
 LogicalDevice* Graphics::getLogicalDevice() {
-    return &logicalDevice;
+    return logicalDevice;
 }
 
 PhysicalDevice* Graphics::getPhysicalDevice() {
-    return &physicalDevice;
+    return physicalDevice;
 }
 
 Renderer* Graphics::getRenderer() {
-    return &renderer;
+    return renderer;
 }

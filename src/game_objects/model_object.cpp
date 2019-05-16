@@ -1,4 +1,5 @@
 #include "model_object.h"
+#include "../graphics/buffers/uniform_buffer.h"
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>

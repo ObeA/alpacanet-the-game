@@ -8,6 +8,7 @@
 #include "graphics/logical_device.h"
 #include "graphics/graphics.h"
 
+class Graphics;
 class Scene;
 
 class Game {
@@ -20,7 +21,7 @@ public:
     Scene* getCurrentScene();
     Graphics* getGraphics();
 private:
-    Graphics graphics;
+    Graphics* graphics;
 
     std::vector<Scene*> scenes;
     Scene* current_scene;

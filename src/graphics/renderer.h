@@ -2,16 +2,21 @@
 
 #include "logical_device.h"
 #include "pipeline/swapchain.h"
+#include "../scenes/scene.h"
+
+class Scene;
 
 class Renderer {
 public:
-	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice, PhysicalDevice* physicalDevice);
+	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice);
 	~Renderer();
 
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	std::vector<VkImageView> swapChainImageViews;
 
     VkFramebuffer offscreenFrameBuffer;
+
+    void setScene(Scene* scene);
 
     Swapchain* getSwapchain();
     const VkDescriptorPool& getDescriptorPool() const;
@@ -21,7 +26,8 @@ private:
     Window* window;
     Surface* surface;
     LogicalDevice* logicalDevice;
-    PhysicalDevice* physicalDevice;
+    Scene* scene;
+
     Swapchain swapchain;
 
 	VkImageView depthImageView;
@@ -40,6 +46,7 @@ private:
 	VkDeviceMemory offscreenImageMemory;
 
 	VkDescriptorPool descriptorPool;
+    std::vector<VkCommandBuffer> commandBuffers;
 
     void createDescriptorPool();
 
@@ -52,4 +59,6 @@ private:
 	void createImageViews();
 	void createDepthResources();
 	void createDepthResourcesOffscreen();
+
+	void createCommandbuffers();
 };

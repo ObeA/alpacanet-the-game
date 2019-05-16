@@ -79,10 +79,6 @@ private:
 
 	void initWindow();
 
-	void initVulkan();
-
-	void recreateSwapChain();
-
 	void mainLoop();
 
 	void cleanupSwapChain();
@@ -96,12 +92,4 @@ private:
 	void createCommandBuffers();
 
 	void createSyncObjects();
-
-	void createDescriptorPool();
-
-	VkCommandBuffer beginSingleTimeCommands();
-
-	void endSingleTimeCommands(VkCommandBuffer commandBuffer);
-
-	bool hasStencilComponent(VkFormat format);
 };

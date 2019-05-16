@@ -4,7 +4,7 @@
 #include "../game.h"
 #include "../graphics/buffers/buffer.h"
 #include "../materials/material.h"
-#include "../graphics/buffers/uniform_buffer.h"
+
 
 //struct UniformBufferObject {
 //    alignas(16) glm::mat4 model;
@@ -20,7 +20,9 @@ struct UniformBufferObject {
     glm::vec3 lightPos;
 };
 
+class Buffer;
 class Game;
+class Material;
 
 class GameObject {
 public:
@@ -51,8 +53,8 @@ protected:
 	Buffer* vertexBuffer;
 	Buffer* indexBuffer;
 
-	std::vector<UniformBuffer*> uniformBuffers;
-	UniformBuffer* offscreenUniformBuffer;
+	std::vector<Buffer*> uniformBuffers;
+	Buffer* offscreenUniformBuffer;
 
 	virtual void createVertexBuffer();
 

@@ -6,13 +6,15 @@
 #include "graphics/physical_device.h"
 #include "graphics/logical_device.h"
 
-Game::Game() : graphics(), current_scene(nullptr) {
+Game::Game() : graphics(new Graphics()), current_scene(nullptr) {
 }
 
 Game::~Game() {
     for (auto scene : scenes) {
         delete scene;
     }
+
+    delete graphics;
 }
 
 void Game::run() {
@@ -22,7 +24,7 @@ void Game::run() {
     setup();
 
     try {
-        graphics.getWindow()->run();
+        graphics->getWindow()->run();
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
@@ -38,6 +40,8 @@ void Game::setup() {
     current_scene = mainScene;
 
     current_scene->setup();
+
+    graphics->getRenderer()->setScene(current_scene);
 }
 
 Scene* Game::getCurrentScene() {
@@ -45,5 +49,5 @@ Scene* Game::getCurrentScene() {
 }
 
 Graphics* Game::getGraphics() {
-    return &graphics;
+    return graphics;
 }

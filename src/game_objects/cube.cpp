@@ -1,5 +1,6 @@
 #include "cube.h"
 #include "../materials/material.h"
+#include "../graphics/buffers/uniform_buffer.h"
 
 void Cube::updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos) {
 	position.x = glm::clamp(position.x + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);

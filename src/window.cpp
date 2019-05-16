@@ -10,7 +10,6 @@
 
 void Window::run() {
 	initWindow();
-	initVulkan();
 	mainLoop();
 	cleanup();
 }
@@ -113,31 +112,7 @@ void Window::initVulkan() {
 		object->generate(renderer->swapChainImages.size());
 	}*/
 
-	createCommandBuffers();
 	createSyncObjects();
-}
-
-void Window::recreateSwapChain() {
-	int width = 0, height = 0;
-	while (width == 0 || height == 0) {
-		glfwGetFramebufferSize(window, &width, &height);
-		glfwWaitEvents();
-	}
-
-	vkDeviceWaitIdle(device);
-
-	cleanupSwapChain();
-
-	//TODO: recreate in renderer
-	//createSwapChain();
-	//createImageViews();
-	//createRenderPass();
-	//TODO: recreate materials?
-//	createGraphicsPipeline();
-//	createDepthResources();
-	//TODO: recreate in renderer
-	//createFramebuffers();
-	createCommandBuffers();
 }
 
 void Window::mainLoop() {
@@ -192,91 +167,6 @@ VkShaderModule Window::createShaderModule(const std::vector<char>& code) {
 	}
 
 	return shaderModule;
-}
-
-void Window::createCommandBuffers() {
-	commandBuffers.resize(renderer->swapChainFramebuffers.size());
-
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.commandPool = commandPool;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-	allocInfo.commandBufferCount = (uint32_t)commandBuffers.size();
-
-	if (vkAllocateCommandBuffers(device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate command buffers!");
-	}
-
-	for (size_t i = 0; i < commandBuffers.size(); i++) {
-		VkCommandBufferBeginInfo beginInfo = {};
-		beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-		beginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
-		beginInfo.pInheritanceInfo = nullptr; // Optional
-
-		if (vkBeginCommandBuffer(commandBuffers[i], &beginInfo) != VK_SUCCESS) {
-			throw std::runtime_error("failed to begin recording command buffer!");
-		}
-
-		std::array<VkClearValue, 2> clearValues = {};
-		clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-		clearValues[1].depthStencil = { 1.0f, 0 };
-
-		VkRenderPassBeginInfo renderPassBeginInfo = {};
-		renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassBeginInfo.renderPass = renderer->offscreenRenderPass;
-		renderPassBeginInfo.framebuffer = renderer->offscreenFrameBuffer;
-		renderPassBeginInfo.renderArea.extent = renderer->swapChainExtent;
-		renderPassBeginInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		renderPassBeginInfo.pClearValues = clearValues.data();
-
-		vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		// Set depth bias (aka "Polygon offset")
-		// Required to avoid shadow mapping artifacts
-		vkCmdSetDepthBias(
-			commandBuffers[i],
-			1.25f,
-			0.0f,
-			1.75f);
-
-        for (auto& object : objects) {
-            //TODO: Group objects by pipeline, bind pipeline and draw grouped objects
-            vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->shadowMaterial->graphicsPipeline);
-            vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->shadowMaterial->pipelineLayout, 0, 1, &object->offscreenDescriptorSets, 0, nullptr);
-            object->draw(commandBuffers[i], i);
-        }
-
-		vkCmdEndRenderPass(commandBuffers[i]);
-
-		VkRenderPassBeginInfo renderPassInfo = {};
-		renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
-		renderPassInfo.renderPass = renderer->renderPass;
-		renderPassInfo.framebuffer = renderer->swapChainFramebuffers[i];
-		renderPassInfo.renderArea.offset = { 0, 0 };
-		renderPassInfo.renderArea.extent = renderer->swapChainExtent;
-
-		clearValues = {};
-		clearValues[0].color = { 0.0f, 0.0f, 0.0f, 1.0f };
-		clearValues[1].depthStencil = { 1.0f, 0 };
-
-		renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
-		renderPassInfo.pClearValues = clearValues.data();
-
-		vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
-
-		for (auto& object : objects) {
-			//TODO: Group objects by pipeline, bind pipeline and draw grouped objects
-			vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->material->graphicsPipeline);
-			vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->material->pipelineLayout, 0, 1, &object->descriptorSets[i], 0, nullptr);
-			object->draw(commandBuffers[i], i);
-		}
-
-		vkCmdEndRenderPass(commandBuffers[i]);
-
-		if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to record command buffer!");
-		}
-	}
 }
 
 void Window::createSyncObjects() {

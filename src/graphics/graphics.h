@@ -1,12 +1,12 @@
 #pragma once
 
-#include <memory>
-
-#include "renderer.h"
 #include "instance.h"
 #include "surface.h"
 #include "physical_device.h"
 #include "logical_device.h"
+#include "renderer.h"
+
+class Renderer;
 
 class Graphics {
 public:
@@ -18,11 +18,11 @@ public:
     PhysicalDevice* getPhysicalDevice();
     Renderer* getRenderer();
 private:
-    Instance instance;
-    Window window;
-    Surface surface;
-    PhysicalDevice physicalDevice;
-    LogicalDevice logicalDevice;
-    Renderer renderer;
+    Instance* instance;
+    Window* window;
+    Surface* surface;
+    PhysicalDevice* physicalDevice;
+    LogicalDevice* logicalDevice;
+    Renderer* renderer;
 };
 
