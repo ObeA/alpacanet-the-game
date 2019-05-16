@@ -61,4 +61,6 @@ private:
 	void createDepthResourcesOffscreen();
 
 	void createCommandbuffers();
+
+    void render();
 };

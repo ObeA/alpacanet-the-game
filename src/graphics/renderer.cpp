@@ -29,6 +29,7 @@ Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevic
 Renderer::~Renderer() {
     auto device = logicalDevice->getDevice();
 
+    vkFreeCommandBuffers(device, logicalDevice->getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
     vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
     vkDestroySampler(device, offscreenDepthSampler, nullptr);
@@ -411,7 +412,7 @@ void Renderer::createCommandbuffers() {
     }
 }
 
-void render() {
+void Renderer::render() {
 
 }
 

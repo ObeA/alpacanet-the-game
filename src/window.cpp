@@ -125,7 +125,7 @@ void Window::mainLoop() {
 }
 
 void Window::cleanupSwapChain() {
-	vkFreeCommandBuffers(device, commandPool, static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+
 
     for (auto &material : materials) {
         material->cleanupSwapChain();
