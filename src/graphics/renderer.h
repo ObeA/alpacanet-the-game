@@ -18,6 +18,8 @@ public:
 
     void setScene(Scene* scene);
 
+	void render();
+
     Swapchain* getSwapchain();
     const VkDescriptorPool& getDescriptorPool() const;
     const VkRenderPass& getRenderPass() const;
@@ -48,6 +50,11 @@ private:
 	VkDescriptorPool descriptorPool;
     std::vector<VkCommandBuffer> commandBuffers;
 
+	std::vector<VkSemaphore> imageAvailableSemaphores;
+	std::vector<VkSemaphore> renderFinishedSemaphores;
+	std::vector<VkFence> inFlightFences;
+	size_t currentFrame = 0;
+
     void createDescriptorPool();
 
 	void initializeRenderPass();
@@ -62,5 +69,5 @@ private:
 
 	void createCommandbuffers();
 
-    void render();
+	void createSyncObjects();
 };

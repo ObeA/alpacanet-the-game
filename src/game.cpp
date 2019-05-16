@@ -24,7 +24,14 @@ void Game::run() {
     setup();
 
     try {
-        graphics->getWindow()->run();
+        graphics->getWindow()->initWindow();
+
+		while (!graphics->getWindow()->shouldClose()) {
+			graphics->getWindow()->pollEvents();
+			graphics->getRenderer()->render();
+		}
+
+		vkDeviceWaitIdle(graphics->getLogicalDevice()->getDevice());
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

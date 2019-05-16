@@ -61,23 +61,27 @@ public:
 
 	VkExtent2D getExtents() const;
 
+	void initWindow();
+
+	bool shouldClose();
+
+	void pollEvents();
+
 private:
     VkExtent2D extents;
 
 	std::vector<VkCommandBuffer> commandBuffers;
 
-	std::vector<VkSemaphore> imageAvailableSemaphores;
-	std::vector<VkSemaphore> renderFinishedSemaphores;
-	std::vector<VkFence> inFlightFences;
-	size_t currentFrame = 0;
+	//std::vector<VkSemaphore> imageAvailableSemaphores;
+	//std::vector<VkSemaphore> renderFinishedSemaphores;
+	//std::vector<VkFence> inFlightFences;
+	//size_t currentFrame = 0;
 
     glm::vec3 lightPos = glm::vec3(0.0f);
 
 	bool framebufferResized = false;
 
 	void drawFrame();
-
-	void initWindow();
 
 	void mainLoop();
 
