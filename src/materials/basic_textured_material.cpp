@@ -10,8 +10,8 @@ void BasicTexturedMaterial::cleanup() {
     auto device = graphics->getLogicalDevice()->getDevice();
     vkDestroySampler(device, textureSampler, nullptr);
     vkDestroyImageView(device, textureImageView, nullptr);
-    vkDestroyImage(device, textureImage, nullptr);
-    vkFreeMemory(device, textureImageMemory, nullptr);
+
+    delete textureImage;
 
     Material::cleanup();
 }
@@ -149,19 +149,19 @@ void BasicTexturedMaterial::createTextureImage() {
     stbi_image_free(pixels);
 
     VkExtent2D textureExtents{static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight)};
-    Image image(graphics->getLogicalDevice(),
+    textureImage = new Image(graphics->getLogicalDevice(),
                 textureExtents,
                 VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_TILING_OPTIMAL,
                 VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    image.transitionLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    image.copyFromBuffer(&stagingBuffer);
-    image.transitionLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    textureImage->transitionLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    textureImage->copyFromBuffer(&stagingBuffer);
+    textureImage->transitionLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 }
 
 void BasicTexturedMaterial::createTextureImageView() {
-    textureImageView = graphics->getLogicalDevice()->createImageView(textureImage, VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT);
+    textureImageView = graphics->getLogicalDevice()->createImageView(textureImage->getImage(), VK_FORMAT_R8G8B8A8_UNORM, VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
 void BasicTexturedMaterial::createTextureSampler() {

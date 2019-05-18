@@ -66,6 +66,18 @@
 //	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
 //}
 
+Window::Window() {
+    initWindow();
+}
+
+Window::~Window() {
+    //cleanupSwapChain();
+
+    glfwDestroyWindow(window);
+
+    glfwTerminate();
+}
+
 void Window::initWindow() {
 	glfwInit();
 
@@ -135,14 +147,6 @@ void Window::pollEvents() {
 //
 //	renderer->cleanup();
 //}
-
-Window::~Window() {
-	//cleanupSwapChain();
-
-	glfwDestroyWindow(window);
-
-	glfwTerminate();
-}
 
 
 void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height) {

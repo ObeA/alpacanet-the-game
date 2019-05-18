@@ -27,6 +27,5 @@ private:
     VkDeviceMemory memory;
 
     void createImage(VkImageTiling tiling,  VkImageUsageFlags usage, VkMemoryPropertyFlags properties);
-
 };
 

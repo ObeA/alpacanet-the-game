@@ -26,7 +26,7 @@ void LogicalDevice::createCommandPool() {
 
 void LogicalDevice::createLogicalDevice() {
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
-    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+    std::set<uint32_t> uniqueQueueFamilies = {physicalDevice->getGraphicsFamilyIndex(), physicalDevice->getPresentFamilyIndex()};
 
     float queuePriority = 1.0f;
     for (uint32_t queueFamily : uniqueQueueFamilies) {
@@ -63,11 +63,11 @@ void LogicalDevice::createLogicalDevice() {
         throw std::runtime_error("failed to create logical device!");
     }
 
-    vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
-    vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
+    vkGetDeviceQueue(device, physicalDevice->getGraphicsFamilyIndex(), 0, &graphicsQueue);
+    vkGetDeviceQueue(device, physicalDevice->getPresentFamilyIndex(), 0, &presentQueue);
 }
 
-VkImageView LogicalDevice::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
+VkImageView LogicalDevice::createImageView(const VkImage& image, VkFormat format, VkImageAspectFlags aspectFlags) const {
     VkImageViewCreateInfo viewInfo = {};
     viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     viewInfo.image = image;

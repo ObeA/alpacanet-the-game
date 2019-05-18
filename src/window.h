@@ -61,7 +61,7 @@ public:
 
 	VkExtent2D getExtents() const;
 
-	void initWindow();
+
 
 	bool shouldClose();
 
@@ -78,6 +78,8 @@ private:
 	//size_t currentFrame = 0;
 
     glm::vec3 lightPos = glm::vec3(0.0f);
+
+    void initWindow();
 
 	bool framebufferResized = false;
 

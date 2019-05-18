@@ -18,6 +18,7 @@ target_link_libraries(AlpacaWeb ${Vulkan_LIBRARIES})
 add_subdirectory(glm)
 target_link_libraries(AlpacaWeb glm)
 
+# add_subdirectory(glfw)
 find_package(glfw3 REQUIRED)
 target_link_libraries(AlpacaWeb glfw)
 

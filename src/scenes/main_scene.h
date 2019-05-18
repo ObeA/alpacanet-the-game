@@ -8,5 +8,8 @@ public:
     ~MainScene() override;
 
     void setup() override;
+    void update() override;
+private:
+    std::vector<Material*> materials;
 };
 

@@ -2,11 +2,7 @@
 
 GameObject::GameObject(Game* game, Material* material, Material* shadowMaterial)
     : game(game), material(material), shadowMaterial(shadowMaterial) {
-    createVertexBuffer();
-    createIndexBuffer();
 
-    auto numberOfSwapchainImages = game->getGraphics()->getRenderer()->getSwapchain()->getImages().size();
-    createDescriptorSet(numberOfSwapchainImages);
 }
 
 GameObject::~GameObject() {
@@ -20,8 +16,12 @@ GameObject::~GameObject() {
 }
 
 void GameObject::start() {
-	auto numberOfSwapchainImages = game->getGraphics()->getRenderer()->getSwapchain()->getImages().size();
-	createUniformBuffers(numberOfSwapchainImages);
+    createVertexBuffer();
+    createIndexBuffer();
+
+    auto numberOfSwapchainImages = game->getGraphics()->getRenderer()->getSwapchain()->getImages().size();
+    createUniformBuffers(numberOfSwapchainImages);
+    createDescriptorSet(numberOfSwapchainImages);
 }
 
 void GameObject::draw(VkCommandBuffer cmdbuffer, size_t bufferOffset) {

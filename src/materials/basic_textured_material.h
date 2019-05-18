@@ -16,8 +16,7 @@ protected:
 	char* textureLocation;
 	VkImageView textureImageView;
 	VkSampler textureSampler;
-	VkImage textureImage;
-	VkDeviceMemory textureImageMemory;
+	Image* textureImage;
 
     void createGraphicsPipeline();
     virtual void createDescriptorSetLayout();

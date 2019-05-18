@@ -1,13 +1,13 @@
 #include "graphics.h"
 
-Graphics::Graphics()
-        : instance(),
-          window(),
-          physicalDevice(new PhysicalDevice(instance, surface)),
-          surface(new Surface(instance, window, physicalDevice)),
-          logicalDevice(new LogicalDevice(instance, physicalDevice, surface)),
-          renderer(new Renderer(window, surface, logicalDevice)) {
-
+Graphics::Graphics() {
+    window = new Window;
+    instance = new Instance;
+    physicalDevice = new PhysicalDevice(instance);
+    surface = new Surface(instance, window, physicalDevice);
+    physicalDevice->setQueueFamilies(surface);
+    logicalDevice = new LogicalDevice(instance, physicalDevice, surface);
+    renderer = new Renderer(window, surface, logicalDevice);
 }
 
 Graphics::~Graphics() {

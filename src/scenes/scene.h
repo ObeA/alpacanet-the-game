@@ -9,9 +9,10 @@ class GameObject;
 class Scene {
 public:
     explicit Scene(Game* game) : game(game) { }
-    virtual ~Scene() =0;
+    virtual ~Scene() { }
 
     virtual void setup() =0;
+    virtual void update() =0;
 
     std::vector<GameObject*> getActiveObjects();
     Camera* getCamera();

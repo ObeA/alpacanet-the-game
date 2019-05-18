@@ -93,7 +93,7 @@ void ModelObject::createUniformBuffers(size_t swapChainImageSize) {
 
     auto device = game->getGraphics()->getLogicalDevice();
     for (size_t i = 0; i < swapChainImageSize; i++) {
-        uniformBuffers.emplace_back(new UniformBuffer(device, bufferSize));
+        uniformBuffers[i] = new UniformBuffer(device, bufferSize);
     }
 
 	VkDeviceSize offscreenBufferSize = sizeof(UniformBufferObjectOffscreen);

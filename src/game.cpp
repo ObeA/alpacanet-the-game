@@ -6,7 +6,8 @@
 #include "graphics/physical_device.h"
 #include "graphics/logical_device.h"
 
-Game::Game() : graphics(new Graphics()), current_scene(nullptr) {
+Game::Game() : current_scene(nullptr) {
+    graphics = new Graphics;
 }
 
 Game::~Game() {
@@ -24,8 +25,6 @@ void Game::run() {
     setup();
 
     try {
-        graphics->getWindow()->initWindow();
-
 		while (!graphics->getWindow()->shouldClose()) {
 			graphics->getWindow()->pollEvents();
 			graphics->getRenderer()->render();
@@ -45,7 +44,6 @@ void Game::setup() {
 
     scenes.push_back(mainScene);
     current_scene = mainScene;
-
     current_scene->setup();
 
     graphics->getRenderer()->setScene(current_scene);

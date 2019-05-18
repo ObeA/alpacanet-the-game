@@ -2,7 +2,6 @@
 
 
 #include "../logical_device.h"
-#include "../graphics.h"
 
 class Buffer {
 public:

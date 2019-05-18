@@ -128,7 +128,7 @@ std::vector<const char*> Instance::getRequiredExtensions() const {
     return extensions;
 }
 
-VkInstance Instance::getInstance() {
+const VkInstance& Instance::getInstance() const {
     return instance;
 }
 

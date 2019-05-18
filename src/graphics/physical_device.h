@@ -1,6 +1,5 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
 #include "instance.h"
 #include "surface.h"
 
@@ -17,7 +16,7 @@ class Surface;
 
 class PhysicalDevice {
 public:
-    PhysicalDevice(Instance* instance, Surface* surface);
+    explicit PhysicalDevice(Instance* instance);
 
     VkPhysicalDevice getDevice() const;
 
@@ -26,14 +25,15 @@ public:
 
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
+    void setQueueFamilies(Surface* surface);
+
 private:
     Instance* instance;
-    Surface* surface;
     QueueFamilyIndices indices;
 
     VkPhysicalDevice physicalDevice;
 
     void pickPhysicalDevice();
-    QueueFamilyIndices findQueueFamilies();
+    QueueFamilyIndices findQueueFamilies(VkSurfaceKHR surface);
 };
 

@@ -1,9 +1,10 @@
 #include "physical_device.h"
 #include "surface.h"
 
-PhysicalDevice::PhysicalDevice(Instance* instance, Surface* surface)
-        : instance(instance), surface(surface), indices(findQueueFamilies()) {
+PhysicalDevice::PhysicalDevice(Instance* instance)
+        : instance(instance) {
     pickPhysicalDevice();
+
 }
 
 void PhysicalDevice::pickPhysicalDevice() {
@@ -46,7 +47,7 @@ uint32_t PhysicalDevice::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFla
     throw std::runtime_error("failed to find suitable memory type!");
 }
 
-QueueFamilyIndices PhysicalDevice::findQueueFamilies() {
+QueueFamilyIndices PhysicalDevice::findQueueFamilies(VkSurfaceKHR surface) {
     uint32_t queueFamilyCount = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
 
@@ -56,7 +57,7 @@ QueueFamilyIndices PhysicalDevice::findQueueFamilies() {
     int i = 0;
     for (const auto& queueFamily : queueFamilies) {
         VkBool32 presentSupport = false;
-        vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface->getSurface(), &presentSupport);
+        vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevice, i, surface, &presentSupport);
 
         if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) {
             indices.graphicsFamily = i;
@@ -74,6 +75,10 @@ QueueFamilyIndices PhysicalDevice::findQueueFamilies() {
     }
 
     return indices;
+}
+
+void PhysicalDevice::setQueueFamilies(Surface* surface) {
+    indices = findQueueFamilies(surface->getSurface());
 }
 
 uint32_t PhysicalDevice::getPresentFamilyIndex() const {
