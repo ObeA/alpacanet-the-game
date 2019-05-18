@@ -14,8 +14,8 @@ Graphics::~Graphics() {
     delete window;
     delete physicalDevice;
     delete surface;
+	delete renderer;
     delete logicalDevice;
-    delete renderer;
     delete instance;
 }
 
