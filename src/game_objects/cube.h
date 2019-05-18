@@ -27,7 +27,7 @@ public:
     Cube(Game* game, Material* material, Material* shadowMaterial) : GameObject(game, material, shadowMaterial) {
     }
 
-    void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos);
+    void updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos);
 
     std::vector<Vertex> getVertices();
 

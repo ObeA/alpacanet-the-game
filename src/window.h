@@ -49,33 +49,19 @@ public:
 
 	VkDescriptorPool descriptorPool;
 
-	//void run();
-
-	//void updateLight();
-
-	//void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-
-	//void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-
-	//void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-
 	VkExtent2D getExtents() const;
-
-
 
 	bool shouldClose();
 
 	void pollEvents();
 
+	void registerOnCursorMoveCallback(std::function<void(double, double)> callback);
+    void registerOnKeyDownCallback(std::function<void(int, int, int)> callback);
+    void registerOnKeyUpCallback(std::function<void(int, int, int)> callback);
+
 private:
     VkExtent2D extents;
-
 	std::vector<VkCommandBuffer> commandBuffers;
-
-	//std::vector<VkSemaphore> imageAvailableSemaphores;
-	//std::vector<VkSemaphore> renderFinishedSemaphores;
-	//std::vector<VkFence> inFlightFences;
-	//size_t currentFrame = 0;
 
     glm::vec3 lightPos = glm::vec3(0.0f);
 
@@ -83,19 +69,11 @@ private:
 
 	bool framebufferResized = false;
 
-	//void drawFrame();
-
-	//void mainLoop();
-
-	//void cleanupSwapChain();
-
-	//void cleanup();
+    std::vector<std::function<void(double, double)>> onCursorMoveCallbacks;
+    std::vector<std::function<void(int, int, int)>> onKeyDownCallbacks;
+    std::vector<std::function<void(int, int, int)>> onKeyUpCallbacks;
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
-
-	//VkShaderModule createShaderModule(const std::vector<char>& code);
-
-	//void createCommandBuffers();
-
-	//void createSyncObjects();
+	static void cursorPositionCallback(GLFWwindow* window, double x, double y);
+    static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };

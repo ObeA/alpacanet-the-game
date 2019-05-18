@@ -5,6 +5,8 @@
 #include "../materials/shadow_material.h"
 
 void MainScene::setup() {
+    camera = new Camera(game, glm::vec3(2.0, 2.0, 2.0), 0, 225);
+
     auto graphics = game->getGraphics();
     materials.push_back(new BasicMaterial(graphics));
 	materials.push_back(new BasicTexturedMaterial(graphics, (char*)"assets/textures/texture.jpg"));
@@ -41,5 +43,5 @@ MainScene::~MainScene() {
 }
 
 void MainScene::update() {
-
+    camera->update();
 }

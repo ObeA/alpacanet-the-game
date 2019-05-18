@@ -1,3 +1,4 @@
+#include <thread>
 #include "game.h"
 #include "scenes/main_scene.h"
 #include "managers/material_manager.h"
@@ -19,18 +20,34 @@ Game::~Game() {
 }
 
 void Game::run() {
+    using namespace std::chrono_literals;
     auto& materialManager = MaterialManager::getInstance();
 
     materialManager.setup();
     setup();
 
     try {
-		while (!graphics->getWindow()->shouldClose()) {
-			graphics->getWindow()->pollEvents();
-			graphics->getRenderer()->render();
-		}
 
-		vkDeviceWaitIdle(graphics->getLogicalDevice()->getDevice());
+        std::chrono::nanoseconds lag(0ns);
+        auto oldTime = std::chrono::high_resolution_clock::now();
+
+        while (!graphics->getWindow()->shouldClose()) {
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            auto delta = currentTime - oldTime;
+            oldTime = currentTime;
+            lag += std::chrono::duration_cast<std::chrono::nanoseconds>(delta);
+
+            graphics->getWindow()->pollEvents();
+
+            while (lag >= Timestep) {
+                getCurrentScene()->update();
+                lag -= Timestep;
+            }
+
+            graphics->getRenderer()->render();
+        }
+
+        vkDeviceWaitIdle(graphics->getLogicalDevice()->getDevice());
     }
     catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

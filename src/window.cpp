@@ -8,7 +8,7 @@
 #include "materials/shadow_material.h"
 #include "graphics/renderer.h"
 
-Window::Window() {
+Window::Window() : onCursorMoveCallbacks{} {
     initWindow();
 }
 
@@ -29,6 +29,9 @@ void Window::initWindow() {
 	window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
 	glfwSetWindowUserPointer(window, this);
 	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+
+	glfwSetCursorPosCallback(window, cursorPositionCallback);
+	glfwSetKeyCallback(window, keyCallback);
 }
 
 bool Window::shouldClose() {
@@ -40,8 +43,8 @@ void Window::pollEvents() {
 }
 
 void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-	auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	app->framebufferResized = true;
+	auto self = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+	self->framebufferResized = true;
 }
 
 VkExtent2D Window::getExtents() const {
@@ -54,4 +57,39 @@ VkExtent2D Window::getExtents() const {
     };
 
     return actualExtent;
+}
+
+void Window::registerOnCursorMoveCallback(std::function<void(double, double)> callback) {
+    onCursorMoveCallbacks.emplace_back(callback);
+}
+
+void Window::registerOnKeyDownCallback(std::function<void(int, int, int)> callback) {
+    onKeyDownCallbacks.emplace_back(callback);
+}
+
+void Window::registerOnKeyUpCallback(std::function<void(int, int, int)> callback) {
+    onKeyUpCallbacks.emplace_back(callback);
+}
+
+void Window::cursorPositionCallback(GLFWwindow* window, double xoffset, double yoffset) {
+    auto self = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    for (const auto& callback : self->onCursorMoveCallbacks) {
+        callback(xoffset, yoffset);
+    }
+}
+
+void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    auto self = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+
+    std::vector<std::function<void(int, int, int)>> callbacks;
+    if (action == GLFW_PRESS) {
+        callbacks = self->onKeyDownCallbacks;
+    } else if (action == GLFW_RELEASE) {
+        callbacks = self->onKeyUpCallbacks;
+    }
+
+    for (const auto& callback : callbacks) {
+        callback(key, scancode, mods);
+    }
 }

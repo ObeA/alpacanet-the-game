@@ -13,6 +13,8 @@ class Scene;
 
 class Game {
 public:
+    static constexpr std::chrono::nanoseconds Timestep = std::chrono::milliseconds(16);
+
     Game();
     ~Game();
 

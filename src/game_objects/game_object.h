@@ -35,7 +35,7 @@ public:
 
 	virtual void start();
 
-    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos) = 0;
+    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos) = 0;
 
     virtual void draw(VkCommandBuffer cmdbuffer, size_t bufferOffset);
 

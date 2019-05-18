@@ -429,8 +429,10 @@ void Renderer::render() {
 
 	//updateLight();
 
+	auto camera = scene->getCamera();
+	auto projection = glm::perspective(glm::radians(90.0f), swapchain.getExtents().width / (float)swapchain.getExtents().height, 0.1f, 10.0f);
 	for (auto& object : scene->getActiveObjects()) {
-		object->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), swapchain.getExtents().width / (float)swapchain.getExtents().height, 0.1f, 10.0f), glm::vec3(0,0,0));
+		object->updateUniformBuffer(imageIndex, camera->getViewMatrix(), projection, glm::vec3(0,0,0));
 	}
 
 	VkSubmitInfo submitInfo = {};

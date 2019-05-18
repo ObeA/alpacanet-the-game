@@ -30,7 +30,7 @@ public:
 
     void start() override;
 
-    void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos);
+    void updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos);
 
 private:
     char* modelLocation;
