@@ -26,10 +26,9 @@ public:
     ModelObject(Game* game, Material* material, Material* shadowMaterial, char* location)
             : GameObject(game, material, shadowMaterial),
               modelLocation(location) {
-        loadModel();
     }
 
-    void generate(size_t swapchainImageSize);
+    void start() override;
 
     void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos);
 

@@ -72,7 +72,7 @@ void GameObject::createIndexBuffer() {
             VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
     );
 
-    stagingBuffer.copyTo(vertexBuffer);
+    stagingBuffer.copyTo(indexBuffer);
 }
 
 void GameObject::createDescriptorSet(size_t swapChainImageSize) {

@@ -32,7 +32,7 @@ void MainScene::setup() {
 
 MainScene::~MainScene() {
     for (auto material : materials) {
-        delete material;
+        material->cleanup();
     }
 
     for (auto object : objects) {

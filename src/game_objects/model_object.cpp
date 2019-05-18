@@ -99,3 +99,9 @@ void ModelObject::createUniformBuffers(size_t swapChainImageSize) {
 	VkDeviceSize offscreenBufferSize = sizeof(UniformBufferObjectOffscreen);
     offscreenUniformBuffer = new UniformBuffer(device, offscreenBufferSize);
 }
+
+void ModelObject::start() {
+    loadModel();
+
+    GameObject::start();
+}
