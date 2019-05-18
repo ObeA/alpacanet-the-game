@@ -7,6 +7,7 @@ layout(binding = 0) uniform UniformBufferObject {
     mat4 proj;
     mat4 depthBias;
     vec3 lightPos;
+	vec3 viewPos;
 } ubo;
 
 layout(location = 0) in vec3 inPosition;
@@ -17,9 +18,10 @@ layout(location = 3) in vec3 inNormal;
 layout(location = 0) out vec3 outColor;
 layout(location = 1) out vec2 outTexCoord;
 layout(location = 2) out vec3 outNormal;
-layout(location = 3) out vec3 outViewVec;
-layout(location = 4) out vec3 outLightVec;
+layout(location = 3) out vec3 outFragPos;
+layout(location = 4) out vec3 outLightPos;
 layout(location = 5) out vec4 outShadowCoord;
+layout(location = 6) out vec3 outViewPos;
 
 const mat4 biasMat = mat4(
 0.5, 0.0, 0.0, 0.0,
@@ -28,20 +30,14 @@ const mat4 biasMat = mat4(
 0.5, 0.5, 0.0, 1.0 );
 
 void main() {
-
     outColor = inColor;
-    outNormal = inNormal;
     outTexCoord = inTexCoord;
-
-    outColor = inColor;
-    outNormal = inNormal;
+	outViewPos = ubo.viewPos;
 
     gl_Position = ubo.proj * ubo.view * ubo.model * vec4(inPosition.xyz, 1.0);
-
-    vec4 position = ubo.model * vec4(inPosition, 1.0);
-    outNormal = mat3(ubo.model) * inNormal;
-    outLightVec = normalize(ubo.lightPos - inPosition);
-    outViewVec = -position.xyz;
+    outFragPos = vec3(ubo.model * vec4(inPosition, 1.0));
+	outNormal = mat3(transpose(inverse(ubo.model))) * inNormal;  
+	outLightPos = ubo.lightPos;
 
     outShadowCoord = ( biasMat * ubo.depthBias * ubo.model ) * vec4(inPosition, 1.0);
 }

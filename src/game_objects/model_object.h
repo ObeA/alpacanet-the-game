@@ -16,26 +16,20 @@
 #include <algorithm>
 #include <cstring>
 
-#include "game_object.h"
+#include "drawable_object.h"
 
-class Window;
-
-class ModelObject : public GameObject {
+class ModelObject : public DrawableObject {
 public:
 
     ModelObject(Game* game, Material* material, Material* shadowMaterial, char* location)
-            : GameObject(game, material, shadowMaterial),
+            : DrawableObject(game, material, shadowMaterial),
               modelLocation(location) {
     }
 
     void start() override;
 
-    void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos);
-
 private:
     char* modelLocation;
 
     void loadModel();
-
-    void createUniformBuffers(size_t swapChainImageSize);
 };

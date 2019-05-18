@@ -16,18 +16,14 @@
 #include <algorithm>
 #include <cstring>
 
-#include "game_object.h"
+#include "drawable_object.h"
 #include "../models/vertex.h"
 
-class Window;
-
-class Cube : public GameObject {
+class Cube : public DrawableObject {
 public:
 
-    Cube(Game* game, Material* material, Material* shadowMaterial) : GameObject(game, material, shadowMaterial) {
+    Cube(Game* game, Material* material, Material* shadowMaterial) : DrawableObject(game, material, shadowMaterial) {
     }
-
-    void updateUniformBuffer(uint32_t currentImage, glm::mat4 perspective, glm::vec3 lightPos);
 
     std::vector<Vertex> getVertices();
 
@@ -53,7 +49,4 @@ public:
             3, 2, 7, 7, 2, 6,
             4, 5, 0, 0, 5, 1
     };
-
-private:
-    void createUniformBuffers(size_t swapChainImageSize);
 };

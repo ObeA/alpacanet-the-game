@@ -1,6 +1,6 @@
 #include "renderer.h"
 #include "../scenes/scene.h"
-
+#include "../game_objects/drawable_object.h"
 
 Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice)
         : window(window),
@@ -371,7 +371,7 @@ void Renderer::createCommandbuffers() {
                 0.0f,
                 1.75f);
 
-        for (auto& object : scene->getActiveObjects()) {
+        for (auto& object : scene->getActiveDrawableObjects()) {
             //TODO: Group objects by pipeline, bind pipeline and draw grouped objects
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->shadowMaterial->graphicsPipeline);
             vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->shadowMaterial->pipelineLayout, 0, 1, &object->offscreenDescriptorSets, 0, nullptr);
@@ -396,7 +396,7 @@ void Renderer::createCommandbuffers() {
 
         vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-        for (auto& object : scene->getActiveObjects()) {
+        for (auto& object : scene->getActiveDrawableObjects()) {
             //TODO: Group objects by pipeline, bind pipeline and draw grouped objects
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->material->graphicsPipeline);
             vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->material->pipelineLayout, 0, 1, &object->descriptorSets[i], 0, nullptr);
@@ -429,7 +429,7 @@ void Renderer::render() {
 
 	//updateLight();
 
-	for (auto& object : scene->getActiveObjects()) {
+	for (auto& object : scene->getActiveDrawableObjects()) {
 		object->updateUniformBuffer(imageIndex, glm::perspective(glm::radians(90.0f), swapchain.getExtents().width / (float)swapchain.getExtents().height, 0.1f, 10.0f), glm::vec3(0,0,0));
 	}
 
