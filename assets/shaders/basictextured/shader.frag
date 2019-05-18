@@ -7,13 +7,16 @@ layout(binding = 2) uniform sampler2D texSampler;
 layout(location = 0) in vec3 inColor;
 layout(location = 1) in vec2 inTexCoord;
 layout (location = 2) in vec3 inNormal;
-layout (location = 3) in vec3 inViewVec;
-layout (location = 4) in vec3 inLightVec;
+layout (location = 3) in vec3 inFragPos;
+layout (location = 4) in vec3 inLightPos;
 layout (location = 5) in vec4 inShadowCoord;
+layout (location = 6) in vec3 inViewPos;
 
 layout(location = 0) out vec4 outFragColor;
 
 #define ambient 0.5
+float specularStrength = 0.5;
+vec3 lightColor = vec3(1.0);
 
 float shadowProj(vec4 shadowCoord, vec2 off)
 {
@@ -32,14 +35,19 @@ float shadowProj(vec4 shadowCoord, vec2 off)
 void main() {
     vec3 textureColor = texture(texSampler, inTexCoord).rgb;
 
-    float shadow = shadowProj(inShadowCoord / inShadowCoord.w, vec2(0.0));
+    // float shadow = shadowProj(inShadowCoord / inShadowCoord.w, vec2(0.0));
 
-    vec3 N = normalize(inNormal);
-    vec3 L = normalize(inLightVec);
-    vec3 V = normalize(inViewVec);
-    vec3 R = normalize(-reflect(L, N));
-    vec3 diffuse = max(dot(N, L), ambient) * inColor;
-    //	vec3 specular = pow(max(dot(R, V), 0.0), 50.0) * vec3(0.75);
+	vec3 norm = normalize(inNormal);
+	vec3 lightDir = normalize(inLightPos - inFragPos); 
+	float diff = max(dot(norm, lightDir), 0.0);
+	vec3 diffuse = diff * lightColor;
 
-    outFragColor = vec4(diffuse * textureColor, 1.0);
+	vec3 viewDir = normalize(inViewPos - inFragPos);
+	vec3 reflectDir = reflect(-lightDir, norm);  
+	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16);
+	vec3 specular = specularStrength * spec * lightColor; 
+
+	vec3 result = (ambient + diffuse + specular) * textureColor;
+
+    outFragColor = vec4(result, 1.0);
 }

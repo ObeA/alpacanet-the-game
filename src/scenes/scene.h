@@ -1,11 +1,14 @@
 #pragma once
 
-#include "../game_objects/game_object.h"
+#include <vector>
+#include <typeinfo>
+
 #include "../game_objects/camera.h"
 
 class Camera;
 class Game;
 class GameObject;
+class DrawableObject;
 
 class Scene {
 public:
@@ -16,6 +19,7 @@ public:
     virtual void update() =0;
 
     std::vector<GameObject*> getActiveObjects();
+    std::vector<DrawableObject*> getActiveDrawableObjects();
     Camera* getCamera();
 
 protected:

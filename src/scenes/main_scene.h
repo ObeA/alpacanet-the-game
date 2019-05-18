@@ -2,6 +2,8 @@
 
 #include "scene.h"
 
+class Material;
+
 class MainScene : public Scene {
 public:
     explicit MainScene(Game* game) : Scene(game) { }
