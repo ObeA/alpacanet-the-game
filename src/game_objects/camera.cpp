@@ -1,5 +1,6 @@
 #include "camera.h"
 #include <glm/gtx/norm.hpp>
+#include "../game_objects/game_object.h"
 
 Camera::Camera(Game* game, glm::vec3 position, float yaw, float pitch)
         : game(game), position(position), yaw(yaw), pitch(pitch) {
@@ -27,39 +28,52 @@ const glm::vec3 & Camera::getPosition() const
     return position;
 }
 
+void Camera::lookAt(GameObject * object)
+{
+    followedObject = object;
+}
+
 void Camera::update() {
-    if (glm::length2(currentMousePosition - previousMousePosition) > 0) {
-        if (currentMousePosition.x == 0 && currentMousePosition.y == 0) {
-            previousMousePosition = currentMousePosition;
-        } else {
-            auto delta = currentMousePosition - previousMousePosition;
-            std::cout << delta.x << " " << delta.y << " from " << "(" << previousMousePosition.x << "," << previousMousePosition.y << ")" << " to " << "(" << currentMousePosition.x << "," << currentMousePosition.y << ")" << std::endl;
-            previousMousePosition = currentMousePosition;
-            yaw += delta.x;
-            pitch += std::min(89.0f, std::max(-89.0f, pitch + delta.y));
-        }
+    if (followedObject != nullptr) {
+        position = followedObject->position;
+        position += glm::vec3(3.0f);
+        view = glm::lookAt(position, followedObject->position, glm::vec3(0, 0, 1));
     }
+    else {
+        if (glm::length2(currentMousePosition - previousMousePosition) > 0) {
+            if (currentMousePosition.x == 0 && currentMousePosition.y == 0) {
+                previousMousePosition = currentMousePosition;
+            }
+            else {
+                auto delta = currentMousePosition - previousMousePosition;
+                std::cout << delta.x << " " << delta.y << " from " << "(" << previousMousePosition.x << "," << previousMousePosition.y << ")" << " to " << "(" << currentMousePosition.x << "," << currentMousePosition.y << ")" << std::endl;
+                previousMousePosition = currentMousePosition;
+                yaw += delta.x;
+                pitch += std::min(89.0f, std::max(-89.0f, pitch + delta.y));
+            }
+        }
 
-    auto velocity = 0.005f * (Game::Timestep.count() / 1000000.0f);
-    position += forward * moveDirection.y * velocity;
-    position += right * moveDirection.x * velocity;
+        auto velocity = 0.005f * (Game::Timestep.count() / 1000000.0f);
+        position += forward * moveDirection.y * velocity;
+        position += right * moveDirection.x * velocity;
 
-    forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    forward.z = sin(glm::radians(pitch));
-    forward.y = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    forward = glm::normalize(forward);
+        forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        forward.z = sin(glm::radians(pitch));
+        forward.y = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+        forward = glm::normalize(forward);
 
-    right = glm::normalize(glm::cross(forward, WORLD_UP));
-    up = glm::normalize(glm::cross(right, forward));
+        right = glm::normalize(glm::cross(forward, WORLD_UP));
+        up = glm::normalize(glm::cross(right, forward));
 
-    view = glm::lookAt(position, position + forward, up);
+        view = glm::lookAt(position, position + forward, up);
+    }
 }
 
 glm::vec3 Camera::getRay() {
     float mouseX = currentMousePosition.x / (game->getGraphics()->getWindow()->getExtents().width * 0.5f) - 1.0f;
     float mouseY = currentMousePosition.y / (game->getGraphics()->getWindow()->getExtents().height * 0.5f) - 1.0f;
 
-    auto projection = glm::perspective(glm::radians(90.0f), (float)game->getGraphics()->getRenderer()->getSwapchain()->getExtents().width / (float)game->getGraphics()->getRenderer()->getSwapchain()->getExtents().height, 0.1f, 10.0f);
+    auto projection = glm::perspective(glm::radians(90.0f), (float)game->getGraphics()->getRenderer()->getSwapchain()->getExtents().width / (float)game->getGraphics()->getRenderer()->getSwapchain()->getExtents().height, 0.1f, 20.0f);
     glm::mat4 invVP = glm::inverse(projection * view);
     glm::vec4 screenPos = glm::vec4(mouseX, -mouseY, 1.0f, 1.0f);
     glm::vec4 worldPos = invVP * screenPos;

@@ -117,7 +117,7 @@ void DrawableObject::createDescriptorSet(size_t swapChainImageSize) {
     shadowMaterial->createDescriptorSet(bufferInfo, offscreenDescriptorSets);
 }
 
-void DrawableObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos) {
+void DrawableObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos) {
     //    position.x = glm::clamp(position.x + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
     //    position.y = glm::clamp(position.y + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
     //    position.z = glm::clamp(position.z + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
@@ -140,6 +140,7 @@ void DrawableObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, 
     //TODO: change when rendered from light
     ubo.lightPos = lightPos;
     ubo.depthBiasMVP = ubo.view * ubo.projection;
+    ubo.viewPos = cameraPos;
 
     auto device = game->getGraphics()->getLogicalDevice()->getDevice();
     void* data;

@@ -201,7 +201,6 @@ void Renderer::createDescriptorPool() {
     const int objectAmount = 100;
     std::array<VkDescriptorPoolSize, objectAmount * 2> poolSizes = {};
 
-    //TODO: Meest matige pool ooit. Wat als een descriptor set een andere layout heeft?
     auto numberOfSwapchainImages = swapchain.getImages().size();
     for (int i = 0; i < objectAmount; i++) {
         poolSizes[i * 2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -365,11 +364,11 @@ void Renderer::createCommandbuffers() {
 
         // Set depth bias (aka "Polygon offset")
         // Required to avoid shadow mapping artifacts
-        vkCmdSetDepthBias(
-                commandBuffers[i],
-                1.25f,
-                0.0f,
-                1.75f);
+        //vkCmdSetDepthBias(
+        //        commandBuffers[i],
+        //        1.25f,
+        //        0.0f,
+        //        1.75f);
 
         for (auto& object : scene->getActiveDrawableObjects()) {
             //TODO: Group objects by pipeline, bind pipeline and draw grouped objects
@@ -430,9 +429,9 @@ void Renderer::render() {
 	//updateLight();
 
 	auto camera = scene->getCamera();
-	auto projection = glm::perspective(glm::radians(90.0f), swapchain.getExtents().width / (float)swapchain.getExtents().height, 0.1f, 10.0f);
+	auto projection = glm::perspective(glm::radians(90.0f), swapchain.getExtents().width / (float)swapchain.getExtents().height, 0.1f, 20.0f);
 	for (auto& object : scene->getActiveDrawableObjects()) {
-		object->updateUniformBuffer(imageIndex, camera->getViewMatrix(), projection, glm::vec3(0,0,0));
+		object->updateUniformBuffer(imageIndex, camera->getViewMatrix(), projection, glm::vec3(5,5,5), camera->getPosition());
 	}
 
 	VkSubmitInfo submitInfo = {};

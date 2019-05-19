@@ -11,7 +11,7 @@ public:
 
     void moveTo(glm::vec2 position);
 
-    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos) override;
+    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 viewPos) override;
 
     void update();
 

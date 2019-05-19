@@ -6,6 +6,7 @@
 constexpr glm::vec3 WORLD_UP{0.0, 0.0, 1.0};
 
 class Game;
+class GameObject;
 
 class Camera {
 public:
@@ -20,6 +21,8 @@ public:
 
     const glm::mat4& getViewMatrix() const;
     const glm::vec3& getPosition() const;
+    
+    void lookAt(GameObject* object);
 private:
     Game* game;
 
@@ -37,6 +40,8 @@ private:
     glm::vec2 previousMousePosition{};
     glm::vec2 currentMousePosition{};
     glm::vec3 moveDirection{};
+
+    GameObject* followedObject = nullptr;
 
     void onMouseMove(double x, double y);
 

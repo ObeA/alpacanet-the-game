@@ -19,13 +19,13 @@ void MainScene::setup() {
 		material->initialize();
 	}
 
-	auto model = new ModelObject(game, materials[2], materials[4], (char*)"assets/models/cube.obj");
+	auto model = new ModelObject(game, materials[1], materials[4], (char*)"assets/models/cube.obj");
     model->scale = glm::vec3(.5);
 	model->position = glm::vec3(0, -2, 1);
 
-	auto model2 = new ModelObject(game, materials[1], materials[4], (char*)"assets/models/cube.obj");
-    model2->scale = glm::vec3(.5);
-    model2->position = glm::vec3(0, 0, 2);
+	auto model2 = new ModelObject(game, materials[2], materials[4], (char*)"assets/models/cube.obj");
+    model2->scale = glm::vec3(20, 20, .2);
+    model2->position = glm::vec3(0, 0, -.5);
     objects.push_back(model);
 	objects.push_back(model2);
 
@@ -70,7 +70,7 @@ void MainScene::update() {
             casted->update();
             if (currentTime > casted->nextMoveTime) {
                 casted->nextMoveTime = currentTime + std::chrono::seconds(5 + std::rand() % 10);
-                auto newPosition = glm::vec3(glm::vec2((std::rand() % 10) - 5, (std::rand() % 10) - 5), 1.0);
+                auto newPosition = glm::vec3(glm::vec2((std::rand() % 20) - 10, (std::rand() % 20) - 10), 1.0);
                 casted->moveTo(newPosition);
             };
         }
@@ -85,7 +85,7 @@ void MainScene::onMouseButton(int button, int action, int mods) {
         auto intersected = glm::intersectRaySphere(camera->getPosition(), ray, object->position, 1, distance);
         if (intersected) 
         {
-            object->scale = glm::vec3(.1);
+            camera->lookAt(object);
         }
     }
 }

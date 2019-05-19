@@ -29,9 +29,9 @@ float moveTowards(float from, float to, float amount) {
     return result;
 }
 
-void Alpaca::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos)
+void Alpaca::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 viewPos)
 {
-    ModelObject::updateUniformBuffer(currentImage, view, projection, lightPos);
+    ModelObject::updateUniformBuffer(currentImage, view, projection, lightPos, viewPos);
 }
 
 void Alpaca::update() {
