@@ -10,6 +10,7 @@ Alpaca::Alpaca(Game* game, Material* material, Material* shadowMaterial)
 
 void Alpaca::start() {
     ModelObject::start();
+    wooliness = (rand() % 50);
 }
 
 void Alpaca::moveTo(glm::vec2 position)
@@ -35,6 +36,10 @@ void Alpaca::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat
 }
 
 void Alpaca::update() {
+    if (rand() % 500 == 1) {
+        wooliness++;
+    }
+
     auto angle = atan2(targetPosition.y - position.y, targetPosition.x - position.x);;
     rotation.y = angle;
 
@@ -63,4 +68,9 @@ void Alpaca::update() {
         }
         position.z = newPos;
     }
+}
+
+int Alpaca::shear() {
+    return wooliness;
+    wooliness = 0;
 }
