@@ -11,6 +11,7 @@ public:
 
     void setup() override;
     void update() override;
+    void onMouseButton(int button, int action, int mods);
 private:
     std::vector<Material*> materials;
 };

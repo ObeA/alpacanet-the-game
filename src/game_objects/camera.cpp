@@ -22,6 +22,11 @@ const glm::mat4& Camera::getViewMatrix() const {
     return view;
 }
 
+const glm::vec3 & Camera::getPosition() const
+{
+    return position;
+}
+
 void Camera::update() {
     if (glm::length2(currentMousePosition - previousMousePosition) > 0) {
         if (currentMousePosition.x == 0 && currentMousePosition.y == 0) {
@@ -48,6 +53,20 @@ void Camera::update() {
     up = glm::normalize(glm::cross(right, forward));
 
     view = glm::lookAt(position, position + forward, up);
+}
+
+glm::vec3 Camera::getRay() {
+    float mouseX = currentMousePosition.x / (game->getGraphics()->getWindow()->getExtents().width * 0.5f) - 1.0f;
+    float mouseY = currentMousePosition.y / (game->getGraphics()->getWindow()->getExtents().height * 0.5f) - 1.0f;
+
+    auto projection = glm::perspective(glm::radians(90.0f), (float)game->getGraphics()->getRenderer()->getSwapchain()->getExtents().width / (float)game->getGraphics()->getRenderer()->getSwapchain()->getExtents().height, 0.1f, 10.0f);
+    glm::mat4 invVP = glm::inverse(projection * view);
+    glm::vec4 screenPos = glm::vec4(mouseX, -mouseY, 1.0f, 1.0f);
+    glm::vec4 worldPos = invVP * screenPos;
+
+    glm::vec3 dir = glm::normalize(glm::vec3(worldPos));
+
+    return dir;
 }
 
 void Camera::setPosition(glm::vec3 newPosition) {

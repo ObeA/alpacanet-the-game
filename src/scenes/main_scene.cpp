@@ -4,6 +4,7 @@
 #include "../materials/basic_textured_material.h"
 #include "../materials/shadow_material.h"
 #include "scene_objects/alpaca.h"
+#include <glm/gtx/intersect.hpp>
 
 void MainScene::setup() {
     camera = new Camera(game, glm::vec3(2.0, 2.0, 2.0), 0, 225);
@@ -40,6 +41,10 @@ void MainScene::setup() {
 	for (auto object : objects) {
 	    object->start();
 	}
+
+    auto window = game->getGraphics()->getWindow();
+    auto onMouseButtonCallback = std::bind(&MainScene::onMouseButton, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    window->registerOnMouseButtonCallback(onMouseButtonCallback);
 }
 
 MainScene::~MainScene() {
@@ -68,6 +73,19 @@ void MainScene::update() {
                 auto newPosition = glm::vec3(glm::vec2((std::rand() % 10) - 5, (std::rand() % 10) - 5), 1.0);
                 casted->moveTo(newPosition);
             };
+        }
+    }
+}
+
+void MainScene::onMouseButton(int button, int action, int mods) {
+    auto ray = camera->getRay();
+
+    for (auto object : objects) {
+        float distance;
+        auto intersected = glm::intersectRaySphere(camera->getPosition(), ray, object->position, 1, distance);
+        if (intersected) 
+        {
+            object->scale = glm::vec3(.1);
         }
     }
 }

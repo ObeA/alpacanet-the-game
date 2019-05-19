@@ -16,7 +16,10 @@ public:
 
     void update();
 
+    glm::vec3 getRay();
+
     const glm::mat4& getViewMatrix() const;
+    const glm::vec3& getPosition() const;
 private:
     Game* game;
 

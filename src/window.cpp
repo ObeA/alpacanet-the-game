@@ -32,6 +32,7 @@ void Window::initWindow() {
 
 	glfwSetCursorPosCallback(window, cursorPositionCallback);
 	glfwSetKeyCallback(window, keyCallback);
+    glfwSetMouseButtonCallback(window, mouseButtonCallback);
 }
 
 bool Window::shouldClose() {
@@ -71,11 +72,25 @@ void Window::registerOnKeyUpCallback(std::function<void(int, int, int)> callback
     onKeyUpCallbacks.emplace_back(callback);
 }
 
+void Window::registerOnMouseButtonCallback(std::function<void(int, int, int)> callback) {
+    onMouseButtonCallbacks.emplace_back(callback);
+}
+
 void Window::cursorPositionCallback(GLFWwindow* window, double xoffset, double yoffset) {
     auto self = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 
     for (const auto& callback : self->onCursorMoveCallbacks) {
         callback(xoffset, yoffset);
+    }
+}
+
+void Window::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        auto self = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+
+        for (const auto& callback : self->onMouseButtonCallbacks) {
+            callback(button, action, mods);
+        }
     }
 }
 

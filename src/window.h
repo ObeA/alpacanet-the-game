@@ -58,6 +58,7 @@ public:
 	void registerOnCursorMoveCallback(std::function<void(double, double)> callback);
     void registerOnKeyDownCallback(std::function<void(int, int, int)> callback);
     void registerOnKeyUpCallback(std::function<void(int, int, int)> callback);
+    void registerOnMouseButtonCallback(std::function<void(int, int, int)> callback);
 
 private:
     VkExtent2D extents;
@@ -72,8 +73,10 @@ private:
     std::vector<std::function<void(double, double)>> onCursorMoveCallbacks;
     std::vector<std::function<void(int, int, int)>> onKeyDownCallbacks;
     std::vector<std::function<void(int, int, int)>> onKeyUpCallbacks;
+    std::vector<std::function<void(int, int, int)>> onMouseButtonCallbacks;
 
 	static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 	static void cursorPositionCallback(GLFWwindow* window, double x, double y);
+    static void mouseButtonCallback(GLFWwindow * window, int button, int action, int mods);
     static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
