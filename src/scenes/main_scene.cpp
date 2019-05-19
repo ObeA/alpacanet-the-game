@@ -3,6 +3,7 @@
 #include "../materials/basic_material.h"
 #include "../materials/basic_textured_material.h"
 #include "../materials/shadow_material.h"
+#include "scene_objects/alpaca.h"
 
 void MainScene::setup() {
     camera = new Camera(game, glm::vec3(2.0, 2.0, 2.0), 0, 225);
@@ -27,6 +28,15 @@ void MainScene::setup() {
     objects.push_back(model);
 	objects.push_back(model2);
 
+
+    for (size_t i = 0; i < 5; i++)
+    {
+        auto alpaca = new Alpaca(game, materials[1], materials[4]);
+        alpaca->position = glm::vec3(0);
+        alpaca->scale = glm::vec3(1, 0.5, 0.5);
+        objects.push_back(alpaca);
+    }
+
 	for (auto object : objects) {
 	    object->start();
 	}
@@ -44,4 +54,20 @@ MainScene::~MainScene() {
 
 void MainScene::update() {
     camera->update();
+
+    auto currentTime = std::chrono::duration_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now().time_since_epoch()
+        );
+
+    for (auto object : objects) {
+        auto casted = dynamic_cast<Alpaca*>(object);
+        if (casted != nullptr) {
+            casted->update();
+            if (currentTime > casted->nextMoveTime) {
+                casted->nextMoveTime = currentTime + std::chrono::seconds(5 + std::rand() % 10);
+                auto newPosition = glm::vec3(glm::vec2((std::rand() % 10) - 5, (std::rand() % 10) - 5), 1.0);
+                casted->moveTo(newPosition);
+            };
+        }
+    }
 }
