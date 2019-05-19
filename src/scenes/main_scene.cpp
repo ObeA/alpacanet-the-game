@@ -45,6 +45,10 @@ void MainScene::setup() {
     auto window = game->getGraphics()->getWindow();
     auto onMouseButtonCallback = std::bind(&MainScene::onMouseButton, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     window->registerOnMouseButtonCallback(onMouseButtonCallback);
+
+    auto onKeyDownCallback = std::bind(&MainScene::onKeyDown, this, std::placeholders::_1, std::placeholders::_2,
+        std::placeholders::_3);
+    window->registerOnKeyDownCallback(onKeyDownCallback);
 }
 
 MainScene::~MainScene() {
@@ -85,7 +89,62 @@ void MainScene::onMouseButton(int button, int action, int mods) {
         auto intersected = glm::intersectRaySphere(camera->getPosition(), ray, object->position, 1, distance);
         if (intersected) 
         {
-            camera->lookAt(object);
+            auto casted = dynamic_cast<Alpaca*>(object);
+            if (casted != nullptr) {
+                selectedAlpaca = casted;
+                camera->lookAt(casted);
+            }
         }
     }
+}
+
+std::vector<Alpaca*> MainScene::getAlpacas() {
+    auto alpacas = std::vector<Alpaca*>();
+    for (auto object : objects) {
+        auto casted = dynamic_cast<Alpaca*>(object);
+        if (casted != nullptr) {
+            alpacas.push_back(casted);
+        }
+    }
+    return alpacas;
+}
+
+void MainScene::onKeyDown(int key, int scancode, int mods) {
+    switch (key) {
+    case GLFW_KEY_Z:
+        loopAlpacas(false);
+        break;
+    case GLFW_KEY_X:
+        if (selectedAlpaca) {
+            auto wool = selectedAlpaca->shear();
+            score += wool;
+            std::cout << "sheared" << wool << "total is" << score << std::endl;
+        }
+        break;
+    case GLFW_KEY_C:
+        loopAlpacas(true);
+        break;
+    }
+}
+
+void MainScene::loopAlpacas(bool nextOrPrevious) {
+    auto alpacas = getAlpacas();
+    if (selectedAlpaca) {
+        for (size_t i = 0; i < alpacas.size(); i++)
+        {
+            if (alpacas[i] == selectedAlpaca) {
+                if (i == 0 && !nextOrPrevious)
+                    selectedAlpaca = alpacas[alpacas.size() - 1];
+                else if (i == alpacas.size() - 1 && nextOrPrevious)
+                    selectedAlpaca = alpacas[0];
+                else {
+                    selectedAlpaca = nextOrPrevious ? alpacas[i + 1] : alpacas[i - 1];
+                }
+            }
+        }
+    }
+    else {
+        selectedAlpaca = alpacas[0];
+    }
+    camera->lookAt(selectedAlpaca);
 }

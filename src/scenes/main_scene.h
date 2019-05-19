@@ -3,6 +3,7 @@
 #include "scene.h"
 
 class Material;
+class Alpaca;
 
 class MainScene : public Scene {
 public:
@@ -12,7 +13,12 @@ public:
     void setup() override;
     void update() override;
     void onMouseButton(int button, int action, int mods);
+    void onKeyDown(int key, int scancode, int mods);
+    std::vector<Alpaca*> getAlpacas();
 private:
     std::vector<Material*> materials;
+    Alpaca* selectedAlpaca = nullptr;
+    int score = 0;
+    void loopAlpacas(bool nextOrPrevious);
 };
 

@@ -71,6 +71,7 @@ void Alpaca::update() {
 }
 
 int Alpaca::shear() {
-    return wooliness;
+    auto temp = wooliness;
     wooliness = 0;
+    return temp;
 }
