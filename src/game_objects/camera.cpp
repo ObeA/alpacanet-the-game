@@ -46,10 +46,11 @@ void Camera::update() {
             }
             else {
                 auto delta = currentMousePosition - previousMousePosition;
-                std::cout << delta.x << " " << delta.y << " from " << "(" << previousMousePosition.x << "," << previousMousePosition.y << ")" << " to " << "(" << currentMousePosition.x << "," << currentMousePosition.y << ")" << std::endl;
+                //std::cout << delta.x << " " << delta.y << " from " << "(" << previousMousePosition.x << "," << previousMousePosition.y << ")" << " to " << "(" << currentMousePosition.x << "," << currentMousePosition.y << ")" << std::endl;
                 previousMousePosition = currentMousePosition;
-                yaw += delta.x;
-                pitch += std::min(89.0f, std::max(-89.0f, pitch + delta.y));
+                float sensitivity = 0.5;
+                yaw -= (delta.x * sensitivity);
+                pitch = std::min(89.0f, std::max(-89.0f, pitch + (delta.y * sensitivity)));
             }
         }
 
