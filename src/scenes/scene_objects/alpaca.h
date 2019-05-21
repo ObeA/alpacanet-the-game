@@ -19,10 +19,11 @@ public:
 
     int shear();
 
+    int wooliness;
+
 private:
     glm::vec2 targetPosition;
     bool targetPositionReached = false;
     bool bounceCompleted = false;
     std::chrono::steady_clock::time_point bounceStartTime;
-    int wooliness;
 };

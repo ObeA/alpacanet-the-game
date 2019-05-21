@@ -4,6 +4,7 @@
 #include "../materials/basic_textured_material.h"
 #include "../materials/shadow_material.h"
 #include "scene_objects/alpaca.h"
+#include "../graphics/gui/gui.h"
 #include <glm/gtx/intersect.hpp>
 
 void MainScene::setup() {
@@ -93,6 +94,7 @@ void MainScene::onMouseButton(int button, int action, int mods) {
             if (casted != nullptr) {
                 selectedAlpaca = casted;
                 camera->lookAt(casted);
+                game->getGraphics()->getRenderer()->getGui()->setAlpaca(casted);
             }
         }
     }
@@ -147,4 +149,5 @@ void MainScene::loopAlpacas(bool nextOrPrevious) {
         selectedAlpaca = alpacas[0];
     }
     camera->lookAt(selectedAlpaca);
+    game->getGraphics()->getRenderer()->getGui()->setAlpaca(selectedAlpaca);
 }

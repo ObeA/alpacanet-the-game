@@ -539,3 +539,8 @@ void Renderer::setScene(Scene* scene) {
 
     createCommandbuffers();
 }
+
+GUI* Renderer::getGui() {
+    return gui;
+}
+ 

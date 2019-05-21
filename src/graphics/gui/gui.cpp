@@ -1,4 +1,5 @@
 #include "gui.h"
+#include "../../scenes/scene_objects/alpaca.h"
 
 struct PushConstBlock {
     glm::vec2 scale;
@@ -387,6 +388,10 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     }
 }
 
+void GUI::setAlpaca(Alpaca* selectedAlpaca) {
+    alpaca = selectedAlpaca;
+}
+
 // Starts a new imGui frame and sets up windows and ui elements
 void GUI::newFrame()
 {
@@ -402,8 +407,10 @@ void GUI::newFrame()
     ImVec4 clear_color = ImColor(114, 144, 154);
     static float f = 0.0f;
 
-    ImGui::TextUnformatted("hallo");
-    ImGui::TextUnformatted("hallo" + ic++);
+    ImGui::TextUnformatted("Geselecteerde alpaca");
+    if (alpaca != nullptr) {
+        ImGui::TextUnformatted(std::to_string(alpaca->wooliness).c_str());
+    }
 
     //ImGui::SetNextWindowPos(ImVec2(450, 20), ImGuiSetCond_FirstUseEver);
     //ImGui::ShowDemoWindow();

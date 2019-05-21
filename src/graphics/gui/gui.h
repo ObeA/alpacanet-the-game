@@ -2,6 +2,9 @@
 
 #include "imgui/imgui.h"
 #include "../renderer.h"
+#include <string>
+
+class Alpaca;
 
 class GUI {
 public:
@@ -9,6 +12,7 @@ public:
     ~GUI();
     void init(float width, float height);
     void initResources(VkRenderPass renderPass, VkQueue copyQueue);
+    void setAlpaca(Alpaca* alpaca);
     void newFrame();
     bool updateBuffers();
     void drawFrame(VkCommandBuffer commandBuffer);
@@ -33,5 +37,6 @@ private:
     void onMouseButton(int key, int scancode, int mods);
     glm::vec2 currentMousePosition = glm::vec2(0);
     std::vector<bool> mouseButtons = {false, false};
-    int ic = 0;
+
+    Alpaca* alpaca = nullptr;
 };

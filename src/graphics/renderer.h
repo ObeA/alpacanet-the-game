@@ -28,6 +28,7 @@ public:
     const VkDescriptorPool& getDescriptorPool() const;
     const VkRenderPass& getRenderPass() const;
     const VkRenderPass& getOffscreenRenderPass() const;
+    GUI* getGui();
 private:
     Window* window;
     Surface* surface;
