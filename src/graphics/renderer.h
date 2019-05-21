@@ -6,6 +6,7 @@
 #include "images/image.h"
 
 class Scene;
+class GUI;
 
 class Renderer {
 public:
@@ -44,6 +45,8 @@ private:
 	VkSampler offscreenDepthSampler;
 	VkImageView offscreenImageView;
 	Image* offscreenImage;
+
+    GUI* gui;
 
 	VkDescriptorPool descriptorPool;
     std::vector<VkCommandBuffer> commandBuffers;

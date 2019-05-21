@@ -20,6 +20,7 @@ Buffer::Buffer(LogicalDevice* device,
 }
 
 Buffer::~Buffer() {
+    unmap();
     vkDestroyBuffer(device->getDevice(), buffer, nullptr);
     vkFreeMemory(device->getDevice(), memory, nullptr);
 }
@@ -51,6 +52,29 @@ void Buffer::createBuffer() {
     }
 
     vkBindBufferMemory(device->getDevice(), buffer, memory, 0);
+}
+
+VkResult Buffer::mapAll() {
+    return vkMapMemory(device->getDevice(), memory, 0, VK_WHOLE_SIZE, 0, &mapped);
+}
+
+void Buffer::unmap()
+{
+    if (mapped)
+    {
+        vkUnmapMemory(device->getDevice(), memory);
+        mapped = nullptr;
+    }
+}
+
+VkResult Buffer::flush()
+{
+    VkMappedMemoryRange mappedRange = {};
+    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    mappedRange.memory = memory;
+    mappedRange.offset = 0;
+    mappedRange.size = VK_WHOLE_SIZE;
+    return vkFlushMappedMemoryRanges(device->getDevice(), 1, &mappedRange);
 }
 
 void Buffer::copyFrom(void* data) {

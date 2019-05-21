@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "../scenes/scene.h"
 #include "../game_objects/drawable_object.h"
+#include "gui/gui.h"
 
 Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice)
         : window(window),
@@ -25,6 +26,12 @@ Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevic
     createFramebuffers();
 
 	createSyncObjects();
+
+    gui = new GUI(this, logicalDevice, window);
+    gui->init(window->getExtents().width, window->getExtents().height);
+    gui->initResources(renderPass, logicalDevice->getGraphicsQueue());
+    gui->newFrame();
+    gui->updateBuffers();
 }
 
 Renderer::~Renderer() {
@@ -402,6 +409,8 @@ void Renderer::createCommandbuffers() {
             object->draw(commandBuffers[i], i);
         }
 
+        gui->drawFrame(commandBuffers[i]);
+
         vkCmdEndRenderPass(commandBuffers[i]);
 
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
@@ -423,6 +432,10 @@ void Renderer::render() {
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 		throw std::runtime_error("failed to acquire swap chain image!");
 	}
+
+    gui->newFrame();
+
+    gui->updateBuffers();
 
 	//objects[1]->position = lightPos;
 
