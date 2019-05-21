@@ -10,7 +10,7 @@ public:
     void init(float width, float height);
     void initResources(VkRenderPass renderPass, VkQueue copyQueue);
     void newFrame();
-    void updateBuffers();
+    bool updateBuffers();
     void drawFrame(VkCommandBuffer commandBuffer);
 private:
     VkSampler sampler;

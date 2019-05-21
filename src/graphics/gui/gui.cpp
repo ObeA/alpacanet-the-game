@@ -403,17 +403,17 @@ void GUI::newFrame()
     static float f = 0.0f;
 
     ImGui::TextUnformatted("hallo");
-    //ImGui::TextUnformatted("hallo" + ic++);
+    ImGui::TextUnformatted("hallo" + ic++);
 
-    ImGui::SetNextWindowPos(ImVec2(450, 20), ImGuiSetCond_FirstUseEver);
-    ImGui::ShowDemoWindow();
+    //ImGui::SetNextWindowPos(ImVec2(450, 20), ImGuiSetCond_FirstUseEver);
+    //ImGui::ShowDemoWindow();
 
     // Render to generate draw buffers
     ImGui::Render();
 }
 
 // Update vertex and index buffer containing the imGui elements when required
-void GUI::updateBuffers()
+bool GUI::updateBuffers()
 {
     ImDrawData* imDrawData = ImGui::GetDrawData();
 
@@ -422,35 +422,41 @@ void GUI::updateBuffers()
     VkDeviceSize indexBufferSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
 
     if ((vertexBufferSize == 0) || (indexBufferSize == 0)) {
-        return;
+        return false;
     }
 
     // Update buffers only if vertex or index count has been changed compared to current buffer size
+
+    bool updated = false;
 
     // Vertex buffer
     if (vertexBuffer == nullptr) {
         vertexBuffer = new Buffer(device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         vertexBuffer->mapAll();
+        updated = true;
     }
-    //else if (vertexCount != imDrawData->TotalVtxCount) {
-    //    vertexBuffer->~Buffer();
-    //    vertexBuffer = new Buffer(device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-    //    vertexCount = imDrawData->TotalVtxCount;
-    //    vertexBuffer->mapAll();
-    //}
+    else if (vertexCount != imDrawData->TotalVtxCount) {
+        vertexBuffer->~Buffer();
+        vertexBuffer = new Buffer(device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        vertexCount = imDrawData->TotalVtxCount;
+        vertexBuffer->mapAll();
+        updated = true;
+    }
 
     // Index buffer
     VkDeviceSize indexSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
     if (indexBuffer == nullptr) {
         indexBuffer = new Buffer(device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         indexBuffer->mapAll();
+        updated = true;
     }
-    //else if (indexCount < imDrawData->TotalIdxCount) {
-    //    indexBuffer->~Buffer();
-    //    indexBuffer = new Buffer(device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-    //    indexCount = imDrawData->TotalIdxCount;
-    //    indexBuffer->mapAll();
-    //}
+    else if (indexCount < imDrawData->TotalIdxCount) {
+        indexBuffer->~Buffer();
+        indexBuffer = new Buffer(device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        indexCount = imDrawData->TotalIdxCount;
+        indexBuffer->mapAll();
+        updated = true;
+    }
 
     // Upload data
     ImDrawVert* vtxDst = (ImDrawVert*)vertexBuffer->mapped;
@@ -468,6 +474,8 @@ void GUI::updateBuffers()
     // Flush to make writes visible to GPU
     vertexBuffer->flush();
     indexBuffer->flush();
+
+    return updated;
 }
 
 // Draw current imGui frame into a command buffer

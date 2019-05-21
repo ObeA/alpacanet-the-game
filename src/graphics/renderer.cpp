@@ -64,6 +64,12 @@ Renderer::~Renderer() {
 	}
 }
 
+void Renderer::recreateCommandBuffer() {
+    vkWaitForFences(logicalDevice->getDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
+    vkFreeCommandBuffers(logicalDevice->getDevice(), logicalDevice->getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+    createCommandbuffers();
+}
+
 void Renderer::initializeRenderPass() {
     VkAttachmentDescription colorAttachment = {};
     colorAttachment.format = surface->getFormat().format;
@@ -435,7 +441,10 @@ void Renderer::render() {
 
     gui->newFrame();
 
-    gui->updateBuffers();
+    bool update = gui->updateBuffers();
+    if (update) {
+        recreateCommandBuffer();
+    }
 
 	//objects[1]->position = lightPos;
 
