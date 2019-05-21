@@ -46,7 +46,6 @@ void Camera::update() {
             }
             else {
                 auto delta = currentMousePosition - previousMousePosition;
-                //std::cout << delta.x << " " << delta.y << " from " << "(" << previousMousePosition.x << "," << previousMousePosition.y << ")" << " to " << "(" << currentMousePosition.x << "," << currentMousePosition.y << ")" << std::endl;
                 previousMousePosition = currentMousePosition;
                 float sensitivity = 0.5;
                 yaw -= (delta.x * sensitivity);

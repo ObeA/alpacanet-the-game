@@ -1,3 +1,5 @@
+#include <utility>
+
 #pragma once
 
 #define GLFW_INCLUDE_VULKAN
@@ -21,15 +23,15 @@
 class ModelObject : public DrawableObject {
 public:
 
-    ModelObject(Game* game, Material* material, Material* shadowMaterial, char* location)
+    ModelObject(Game* game, Material* material, Material* shadowMaterial, std::string location)
             : DrawableObject(game, material, shadowMaterial),
-              modelLocation(location) {
+              modelLocation(std::move(location)) {
     }
 
     void start() override;
 
 private:
-    char* modelLocation;
+    const std::string modelLocation;
 
     void loadModel();
 };

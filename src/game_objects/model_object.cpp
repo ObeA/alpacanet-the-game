@@ -9,7 +9,7 @@ void ModelObject::loadModel() {
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, modelLocation)) {
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, modelLocation.c_str())) {
         throw std::runtime_error(warn + err);
     }
 
