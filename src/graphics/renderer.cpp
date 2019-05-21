@@ -65,7 +65,7 @@ Renderer::~Renderer() {
 }
 
 void Renderer::recreateCommandBuffer() {
-    vkWaitForFences(logicalDevice->getDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
+    vkQueueWaitIdle(logicalDevice->getGraphicsQueue());
     vkFreeCommandBuffers(logicalDevice->getDevice(), logicalDevice->getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
     createCommandbuffers();
 }
