@@ -76,7 +76,7 @@ void MainScene::update() {
                 casted->nextMoveTime = currentTime + std::chrono::seconds(5 + std::rand() % 10);
                 auto newPosition = glm::vec3(glm::vec2((std::rand() % 20) - 10, (std::rand() % 20) - 10), 1.0);
                 casted->moveTo(newPosition);
-            };
+            }
         }
     }
 }
@@ -86,7 +86,7 @@ void MainScene::onMouseButton(int button, int action, int mods) {
 
     for (auto object : objects) {
         float distance;
-        auto intersected = glm::intersectRaySphere(camera->getPosition(), ray, object->position, 1, distance);
+        auto intersected = glm::intersectRaySphere(camera->getPosition(), ray, object->position, 2, distance);
         if (intersected) 
         {
             auto casted = dynamic_cast<Alpaca*>(object);

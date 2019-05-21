@@ -6,6 +6,9 @@ Camera::Camera(Game* game, glm::vec3 position, float yaw, float pitch)
         : game(game), position(position), yaw(yaw), pitch(pitch) {
     update();
 
+    auto extents = game->getGraphics()->getRenderer()->getExtents();
+    projection = glm::perspective(glm::radians(90.0f), (float)extents.width / extents.height, 0.1f, 20.0f);
+
     auto window = game->getGraphics()->getWindow();
     auto onMoveCallback = std::bind(&Camera::onMouseMove, this, std::placeholders::_1, std::placeholders::_2);
     window->registerOnCursorMoveCallback(onMoveCallback);
@@ -23,13 +26,15 @@ const glm::mat4& Camera::getViewMatrix() const {
     return view;
 }
 
-const glm::vec3 & Camera::getPosition() const
-{
+const glm::mat4& Camera::getProjectionMatrix() const {
+    return projection;
+}
+
+const glm::vec3& Camera::getPosition() const {
     return position;
 }
 
-void Camera::lookAt(GameObject * object)
-{
+void Camera::lookAt(GameObject* object) {
     followedObject = object;
 }
 
@@ -38,13 +43,11 @@ void Camera::update() {
         position = followedObject->position;
         position += glm::vec3(3.0f);
         view = glm::lookAt(position, followedObject->position, glm::vec3(0, 0, 1));
-    }
-    else {
+    } else {
         if (glm::length2(currentMousePosition - previousMousePosition) > 0) {
             if (currentMousePosition.x == 0 && currentMousePosition.y == 0) {
                 previousMousePosition = currentMousePosition;
-            }
-            else {
+            } else {
                 auto delta = currentMousePosition - previousMousePosition;
                 previousMousePosition = currentMousePosition;
                 float sensitivity = 0.5;
@@ -73,7 +76,6 @@ glm::vec3 Camera::getRay() {
     float mouseX = currentMousePosition.x / (game->getGraphics()->getWindow()->getExtents().width * 0.5f) - 1.0f;
     float mouseY = currentMousePosition.y / (game->getGraphics()->getWindow()->getExtents().height * 0.5f) - 1.0f;
 
-    auto projection = glm::perspective(glm::radians(90.0f), (float)game->getGraphics()->getRenderer()->getSwapchain()->getExtents().width / (float)game->getGraphics()->getRenderer()->getSwapchain()->getExtents().height, 0.1f, 20.0f);
     glm::mat4 invVP = glm::inverse(projection * view);
     glm::vec4 screenPos = glm::vec4(mouseX, -mouseY, 1.0f, 1.0f);
     glm::vec4 worldPos = invVP * screenPos;

@@ -13,6 +13,7 @@ public:
     Camera(Game* game, glm::vec3 position, float yaw, float pitch);
 
     void setPosition(glm::vec3 position);
+    void lookAt(GameObject* object);
     void setRotation(float yaw, float pitch);
 
     void update();
@@ -20,9 +21,9 @@ public:
     glm::vec3 getRay();
 
     const glm::mat4& getViewMatrix() const;
+    const glm::mat4& getProjectionMatrix() const;
     const glm::vec3& getPosition() const;
-    
-    void lookAt(GameObject* object);
+
 private:
     Game* game;
 

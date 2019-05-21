@@ -429,9 +429,10 @@ void Renderer::render() {
 	//updateLight();
 
 	auto camera = scene->getCamera();
-	auto projection = glm::perspective(glm::radians(90.0f), swapchain.getExtents().width / (float)swapchain.getExtents().height, 0.1f, 20.0f);
+	auto& view = camera->getViewMatrix();
+	auto& projection = camera->getProjectionMatrix();
 	for (auto& object : scene->getActiveDrawableObjects()) {
-		object->updateUniformBuffer(imageIndex, camera->getViewMatrix(), projection, glm::vec3(5,5,5), camera->getPosition());
+		object->updateUniformBuffer(imageIndex, view, projection, glm::vec3(5,5,5), camera->getPosition());
 	}
 
 	VkSubmitInfo submitInfo = {};
@@ -512,8 +513,11 @@ const VkRenderPass& Renderer::getOffscreenRenderPass() const {
     return offscreenRenderPass;
 }
 
-void Renderer::setScene(Scene* scene) {
-    this->scene = scene;
-
+void Renderer::setScene(Scene* newScene) {
+    scene = newScene;
     createCommandbuffers();
+}
+
+const VkExtent2D& Renderer::getExtents() const {
+    return swapchain.getExtents();
 }

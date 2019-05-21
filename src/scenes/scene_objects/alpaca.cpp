@@ -30,17 +30,12 @@ float moveTowards(float from, float to, float amount) {
     return result;
 }
 
-void Alpaca::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 viewPos)
-{
-    ModelObject::updateUniformBuffer(currentImage, view, projection, lightPos, viewPos);
-}
-
 void Alpaca::update() {
     if (rand() % 500 == 1) {
         wooliness++;
     }
 
-    auto angle = atan2(targetPosition.y - position.y, targetPosition.x - position.x);;
+    auto angle = std::atan2(targetPosition.y - position.y, targetPosition.x - position.x);
     rotation.y = angle;
 
     if (!targetPositionReached) {
@@ -48,7 +43,7 @@ void Alpaca::update() {
             targetPositionReached = true;
         }
         else {
-            auto heading = glm::vec2(cos(angle), sin(angle));
+            auto heading = glm::vec2(std::cos(angle), std::sin(angle));
             position.x += heading.x * 0.01;
             position.y += heading.y * 0.01;
         }
@@ -61,7 +56,7 @@ void Alpaca::update() {
     if (!bounceCompleted) {
         auto currentTime = std::chrono::high_resolution_clock::now();
         float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - bounceStartTime).count();
-        float newPos = sin(time * 2);
+        float newPos = std::sin(time * 2);
         if (newPos < 0) {
             newPos = 0;
             bounceCompleted = true;
