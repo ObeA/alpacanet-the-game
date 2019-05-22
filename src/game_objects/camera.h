@@ -10,11 +10,12 @@ class GameObject;
 
 class Camera {
 public:
-    Camera(Game* game, glm::vec3 position, float yaw, float pitch);
+    Camera(Game* game, glm::vec3 position, float followDistance);
 
-    void setPosition(glm::vec3 position);
-    void lookAt(GameObject* object);
-    void setRotation(float yaw, float pitch);
+    void lookAt(const GameObject* object);
+    void lookAt(const glm::vec3& position);
+    void setHorizontalRotation(float radians);
+    void setFollowDistance(float newFollowDistance);
 
     void update();
 
@@ -31,18 +32,16 @@ private:
     glm::mat4 projection{};
 
     glm::vec3 position;
-    glm::vec3 up{};
-    glm::vec3 forward{};
-    glm::vec3 right{};
 
-    float yaw;
-    float pitch;
+    float followDistance;
+    float horizontalRotation;
 
     glm::vec2 previousMousePosition{};
     glm::vec2 currentMousePosition{};
     glm::vec3 moveDirection{};
 
-    GameObject* followedObject = nullptr;
+    const GameObject* followedObject = nullptr;
+    glm::vec3 targetPosition;
 
     void onMouseMove(double x, double y);
 

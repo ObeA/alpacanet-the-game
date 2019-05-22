@@ -2,10 +2,8 @@
 #include <glm/gtx/norm.hpp>
 #include "../game_objects/game_object.h"
 
-Camera::Camera(Game* game, glm::vec3 position, float yaw, float pitch)
-        : game(game), position(position), yaw(yaw), pitch(pitch) {
-    update();
-
+Camera::Camera(Game* game, glm::vec3 position, float distance)
+        : game(game), position(position), followDistance(distance), horizontalRotation(0) {
     auto extents = game->getGraphics()->getRenderer()->getExtents();
     projection = glm::perspective(glm::radians(90.0f), (float)extents.width / extents.height, 0.1f, 20.0f);
 
@@ -34,42 +32,18 @@ const glm::vec3& Camera::getPosition() const {
     return position;
 }
 
-void Camera::lookAt(GameObject* object) {
-    followedObject = object;
-}
-
 void Camera::update() {
     if (followedObject != nullptr) {
-        position = followedObject->position;
-        position += glm::vec3(3.0f);
-        view = glm::lookAt(position, followedObject->position, glm::vec3(0, 0, 1));
-    } else {
-        if (glm::length2(currentMousePosition - previousMousePosition) > 0) {
-            if (currentMousePosition.x == 0 && currentMousePosition.y == 0) {
-                previousMousePosition = currentMousePosition;
-            } else {
-                auto delta = currentMousePosition - previousMousePosition;
-                previousMousePosition = currentMousePosition;
-                float sensitivity = 0.5;
-                yaw -= (delta.x * sensitivity);
-                pitch = std::min(89.0f, std::max(-89.0f, pitch + (delta.y * sensitivity)));
-            }
-        }
-
-        auto velocity = 0.005f * (Game::Timestep.count() / 1000000.0f);
-        position += forward * moveDirection.y * velocity;
-        position += right * moveDirection.x * velocity;
-
-        forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-        forward.z = sin(glm::radians(pitch));
-        forward.y = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-        forward = glm::normalize(forward);
-
-        right = glm::normalize(glm::cross(forward, WORLD_UP));
-        up = glm::normalize(glm::cross(right, forward));
-
-        view = glm::lookAt(position, position + forward, up);
+        targetPosition = followedObject->position;
     }
+
+    position.x = std::cos(horizontalRotation) * followDistance - std::sin(horizontalRotation) * followDistance + targetPosition.x;
+    position.y = std::sin(horizontalRotation) * followDistance + std::cos(horizontalRotation) * followDistance + targetPosition.y;
+    position.z = targetPosition.z + followDistance;
+
+    horizontalRotation += 0.01f;
+
+    view = glm::lookAt(position, targetPosition, glm::vec3(0, 0, 1));
 }
 
 glm::vec3 Camera::getRay() {
@@ -85,21 +59,9 @@ glm::vec3 Camera::getRay() {
     return dir;
 }
 
-void Camera::setPosition(glm::vec3 newPosition) {
-    position = newPosition;
-    update();
-}
-
-void Camera::setRotation(float newYaw, float newPitch) {
-    yaw = newYaw;
-    pitch = newPitch;
-    update();
-}
-
 void Camera::onMouseMove(double x, double y) {
     currentMousePosition.x = x;
     currentMousePosition.y = y;
-    update();
 }
 
 void Camera::onKeyDown(int key, int scancode, int mods) {
@@ -130,4 +92,21 @@ void Camera::onKeyUp(int key, int scancode, int mods) {
             moveDirection.x = 0;
             break;
     }
+}
+
+void Camera::lookAt(const GameObject* object) {
+    followedObject = object;
+}
+
+void Camera::lookAt(const glm::vec3& newTargetPosition) {
+    followedObject = nullptr;
+    targetPosition = newTargetPosition;
+}
+
+void Camera::setHorizontalRotation(float radians) {
+    horizontalRotation = radians;
+}
+
+void Camera::setFollowDistance(float newFollowDistance) {
+    followDistance = newFollowDistance;
 }
