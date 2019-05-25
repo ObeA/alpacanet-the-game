@@ -1,6 +1,7 @@
 #include "renderer.h"
 #include "../scenes/scene.h"
 #include "../game_objects/drawable_object.h"
+#include "gui/gui.h"
 
 Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice)
         : window(window),
@@ -25,6 +26,8 @@ Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevic
     createFramebuffers();
 
 	createSyncObjects();
+
+    createGUI();
 }
 
 Renderer::~Renderer() {
@@ -55,6 +58,12 @@ Renderer::~Renderer() {
 		vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
 		vkDestroyFence(device, inFlightFences[i], nullptr);
 	}
+}
+
+void Renderer::recreateCommandBuffer() {
+    vkQueueWaitIdle(logicalDevice->getGraphicsQueue());
+    vkFreeCommandBuffers(logicalDevice->getDevice(), logicalDevice->getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+    createCommandbuffers();
 }
 
 void Renderer::initializeRenderPass() {
@@ -402,6 +411,8 @@ void Renderer::createCommandbuffers() {
             object->draw(commandBuffers[i], i);
         }
 
+        gui->drawFrame(commandBuffers[i]);
+
         vkCmdEndRenderPass(commandBuffers[i]);
 
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
@@ -423,6 +434,13 @@ void Renderer::render() {
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 		throw std::runtime_error("failed to acquire swap chain image!");
 	}
+
+    gui->newFrame();
+
+    bool update = gui->updateBuffers();
+    if (update) {
+        recreateCommandBuffer();
+    }
 
 	//objects[1]->position = lightPos;
 
@@ -497,6 +515,14 @@ void Renderer::createSyncObjects() {
 	}
 }
 
+void Renderer::createGUI() {
+    gui = new GUI(this, logicalDevice, window);
+    gui->init(window->getExtents().width, window->getExtents().height);
+    gui->initResources(renderPass, logicalDevice->getGraphicsQueue());
+    gui->newFrame();
+    gui->updateBuffers();
+}
+
 const VkDescriptorPool& Renderer::getDescriptorPool() const {
     return descriptorPool;
 }
@@ -520,4 +546,8 @@ void Renderer::setScene(Scene* newScene) {
 
 const VkExtent2D& Renderer::getExtents() const {
     return swapchain.getExtents();
+}
+
+GUI* Renderer::getGui() {
+    return gui;
 }

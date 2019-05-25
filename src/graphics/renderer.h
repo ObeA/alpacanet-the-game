@@ -6,11 +6,14 @@
 #include "images/image.h"
 
 class Scene;
+class GUI;
 
 class Renderer {
 public:
 	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice);
 	~Renderer();
+
+    void recreateCommandBuffer();
 
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	std::vector<VkImageView> swapChainImageViews;
@@ -26,6 +29,7 @@ public:
     const VkRenderPass& getRenderPass() const;
     const VkRenderPass& getOffscreenRenderPass() const;
     const VkExtent2D& getExtents() const;
+    GUI* getGui();
 private:
     Window* window;
     Surface* surface;
@@ -45,6 +49,8 @@ private:
 	VkSampler offscreenDepthSampler;
 	VkImageView offscreenImageView;
 	Image* offscreenImage;
+
+    GUI* gui;
 
 	VkDescriptorPool descriptorPool;
     std::vector<VkCommandBuffer> commandBuffers;
@@ -69,4 +75,6 @@ private:
 	void createCommandbuffers();
 
 	void createSyncObjects();
+
+    void createGUI();
 };

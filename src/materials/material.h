@@ -22,8 +22,6 @@ protected:
     Graphics* graphics;
 
     virtual void createGraphicsPipeline() = 0;
-
-    VkShaderModule createShaderModule(const std::vector<char>& code);
     virtual void createDescriptorSetLayout() = 0;
 
 	void createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shaderStages[]);

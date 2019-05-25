@@ -17,6 +17,8 @@ public:
 
     int shear();
 
+    int getWooliness();
+
 private:
     glm::vec2 targetPosition;
     bool targetPositionReached = false;
