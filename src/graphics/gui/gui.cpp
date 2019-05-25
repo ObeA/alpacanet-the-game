@@ -33,28 +33,27 @@ GUI::~GUI()
     vkDestroyDescriptorSetLayout(device->getDevice(), descriptorSetLayout, nullptr);
 }
 
-// Initialize styles, keys, etc.
 void GUI::init(float width, float height)
 {
-    // Color scheme
     ImGuiStyle& style = ImGui::GetStyle();
-    style.Colors[ImGuiCol_TitleBg] = ImVec4(1.0f, 0.0f, 0.0f, 0.6f);
-    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(1.0f, 0.0f, 0.0f, 0.8f);
+    style.Colors[ImGuiCol_WindowBg] = ImVec4(0.5f, 0.25f, 0.25f, 0.8f);
+    style.Colors[ImGuiCol_TitleBg] = ImVec4(0.5f, 0.25f, 0.25f, 0.8f);
+    style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.5f, 0.25f, 0.25f, 0.8f);
     style.Colors[ImGuiCol_MenuBarBg] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
     style.Colors[ImGuiCol_Header] = ImVec4(1.0f, 0.0f, 0.0f, 0.4f);
     style.Colors[ImGuiCol_CheckMark] = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
-    // Dimensions
+
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2(width, height);
     io.DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
 }
 
-// Initialize all Vulkan resources used by the ui
 void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    // Create font texture
+    ImFont* pFont = io.Fonts->AddFontFromFileTTF("assets/fonts/COMIC.TTF", 27.0f);
+
     unsigned char* fontData;
     int texWidth, texHeight;
     io.Fonts->GetTexDataAsRGBA32(&fontData, &texWidth, &texHeight);
@@ -63,14 +62,13 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     extent.width = texWidth;
     extent.height = texHeight;
 
+
     fontImage = new Image(device, extent, VK_FORMAT_R8G8B8A8_UNORM,
         VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    // Image view
     fontView = device->createImageView(fontImage->getImage(), VK_FORMAT_R8G8B8A8_UNORM,
         VK_IMAGE_ASPECT_COLOR_BIT);
 
-    // Staging buffers for font data upload
     Buffer* stagingBuffer = new Buffer(
         device,
         uploadSize,
@@ -79,56 +77,12 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     );
 
     stagingBuffer->copyFrom(fontData, uploadSize);
-
-    // Copy buffer data to font image
-    //VkCommandBuffer copyCmd = device->createCommandBuffer(VK_COMMAND_BUFFER_LEVEL_PRIMARY, true);
-
-    // Prepare for transfer
     fontImage->transitionLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-
-    //vks::tools::setImageLayout(
-    //    copyCmd,
-    //    fontImage,
-    //    VK_IMAGE_ASPECT_COLOR_BIT,
-    //    VK_IMAGE_LAYOUT_UNDEFINED,
-    //    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-    //    VK_PIPELINE_STAGE_HOST_BIT,
-    //    VK_PIPELINE_STAGE_TRANSFER_BIT);
-
-    // Copy
     fontImage->copyFromBuffer(stagingBuffer);
-    //VkBufferImageCopy bufferCopyRegion = {};
-    //bufferCopyRegion.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-    //bufferCopyRegion.imageSubresource.layerCount = 1;
-    //bufferCopyRegion.imageExtent.width = texWidth;
-    //bufferCopyRegion.imageExtent.height = texHeight;
-    //bufferCopyRegion.imageExtent.depth = 1;
-
-    //vkCmdCopyBufferToImage(
-    //    copyCmd,
-    //    stagingBuffer.buffer,
-    //    fontImage,
-    //    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-    //    1,
-    //    &bufferCopyRegion
-    //);
-
-    // Prepare for shader read
     fontImage->transitionLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-    //vks::tools::setImageLayout(
-    //    copyCmd,
-    //    fontImage,
-    //    VK_IMAGE_ASPECT_COLOR_BIT,
-    //    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-    //    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
-    //    VK_PIPELINE_STAGE_TRANSFER_BIT,
-    //    VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT);
-
-    //device->flushCommandBuffer(copyCmd, copyQueue, true);
 
     delete stagingBuffer;
 
-    // Font texture Sampler
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
     samplerInfo.magFilter = VK_FILTER_LINEAR;
@@ -142,7 +96,6 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
         throw std::runtime_error("failed to create GUI font sampler!");
     }
 
-    // Descriptor pool
     std::array<VkDescriptorPoolSize, 1> poolSizes = {};
     poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
     poolSizes[0].descriptorCount = 1;
@@ -171,7 +124,6 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
         throw std::runtime_error("failed to create GUI descriptor set layout binding!");
     }
 
-    // Descriptor set
     std::vector<VkDescriptorSetLayout> layouts(1, descriptorSetLayout);
     VkDescriptorSetAllocateInfo allocInfo = {};
     allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -182,14 +134,6 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     if (vkAllocateDescriptorSets(device->getDevice(), &allocInfo, &descriptorSet) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate descriptor sets!");
     }
-
-    //VkDescriptorSetAllocateInfo allocInfo = vks::initializers::descriptorSetAllocateInfo(descriptorPool, &descriptorSetLayout, 1);
-    //VK_CHECK_RESULT(vkAllocateDescriptorSets(device->logicalDevice, &allocInfo, &descriptorSet));
-    //VkDescriptorImageInfo fontDescriptor = vks::initializers::descriptorImageInfo(
-    //    sampler,
-    //    fontView,
-    //    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-    //);
 
     std::array<VkWriteDescriptorSet, 1> descriptorWrites = {};
     VkDescriptorImageInfo imageInfo = {};
@@ -204,20 +148,14 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     descriptorWrites[0].descriptorCount = 1;
     descriptorWrites[0].pImageInfo = &imageInfo;
 
-    //std::vector<VkWriteDescriptorSet> writeDescriptorSets = {
-    //    vks::initializers::writeDescriptorSet(descriptorSet, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 0, &fontDescriptor)
-    //};
     vkUpdateDescriptorSets(device->getDevice(), static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 
-    // Pipeline cache
     VkPipelineCacheCreateInfo pipelineCacheCreateInfo = {};
     pipelineCacheCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_CACHE_CREATE_INFO;
     if (vkCreatePipelineCache(device->getDevice(), &pipelineCacheCreateInfo, nullptr, &pipelineCache) != VK_SUCCESS) {
         throw std::runtime_error("failed to create GUI pipeline cache!");
     }
 
-    // Pipeline layout
-    // Push constants for UI rendering parameters
     VkPushConstantRange pushConstantRange{};
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
     pushConstantRange.offset = 0;
@@ -232,7 +170,6 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
         throw std::runtime_error("failed to create GUI pipeline layout!");
     }
 
-    // Setup graphics pipeline for UI rendering
     VkPipelineInputAssemblyStateCreateInfo inputAssemblyState{};
     inputAssemblyState.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     inputAssemblyState.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -248,7 +185,6 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     pipelineRasterizationStateCreateInfo.depthClampEnable = VK_FALSE;
     pipelineRasterizationStateCreateInfo.lineWidth = 1.0f;
 
-    // Enable blending
     VkPipelineColorBlendAttachmentState blendAttachmentState{};
     blendAttachmentState.blendEnable = VK_TRUE;
     blendAttachmentState.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
@@ -259,15 +195,11 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     blendAttachmentState.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
     blendAttachmentState.alphaBlendOp = VK_BLEND_OP_ADD;
 
-    //VkPipelineColorBlendStateCreateInfo colorBlendState =
-    //    vks::initializers::pipelineColorBlendStateCreateInfo(1, &blendAttachmentState);
     VkPipelineColorBlendStateCreateInfo pipelineColorBlendStateCreateInfo{};
     pipelineColorBlendStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     pipelineColorBlendStateCreateInfo.attachmentCount = 1;
     pipelineColorBlendStateCreateInfo.pAttachments = &blendAttachmentState;
 
-    //VkPipelineDepthStencilStateCreateInfo depthStencilState =
-    //    vks::initializers::pipelineDepthStencilStateCreateInfo(VK_FALSE, VK_FALSE, VK_COMPARE_OP_LESS_OR_EQUAL);
     VkPipelineDepthStencilStateCreateInfo pipelineDepthStencilStateCreateInfo{};
     pipelineDepthStencilStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     pipelineDepthStencilStateCreateInfo.depthTestEnable = VK_FALSE;
@@ -276,16 +208,12 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     pipelineDepthStencilStateCreateInfo.front = pipelineDepthStencilStateCreateInfo.back;
     pipelineDepthStencilStateCreateInfo.back.compareOp = VK_COMPARE_OP_ALWAYS;
 
-    //VkPipelineViewportStateCreateInfo viewportState =
-    //    vks::initializers::pipelineViewportStateCreateInfo(1, 1, 0);
     VkPipelineViewportStateCreateInfo pipelineViewportStateCreateInfo{};
     pipelineViewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
     pipelineViewportStateCreateInfo.viewportCount = 1;
     pipelineViewportStateCreateInfo.scissorCount = 1;
     pipelineViewportStateCreateInfo.flags = 0;
 
-    //VkPipelineMultisampleStateCreateInfo multisampleState =
-    //    vks::initializers::pipelineMultisampleStateCreateInfo(VK_SAMPLE_COUNT_1_BIT);
     VkPipelineMultisampleStateCreateInfo pipelineMultisampleStateCreateInfo{};
     pipelineMultisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     pipelineMultisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
@@ -295,8 +223,7 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
         VK_DYNAMIC_STATE_VIEWPORT,
         VK_DYNAMIC_STATE_SCISSOR
     };
-    //VkPipelineDynamicStateCreateInfo dynamicState =
-    //    vks::initializers::pipelineDynamicStateCreateInfo(dynamicStateEnables);
+
     VkPipelineDynamicStateCreateInfo pipelineDynamicStateCreateInfo{};
     pipelineDynamicStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     pipelineDynamicStateCreateInfo.pDynamicStates = dynamicStateEnables.data();
@@ -326,7 +253,6 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     shaderStages[0] = vertShaderStageInfo;
     shaderStages[1] = fragShaderStageInfo;
 
-    //VkGraphicsPipelineCreateInfo pipelineCreateInfo = vks::initializers::pipelineCreateInfo(pipelineLayout, renderPass);
     VkGraphicsPipelineCreateInfo pipelineCreateInfo{};
     pipelineCreateInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipelineCreateInfo.layout = pipelineLayout;
@@ -345,7 +271,6 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     pipelineCreateInfo.stageCount = static_cast<uint32_t>(shaderStages.size());
     pipelineCreateInfo.pStages = shaderStages.data();
 
-    // Vertex bindings an attributes based on ImGui vertex definition
     VkVertexInputBindingDescription vInputBindDescription{};
     vInputBindDescription.binding = 0;
     vInputBindDescription.stride = sizeof(ImDrawVert);
@@ -392,7 +317,6 @@ void GUI::setAlpaca(Alpaca* selectedAlpaca) {
     alpaca = selectedAlpaca;
 }
 
-// Starts a new imGui frame and sets up windows and ui elements
 void GUI::newFrame()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -402,29 +326,26 @@ void GUI::newFrame()
 
     ImGui::NewFrame();
 
-    // Init imGui windows and elements
+    ImGui::SetNextWindowPos(ImVec2(525, 425), ImGuiSetCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(250, 150), ImGuiCond_FirstUseEver);
+    ImGui::Begin("Huidige alpaca", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
-    ImVec4 clear_color = ImColor(114, 144, 154);
-    static float f = 0.0f;
-
-    ImGui::TextUnformatted("Geselecteerde alpaca");
     if (alpaca != nullptr) {
-        ImGui::TextUnformatted(std::to_string(alpaca->wooliness).c_str());
+        ImGui::TextUnformatted(("Wol: " + std::to_string(alpaca->wooliness)).c_str());
+    }
+    else {
+        ImGui::TextUnformatted("Geen alpaca geselecteerd");
     }
 
-    //ImGui::SetNextWindowPos(ImVec2(450, 20), ImGuiSetCond_FirstUseEver);
-    //ImGui::ShowDemoWindow();
+    ImGui::End();
 
-    // Render to generate draw buffers
     ImGui::Render();
 }
 
-// Update vertex and index buffer containing the imGui elements when required
 bool GUI::updateBuffers()
 {
     ImDrawData* imDrawData = ImGui::GetDrawData();
 
-    // Note: Alignment is done inside buffer creation
     VkDeviceSize vertexBufferSize = imDrawData->TotalVtxCount * sizeof(ImDrawVert);
     VkDeviceSize indexBufferSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
 
@@ -432,11 +353,8 @@ bool GUI::updateBuffers()
         return false;
     }
 
-    // Update buffers only if vertex or index count has been changed compared to current buffer size
-
     bool updated = false;
 
-    // Vertex buffer
     if (vertexBuffer == nullptr) {
         vertexBuffer = new Buffer(device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         vertexBuffer->mapAll();
@@ -450,7 +368,6 @@ bool GUI::updateBuffers()
         updated = true;
     }
 
-    // Index buffer
     VkDeviceSize indexSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
     if (indexBuffer == nullptr) {
         indexBuffer = new Buffer(device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
@@ -465,7 +382,6 @@ bool GUI::updateBuffers()
         updated = true;
     }
 
-    // Upload data
     ImDrawVert* vtxDst = (ImDrawVert*)vertexBuffer->mapped;
     ImDrawIdx* idxDst = (ImDrawIdx*)indexBuffer->mapped;
 
@@ -477,15 +393,12 @@ bool GUI::updateBuffers()
         idxDst += cmd_list->IdxBuffer.Size;
     }
 
-
-    // Flush to make writes visible to GPU
     vertexBuffer->flush();
     indexBuffer->flush();
 
     return updated;
 }
 
-// Draw current imGui frame into a command buffer
 void GUI::drawFrame(VkCommandBuffer commandBuffer)
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -500,12 +413,10 @@ void GUI::drawFrame(VkCommandBuffer commandBuffer)
     viewport.maxDepth = 1.0f;
     vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 
-    // UI scale and translate via push constants
     pushConstBlock.scale = glm::vec2(2.0f / io.DisplaySize.x, 2.0f / io.DisplaySize.y);
     pushConstBlock.translate = glm::vec2(-1.0f);
     vkCmdPushConstants(commandBuffer, pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(PushConstBlock), &pushConstBlock);
 
-    // Render commands
     ImDrawData* imDrawData = ImGui::GetDrawData();
     int32_t vertexOffset = 0;
     int32_t indexOffset = 0;
