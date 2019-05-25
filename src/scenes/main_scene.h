@@ -14,6 +14,7 @@ public:
     void update() override;
     void onMouseButton(int button, int action, int mods);
     void onKeyDown(int key, int scancode, int mods);
+    void drawUI();
     std::vector<Alpaca*> getAlpacas();
 private:
     std::vector<Material*> materials;

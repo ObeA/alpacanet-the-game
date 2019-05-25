@@ -542,6 +542,7 @@ const VkRenderPass& Renderer::getOffscreenRenderPass() const {
 void Renderer::setScene(Scene* newScene) {
     scene = newScene;
     createCommandbuffers();
+    gui->setScene(newScene);
 }
 
 const VkExtent2D& Renderer::getExtents() const {

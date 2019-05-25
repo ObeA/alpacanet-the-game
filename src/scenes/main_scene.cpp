@@ -99,7 +99,6 @@ void MainScene::onMouseButton(int button, int action, int mods) {
                 selectedAlpaca = casted;
                 camera->lookAt(casted);
                 camera->setFollowDistance(2.0f);
-                game->getGraphics()->getRenderer()->getGui()->setAlpaca(casted);
             }
         }
     }
@@ -156,5 +155,22 @@ void MainScene::loopAlpacas(bool nextOrPrevious) {
         selectedAlpaca = alpacas[0];
     }
     camera->lookAt(selectedAlpaca);
-    game->getGraphics()->getRenderer()->getGui()->setAlpaca(selectedAlpaca);
+}
+
+void MainScene::drawUI() {
+    ImGui::SetNextWindowPos(ImVec2(525, 425), ImGuiSetCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(250, 150), ImGuiCond_FirstUseEver);
+    ImGui::Begin("Huidige alpaca", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+    if (selectedAlpaca != nullptr) {
+        ImGui::TextUnformatted(("Wol: " + std::to_string(selectedAlpaca->getWooliness())).c_str());
+    }
+    else {
+        ImGui::TextUnformatted("Geen alpaca geselecteerd");
+    }
+
+    ImGui::TextUnformatted("Wool-O-Meter");
+    ImGui::ProgressBar(score / (float)1000, ImVec2(-1, 0), (std::to_string(score) + "/1000").c_str());
+
+    ImGui::End();
 }

@@ -21,6 +21,7 @@ public:
     std::vector<GameObject*> getActiveObjects();
     std::vector<DrawableObject*> getActiveDrawableObjects();
     Camera* getCamera();
+    virtual void drawUI() = 0;
 
 protected:
     Game* game;

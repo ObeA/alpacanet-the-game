@@ -12,10 +12,10 @@ public:
     ~GUI();
     void init(float width, float height);
     void initResources(VkRenderPass renderPass, VkQueue copyQueue);
-    void setAlpaca(Alpaca* alpaca);
     void newFrame();
     bool updateBuffers();
     void drawFrame(VkCommandBuffer commandBuffer);
+    void setScene(Scene* newScene);
 private:
     VkSampler sampler;
     Buffer* vertexBuffer =  nullptr;
@@ -33,10 +33,9 @@ private:
     Renderer* renderer;
     LogicalDevice* device;
     Window* window;
+    Scene* scene = nullptr;
     void onMouseMove(double x, double y);
     void onMouseButton(int key, int scancode, int mods);
     glm::vec2 currentMousePosition = glm::vec2(0);
     std::vector<bool> mouseButtons = {false, false};
-
-    Alpaca* alpaca = nullptr;
 };

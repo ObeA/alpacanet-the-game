@@ -52,7 +52,7 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    ImFont* pFont = io.Fonts->AddFontFromFileTTF("assets/fonts/COMIC.TTF", 27.0f);
+    ImFont* pFont = io.Fonts->AddFontFromFileTTF("assets/fonts/COMIC.TTF", 25.0f);
 
     unsigned char* fontData;
     int texWidth, texHeight;
@@ -313,10 +313,6 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     }
 }
 
-void GUI::setAlpaca(Alpaca* selectedAlpaca) {
-    alpaca = selectedAlpaca;
-}
-
 void GUI::newFrame()
 {
     ImGuiIO& io = ImGui::GetIO();
@@ -326,18 +322,9 @@ void GUI::newFrame()
 
     ImGui::NewFrame();
 
-    ImGui::SetNextWindowPos(ImVec2(525, 425), ImGuiSetCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(250, 150), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Huidige alpaca", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
-
-    if (alpaca != nullptr) {
-        ImGui::TextUnformatted(("Wol: " + std::to_string(alpaca->getWooliness())).c_str());
+    if (scene != nullptr) {
+        scene->drawUI();
     }
-    else {
-        ImGui::TextUnformatted("Geen alpaca geselecteerd");
-    }
-
-    ImGui::End();
 
     ImGui::Render();
 }
@@ -468,4 +455,8 @@ void GUI::onMouseButton(int button, int action, int mods) {
             mouseButtons[1] = false;
         }
     }
+}
+
+void GUI::setScene(Scene* newScene) {
+    scene = newScene;
 }
