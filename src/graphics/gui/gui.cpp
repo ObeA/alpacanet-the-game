@@ -440,14 +440,14 @@ void GUI::onMouseMove(double x, double y) {
 }
 
 void GUI::onMouseButton(int button, int action, int mods) {
-    if (button = GLFW_MOUSE_BUTTON_1) {
+    if (button == GLFW_MOUSE_BUTTON_1) {
         if (action == GLFW_PRESS) {
             mouseButtons[0] = true;
         }
         else {
             mouseButtons[0] = false;
         }
-    } else if (button = GLFW_MOUSE_BUTTON_2) {
+    } else if (button == GLFW_MOUSE_BUTTON_2) {
         if (action == GLFW_PRESS) {
             mouseButtons[1] = true;
         }

@@ -158,8 +158,8 @@ void MainScene::loopAlpacas(bool nextOrPrevious) {
 }
 
 void MainScene::drawUI() {
-    ImGui::SetNextWindowPos(ImVec2(525, 425), ImGuiSetCond_FirstUseEver);
-    ImGui::SetNextWindowSize(ImVec2(250, 150), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowPos(ImVec2(525, 425), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(250, 150), ImGuiCond_Always);
     ImGui::Begin("Huidige alpaca", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
     if (selectedAlpaca != nullptr) {
