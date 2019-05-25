@@ -8,7 +8,7 @@ public:
     Buffer(LogicalDevice* device, VkDeviceSize size, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags properties, void* data = nullptr);
     ~Buffer();
 
-    void* mapped;
+    void* mapped = nullptr;
 
     void copyFrom(void* data, uint32_t length);
     void copyFrom(void * data, uint32_t length, void * dst);

@@ -60,7 +60,7 @@ VkResult Buffer::mapAll() {
 
 void Buffer::unmap()
 {
-    if (mapped)
+    if (mapped != nullptr)
     {
         vkUnmapMemory(device->getDevice(), memory);
         mapped = nullptr;
