@@ -24,5 +24,5 @@ protected:
     virtual void createGraphicsPipeline() = 0;
     virtual void createDescriptorSetLayout() = 0;
 
-	void createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shaderStages[]);
+	virtual void createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shaderStages[]);
 };

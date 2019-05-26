@@ -1,22 +1,30 @@
 #include "main_scene.h"
 #include "../game_objects/model_object.h"
+#include "../game_objects/particlesystem.h"
 #include "../materials/basic_material.h"
 #include "../materials/basic_textured_material.h"
 #include "../materials/shadow_material.h"
+#include "../materials/particle_material.h"
 #include "scene_objects/alpaca.h"
 #include "../graphics/gui/gui.h"
 #include <glm/gtx/intersect.hpp>
 
 void MainScene::setup() {
     auto graphics = game->getGraphics();
-    materials.push_back(new BasicMaterial(graphics));
+    materials.push_back(new BasicMaterial(graphics, "basic"));
     materials.push_back(new BasicTexturedMaterial(graphics, (char*) "assets/textures/texture.jpg"));
-    materials.push_back(new BasicTexturedMaterial(graphics, (char*) "assets/textures/banana.jpg"));
+    materials.push_back(new BasicTexturedMaterial(graphics,(char*) "assets/textures/banana.jpg"));
     materials.push_back(new BasicTexturedMaterial(graphics, (char*) "assets/textures/chalet.jpg"));
     materials.push_back(new ShadowMaterial(graphics));
+    //materials.push_back(new ShadowMaterial(graphics));
+    materials.push_back(new ParticleMaterial(graphics, "particle"));
     for (auto& material : materials) {
         material->initialize();
     }
+
+    auto particles = new ParticleSystem(game, materials[5], materials[4]);
+    particles->scale = glm::vec3(.5);
+    particles->position = glm::vec3(0);
 
     auto model = new ModelObject(game, materials[1], materials[4], (char*) "assets/models/cube.obj");
     model->scale = glm::vec3(.5);
@@ -27,7 +35,7 @@ void MainScene::setup() {
     model2->position = glm::vec3(0, 0, -.5);
     objects.push_back(model);
     objects.push_back(model2);
-
+    objects.push_back(particles);
 
     auto test = new Alpaca(game, materials[1], materials[4]);
     test->position = glm::vec3(0);
