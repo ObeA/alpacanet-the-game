@@ -14,7 +14,7 @@ void ModelObject::loadModel() {
     }
 
     for (const auto& shape : shapes) {
-        glm::vec3 color = glm::vec3(0);
+        glm::vec3 color = glm::vec3(1);
         if (shape.mesh.material_ids[0] != -1) {
             auto matchedMaterial = materials[shape.mesh.material_ids[0]];
             color = { matchedMaterial.diffuse[0], matchedMaterial.diffuse[1], matchedMaterial.diffuse[2] };
@@ -44,12 +44,7 @@ void ModelObject::loadModel() {
                 };
             }
 
-            if (color == glm::vec3(0)) {
-                vertex.color = { 1.0f, 1.0f, 1.0f };
-            }
-            else {
-                vertex.color = color;
-            }
+            vertex.color = color;
 
             vertices.push_back(vertex);
             indices.push_back(indices.size());
