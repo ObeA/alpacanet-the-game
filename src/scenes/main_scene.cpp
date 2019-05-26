@@ -18,7 +18,7 @@ void MainScene::setup() {
         material->initialize();
     }
 
-    auto model = new ModelObject(game, materials[1], materials[4], (char*) "assets/models/cube.obj");
+    auto model = new ModelObject(game, materials[0], materials[4], (char*) "assets/models/world.obj");
     model->scale = glm::vec3(.5);
     model->position = glm::vec3(0, -2, 1);
 

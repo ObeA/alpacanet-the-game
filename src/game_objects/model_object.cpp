@@ -9,11 +9,17 @@ void ModelObject::loadModel() {
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, modelLocation.c_str())) {
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, modelLocation.c_str(), "assets/models/")) {
         throw std::runtime_error(warn + err);
     }
 
     for (const auto& shape : shapes) {
+        glm::vec3 color = glm::vec3(0);
+        if (shape.mesh.material_ids[0] != -1) {
+            auto matchedMaterial = materials[shape.mesh.material_ids[0]];
+            color = { matchedMaterial.diffuse[0], matchedMaterial.diffuse[1], matchedMaterial.diffuse[2] };
+        }
+
         for (const auto& index : shape.mesh.indices) {
             Vertex vertex = {};
 
@@ -38,7 +44,12 @@ void ModelObject::loadModel() {
                 };
             }
 
-            vertex.color = {1.0f, 1.0f, 1.0f};
+            if (color == glm::vec3(0)) {
+                vertex.color = { 1.0f, 1.0f, 1.0f };
+            }
+            else {
+                vertex.color = color;
+            }
 
             vertices.push_back(vertex);
             indices.push_back(indices.size());
