@@ -13,5 +13,5 @@ struct Particle {
 
     static VkVertexInputBindingDescription getBindingDescription();
 
-    static std::array<VkVertexInputAttributeDescription, 4> getAttributeDescriptions();
+    static std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions();
 };
