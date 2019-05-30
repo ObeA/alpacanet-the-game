@@ -16,6 +16,7 @@ public:
     const VkQueue& getPresentQueue() const;
     const VkCommandPool& getCommandPool() const;
     VkImageView createImageView(const VkImage& image, VkFormat format, VkImageAspectFlags aspectFlags) const;
+    VkShaderModule createShaderModule(const std::vector<char>& code);
 
 private:
     Instance* instance;

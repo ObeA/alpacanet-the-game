@@ -3,6 +3,7 @@
 #include "../game_objects/drawable_object.h"
 #include "vulkan_utilities.h"
 #include "../managers/material_manager.h"
+#include "gui/gui.h"
 
 Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice)
         : window(window),
@@ -24,6 +25,7 @@ Renderer::Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevic
     createFramebuffers();
 
     createSyncObjects();
+    createGUI();
 }
 
 Renderer::~Renderer() {
@@ -55,6 +57,12 @@ Renderer::~Renderer() {
         vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
         vkDestroyFence(device, inFlightFences[i], nullptr);
     }
+}
+
+void Renderer::recreateCommandBuffer() {
+    vkQueueWaitIdle(logicalDevice->getGraphicsQueue());
+    vkFreeCommandBuffers(logicalDevice->getDevice(), logicalDevice->getCommandPool(), static_cast<uint32_t>(commandBuffers.size()), commandBuffers.data());
+    createCommandbuffers();
 }
 
 void Renderer::initializeRenderPass() {
@@ -418,6 +426,9 @@ void Renderer::createCommandbuffers() {
             vkCmdEndRenderPass(commandBuffers[i]);
         }
 
+        gui->drawFrame(commandBuffers[i]);
+        vkCmdEndRenderPass(commandBuffers[i]);
+
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
         }
@@ -425,19 +436,24 @@ void Renderer::createCommandbuffers() {
 }
 
 void Renderer::render() {
-    vkWaitForFences(logicalDevice->getDevice(), 1, &inFlightFences[currentFrame], VK_TRUE,
-                    std::numeric_limits<uint64_t>::max());
+	vkWaitForFences(logicalDevice->getDevice(), 1, &inFlightFences[currentFrame], VK_TRUE, std::numeric_limits<uint64_t>::max());
 
-    uint32_t imageIndex;
-    VkResult result = vkAcquireNextImageKHR(logicalDevice->getDevice(), swapchain.getSwapchain(),
-                                            std::numeric_limits<uint64_t>::max(),
-                                            imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
+	uint32_t imageIndex;
+	VkResult result = vkAcquireNextImageKHR(logicalDevice->getDevice(), swapchain.getSwapchain(), std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-        //recreateSwapChain();
-        //return;
-    } else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-        throw std::runtime_error("failed to acquire swap chain image!");
+	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+		//recreateSwapChain();
+		//return;
+	}
+	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+		throw std::runtime_error("failed to acquire swap chain image!");
+	}
+
+    gui->newFrame();
+
+    bool update = gui->updateBuffers();
+    if (update) {
+        recreateCommandBuffer();
     }
 
     auto camera = scene->getCamera();
@@ -511,6 +527,14 @@ void Renderer::createSyncObjects() {
     }
 }
 
+void Renderer::createGUI() {
+    gui = new GUI(this, logicalDevice, window);
+    gui->init(window->getExtents().width, window->getExtents().height);
+    gui->initResources(renderPass, logicalDevice->getGraphicsQueue());
+    gui->newFrame();
+    gui->updateBuffers();
+}
+
 const VkDescriptorPool& Renderer::getDescriptorPool() const {
     return descriptorPool;
 }
@@ -530,8 +554,13 @@ const VkRenderPass& Renderer::getOffscreenRenderPass() const {
 void Renderer::setScene(Scene* newScene) {
     scene = newScene;
     createCommandbuffers();
+    gui->setScene(newScene);
 }
 
 const VkExtent2D& Renderer::getExtents() const {
     return swapchain.getExtents();
+}
+
+GUI* Renderer::getGui() {
+    return gui;
 }

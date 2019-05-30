@@ -1,5 +1,6 @@
 #include "buffer.h"
 #include "../graphics.h"
+#include "../vulkan_utilities.h"
 
 Buffer::Buffer(LogicalDevice* device,
                VkDeviceSize size,
@@ -20,6 +21,7 @@ Buffer::Buffer(LogicalDevice* device,
 }
 
 Buffer::~Buffer() {
+    unmap();
     vkDestroyBuffer(device->getDevice(), buffer, nullptr);
     vkFreeMemory(device->getDevice(), memory, nullptr);
 }
@@ -53,6 +55,15 @@ void Buffer::createBuffer() {
     vkBindBufferMemory(device->getDevice(), buffer, memory, 0);
 }
 
+VkResult Buffer::flush() {
+    VkMappedMemoryRange mappedRange = {};
+    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
+    mappedRange.memory = memory;
+    mappedRange.offset = 0;
+    mappedRange.size = size;
+    return vkFlushMappedMemoryRanges(device->getDevice(), 1, &mappedRange);
+}
+
 void Buffer::copyFrom(void* data) {
     void* mappedMemory = map();
     memcpy(mappedMemory, data, static_cast<uint64_t>(size));
@@ -64,7 +75,7 @@ void* Buffer::map() {
         return mapped;
     }
 
-    vkMapMemory(device->getDevice(), memory, 0, static_cast<uint64_t>(size), 0, &mapped);
+    VK_CHECK_RESULT(vkMapMemory(device->getDevice(), memory, 0, static_cast<uint64_t>(size), 0, &mapped))
     return mapped;
 }
 

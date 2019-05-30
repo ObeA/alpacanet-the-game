@@ -5,6 +5,7 @@
 #include "../materials/shadow_material.h"
 #include "scene_objects/alpaca.h"
 #include "../managers/material_manager.h"
+#include "../graphics/gui/gui.h"
 #include <glm/gtx/intersect.hpp>
 
 void MainScene::setup() {
@@ -137,4 +138,22 @@ void MainScene::loopAlpacas(bool nextOrPrevious) {
         selectedAlpaca = alpacas[0];
     }
     camera->lookAt(selectedAlpaca);
+}
+
+void MainScene::drawUI() {
+    ImGui::SetNextWindowPos(ImVec2(525, 425), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(250, 150), ImGuiCond_Always);
+    ImGui::Begin("Huidige alpaca", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
+
+    if (selectedAlpaca != nullptr) {
+        ImGui::TextUnformatted(("Wol: " + std::to_string(selectedAlpaca->getWooliness())).c_str());
+    }
+    else {
+        ImGui::TextUnformatted("Geen alpaca geselecteerd");
+    }
+
+    ImGui::TextUnformatted("Wool-O-Meter");
+    ImGui::ProgressBar(score / (float)1000, ImVec2(-1, 0), (std::to_string(score) + "/1000").c_str());
+
+    ImGui::End();
 }

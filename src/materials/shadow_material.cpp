@@ -37,8 +37,8 @@ void ShadowMaterial::createGraphicsPipeline() {
 	auto vertShaderCode = FileUtilities::readFile("assets/shaders/shadow/vert.spv");
 	auto fragShaderCode = FileUtilities::readFile("assets/shaders/shadow/frag.spv");
 
-	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
-	VkShaderModule fragShaderModule = createShaderModule(fragShaderCode);
+	VkShaderModule vertShaderModule = graphics->getLogicalDevice()->createShaderModule(vertShaderCode);
+	VkShaderModule fragShaderModule = graphics->getLogicalDevice()->createShaderModule(fragShaderCode);
 
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo = {};
 	vertShaderStageInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;

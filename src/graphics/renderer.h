@@ -6,11 +6,14 @@
 #include "images/image.h"
 
 class Scene;
+class GUI;
 
 class Renderer {
 public:
 	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice);
 	~Renderer();
+
+    void recreateCommandBuffer();
 
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	std::vector<VkImageView> swapChainImageViews;
@@ -32,6 +35,7 @@ public:
     const VkRenderPass& getRenderPass() const;
     const VkRenderPass& getOffscreenRenderPass() const;
     const VkExtent2D& getExtents() const;
+    GUI* getGui();
 private:
     const uint32_t SHADOWMAP_DIMENSION = 2048;
     const VkFilter SHADOWMAP_FILTER = VK_FILTER_LINEAR;
@@ -52,6 +56,8 @@ private:
     VkRenderPass offscreenRenderPass;
 
 
+
+    GUI* gui;
 
 	VkDescriptorPool descriptorPool;
     std::vector<VkCommandBuffer> commandBuffers;
@@ -77,4 +83,6 @@ private:
 
     void initializeOffscreenRendering();
     void initializeOffscreenFramebuffer();
+
+    void createGUI();
 };

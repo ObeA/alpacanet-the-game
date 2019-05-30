@@ -70,3 +70,7 @@ int Alpaca::shear() {
     wooliness = 0;
     return temp;
 }
+
+int Alpaca::getWooliness() {
+    return wooliness;
+}

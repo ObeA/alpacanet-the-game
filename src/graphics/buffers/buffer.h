@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "../logical_device.h"
 
 class Buffer {
@@ -13,10 +12,10 @@ public:
 
     void* map();
     void unmap();
+    VkResult flush();
 
     const VkBuffer& getBuffer() const;
     const VkDeviceMemory& getMemory() const;
-
 private:
     LogicalDevice* device;
 
