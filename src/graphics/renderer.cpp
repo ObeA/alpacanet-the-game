@@ -422,12 +422,10 @@ void Renderer::createCommandbuffers() {
                 );
                 object->draw(commandBuffers[i], i);
             }
-
+       
+            gui->drawFrame(commandBuffers[i]);
             vkCmdEndRenderPass(commandBuffers[i]);
         }
-
-        gui->drawFrame(commandBuffers[i]);
-        vkCmdEndRenderPass(commandBuffers[i]);
 
         if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
             throw std::runtime_error("failed to record command buffer!");
