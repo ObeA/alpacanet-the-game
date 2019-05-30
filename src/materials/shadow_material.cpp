@@ -190,5 +190,11 @@ void ShadowMaterial::createDescriptorSet(VkDescriptorBufferInfo &uniformBufferIn
 	descriptorWrites[0].descriptorCount = 1;
 	descriptorWrites[0].pBufferInfo = &uniformBufferInfo;
 
-	vkUpdateDescriptorSets(graphics->getLogicalDevice()->getDevice(), static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+	vkUpdateDescriptorSets(
+	        graphics->getLogicalDevice()->getDevice(),
+	        static_cast<uint32_t>(descriptorWrites.size()),
+	        descriptorWrites.data(),
+	        0,
+	        nullptr
+    );
 }

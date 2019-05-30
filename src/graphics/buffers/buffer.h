@@ -8,8 +8,11 @@ public:
     Buffer(LogicalDevice* device, VkDeviceSize size, VkBufferUsageFlags usageFlags, VkMemoryPropertyFlags properties, void* data = nullptr);
     ~Buffer();
 
-    void copyFrom(void* data, uint32_t length);
+    void copyFrom(void* data);
     void copyTo(Buffer* other);
+
+    void* map();
+    void unmap();
 
     const VkBuffer& getBuffer() const;
     const VkDeviceMemory& getMemory() const;
@@ -24,7 +27,8 @@ private:
     VkBufferUsageFlags usageFlags;
     VkMemoryPropertyFlags propertyFlags;
 
+    void* mapped = nullptr;
+
     void createBuffer();
-    void copyFrom(void* data);
 };
 

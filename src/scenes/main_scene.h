@@ -16,7 +16,6 @@ public:
     void onKeyDown(int key, int scancode, int mods);
     std::vector<Alpaca*> getAlpacas();
 private:
-    std::vector<Material*> materials;
     Alpaca* selectedAlpaca = nullptr;
     int score = 0;
     void loopAlpacas(bool nextOrPrevious);

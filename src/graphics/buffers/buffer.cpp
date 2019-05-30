@@ -54,14 +54,23 @@ void Buffer::createBuffer() {
 }
 
 void Buffer::copyFrom(void* data) {
-    copyFrom(data, size);
+    void* mappedMemory = map();
+    memcpy(mappedMemory, data, static_cast<uint64_t>(size));
+    unmap();
 }
 
-void Buffer::copyFrom(void* data, uint32_t length) {
-    void* mappedMemory;
-    vkMapMemory(device->getDevice(), memory, 0, length, 0, &mappedMemory);
-    memcpy(mappedMemory, data, length);
+void* Buffer::map() {
+    if (mapped != nullptr) {
+        return mapped;
+    }
+
+    vkMapMemory(device->getDevice(), memory, 0, static_cast<uint64_t>(size), 0, &mapped);
+    return mapped;
+}
+
+void Buffer::unmap() {
     vkUnmapMemory(device->getDevice(), memory);
+    mapped = nullptr;
 }
 
 void Buffer::copyTo(Buffer* other) {

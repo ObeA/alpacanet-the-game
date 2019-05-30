@@ -36,7 +36,6 @@ private:
     float followDistance;
     float horizontalRotation;
 
-    glm::vec2 previousMousePosition{};
     glm::vec2 currentMousePosition{};
     glm::vec3 moveDirection{};
 

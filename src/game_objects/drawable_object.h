@@ -6,9 +6,8 @@ struct UniformBufferObject {
     glm::mat4 model;
     glm::mat4 view;
     glm::mat4 projection;
-    glm::mat4 depthBiasMVP;
+    glm::mat4 lightSpace;
     glm::vec3 lightPos;
-    glm::vec3 viewPos;
 };
 
 class Material;
@@ -21,9 +20,8 @@ public:
 
     void start();
 
-    std::vector<VkDescriptorSet> descriptorSets;
-
-    VkDescriptorSet offscreenDescriptorSets;
+    std::vector<VkDescriptorSet> descriptorSets{};
+    std::vector<VkDescriptorSet> offscreenDescriptorSets{};
 
     virtual void draw(VkCommandBuffer cmdbuffer, size_t bufferOffset);
 
@@ -40,7 +38,7 @@ protected:
     Buffer* indexBuffer;
 
     std::vector<Buffer*> uniformBuffers;
-    Buffer* offscreenUniformBuffer;
+    std::vector<Buffer*> offscreenUniformBuffers;
 
     virtual void createVertexBuffer();
 

@@ -1,5 +1,6 @@
 #include "drawable_object.h"
 #include "../graphics/buffers/uniform_buffer.h"
+#include "../graphics/vulkan_utilities.h"
 
 DrawableObject::DrawableObject(Game* game, Material* material, Material* shadowMaterial)
     : GameObject(game), material(material), shadowMaterial(shadowMaterial) {
@@ -10,7 +11,9 @@ DrawableObject::~DrawableObject() {
     for (auto buffer : uniformBuffers) {
         delete buffer;
     }
-    delete offscreenUniformBuffer;
+    for (auto buffer : offscreenUniformBuffers) {
+        delete buffer;
+    }
 
     delete indexBuffer;
     delete vertexBuffer;
@@ -85,9 +88,7 @@ void DrawableObject::createDescriptorSet(size_t swapChainImageSize) {
     allocInfo.pSetLayouts = layouts.data();
 
     descriptorSets.resize(swapChainImageSize);
-    if (vkAllocateDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), &allocInfo, descriptorSets.data()) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate descriptor sets!");
-    }
+    VK_CHECK_RESULT(vkAllocateDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), &allocInfo, descriptorSets.data()))
 
     for (size_t i = 0; i < swapChainImageSize; i++) {
         VkDescriptorBufferInfo bufferInfo = {};
@@ -102,33 +103,38 @@ void DrawableObject::createDescriptorSet(size_t swapChainImageSize) {
     VkDescriptorSetAllocateInfo offscreenAllocInfo = {};
     offscreenAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     offscreenAllocInfo.descriptorPool = game->getGraphics()->getRenderer()->getDescriptorPool();
-    offscreenAllocInfo.descriptorSetCount = 1;
+    offscreenAllocInfo.descriptorSetCount = static_cast<uint32_t>(swapChainImageSize);
     offscreenAllocInfo.pSetLayouts = offscreenLayouts.data();
 
-    if (vkAllocateDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), &offscreenAllocInfo, &offscreenDescriptorSets) != VK_SUCCESS) {
-        throw std::runtime_error("failed to allocate descriptor sets!");
+    offscreenDescriptorSets.resize(swapChainImageSize);
+    VK_CHECK_RESULT(vkAllocateDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), &offscreenAllocInfo, offscreenDescriptorSets.data()))
+
+    for (size_t i = 0; i < swapChainImageSize; i++) {
+        VkDescriptorBufferInfo bufferInfo = {};
+        bufferInfo.buffer = offscreenUniformBuffers[i]->getBuffer();
+        bufferInfo.offset = 0;
+        bufferInfo.range = sizeof(UniformBufferObjectOffscreen);
+
+        shadowMaterial->createDescriptorSet(bufferInfo, offscreenDescriptorSets[i]);
     }
-
-    VkDescriptorBufferInfo bufferInfo = {};
-    bufferInfo.buffer = offscreenUniformBuffer->getBuffer();
-    bufferInfo.offset = 0;
-    bufferInfo.range = sizeof(UniformBufferObjectOffscreen);
-
-    shadowMaterial->createDescriptorSet(bufferInfo, offscreenDescriptorSets);
 }
 
 void DrawableObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos) {
-    //    position.x = glm::clamp(position.x + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
-    //    position.y = glm::clamp(position.y + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
-    //    position.z = glm::clamp(position.z + (rand() % 2 - .5f) / 500, -3.0f, 3.0f);
+    // Offscreen rendering
+    float lightFOV = 45.0f;
+    float zNear = 1.0f;
+    float zFar = 96.0f;
 
-    static auto startTime = std::chrono::high_resolution_clock::now();
+    auto projectionMatrix = glm::perspective(glm::radians(lightFOV), 1.0f, zNear, zFar);
+    auto viewMatrix = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0, 1, 0));
+    auto modelMatrix = glm::mat4(1.0f);
 
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+    UniformBufferObjectOffscreen uboOffscreen = {};
+    uboOffscreen.depthMVP = projectionMatrix * viewMatrix * modelMatrix;
+    // end offscreen rendering
 
     UniformBufferObject ubo = {};
-    ubo.model = glm::mat4(1.0f);
+    ubo.model = modelMatrix;
     ubo.model = glm::translate(ubo.model, position);//position
     ubo.model = glm::rotate(ubo.model, rotation.y, glm::vec3(0.0f, 0.0f, 1.0f));//rotation
     ubo.model = glm::scale(ubo.model, scale);
@@ -139,8 +145,7 @@ void DrawableObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, 
 
     //TODO: change when rendered from light
     ubo.lightPos = lightPos;
-    ubo.depthBiasMVP = ubo.view * ubo.projection;
-    ubo.viewPos = cameraPos;
+    ubo.lightSpace = uboOffscreen.depthMVP;
 
     auto device = game->getGraphics()->getLogicalDevice()->getDevice();
     void* data;
@@ -148,27 +153,24 @@ void DrawableObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, 
     memcpy(data, &ubo, sizeof(ubo));
     vkUnmapMemory(device, uniformBuffers[currentImage]->getMemory());
 
-    UniformBufferObjectOffscreen uboOffscreen = {};
-    uboOffscreen.model = ubo.model;
-    uboOffscreen.depthVP = ubo.view * ubo.projection;
-
+    // Update offscreen ubo
     void* offscreenData;
-    vkMapMemory(device, offscreenUniformBuffer->getMemory(), 0, sizeof(uboOffscreen), 0, &offscreenData);
-    memcpy(offscreenData, &uboOffscreen, sizeof(uboOffscreen));
-    vkUnmapMemory(device, offscreenUniformBuffer->getMemory());
+    vkMapMemory(device, offscreenUniformBuffers[currentImage]->getMemory(), 0, sizeof(UniformBufferObjectOffscreen), 0, &offscreenData);
+    memcpy(offscreenData, &uboOffscreen, sizeof(UniformBufferObjectOffscreen));
+    vkUnmapMemory(device, offscreenUniformBuffers[currentImage]->getMemory());
 }
 
 void DrawableObject::createUniformBuffers(size_t swapChainImageSize) {
     VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+    VkDeviceSize offscreenBufferSize = sizeof(UniformBufferObjectOffscreen);
     uniformBuffers.resize(swapChainImageSize);
+    offscreenUniformBuffers.resize(swapChainImageSize);
 
     auto device = game->getGraphics()->getLogicalDevice();
     for (size_t i = 0; i < swapChainImageSize; i++) {
         uniformBuffers[i] = new UniformBuffer(device, bufferSize);
+        offscreenUniformBuffers[i] = new UniformBuffer(device, offscreenBufferSize);
     }
-
-    VkDeviceSize offscreenBufferSize = sizeof(UniformBufferObjectOffscreen);
-    offscreenUniformBuffer = new UniformBuffer(device, offscreenBufferSize);
 }
 
 std::vector<Vertex> DrawableObject::getVertices() {

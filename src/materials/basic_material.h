@@ -5,8 +5,7 @@
 
 class BasicMaterial: public Material {
 public:
-    explicit BasicMaterial(Graphics* graphics) : Material(graphics) {
-    }
+    explicit BasicMaterial(Graphics* graphics) : Material(graphics) { }
 
     void createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet) override;
 protected:
