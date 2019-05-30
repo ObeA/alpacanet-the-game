@@ -366,19 +366,19 @@ void Renderer::createCommandbuffers() {
 
             // Set depth bias (aka "Polygon offset")
             // Required to avoid shadow mapping artifacts
-            vkCmdSetDepthBias(
-                    commandBuffers[i],
-                    1.25f,
-                    0.0f,
-                    1.75f);
+//            vkCmdSetDepthBias(
+//                    commandBuffers[i],
+//                    1.25f,
+//                    0.0f,
+//                    1.75f);
 
             auto material = MaterialManager::getInstance().getMaterial("shadow-material");
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, material->graphicsPipeline);
 
             for (auto& object : scene->getActiveDrawableObjects()) {
                 //TODO: Group objects by pipeline, bind pipeline and draw grouped objects
-                vkCmdBindDescriptorSets(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS,
-                                        material->pipelineLayout, 0, 1,
+                vkCmdBindDescriptorSets(commandBuffers[i],
+                        VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 0, 1,
                                         &object->offscreenDescriptorSets[i], 0, nullptr);
                 object->draw(commandBuffers[i], i);
             }
