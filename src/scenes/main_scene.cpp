@@ -143,16 +143,20 @@ void MainScene::onKeyDown(int key, int scancode, int mods) {
 void MainScene::loopAlpacas(bool nextOrPrevious) {
     auto alpacas = getAlpacas();
     if (selectedAlpaca) {
-        for (size_t i = 0; i < alpacas.size(); i++) {
-            if (alpacas[i] == selectedAlpaca) {
-                if (i == 0 && !nextOrPrevious)
-                    selectedAlpaca = alpacas[alpacas.size() - 1];
-                else if (i == alpacas.size() - 1 && nextOrPrevious)
-                    selectedAlpaca = alpacas[0];
-                else {
-                    selectedAlpaca = nextOrPrevious ? alpacas[i + 1] : alpacas[i - 1];
-                }
+        auto it = std::begin(alpacas);
+
+        while (it != std::end(alpacas)) {
+            if (*it == selectedAlpaca) {
+                if (it == std::begin(alpacas) && !nextOrPrevious)
+                    it = std::prev(std::end(alpacas));
+                else if (std::next(it) == std::end(alpacas) && nextOrPrevious)
+                    it = (std::begin(alpacas));
+                else
+                    it = nextOrPrevious ? ++it : --it;
+                selectedAlpaca = dynamic_cast<Alpaca*>(*it);
+                break;
             }
+            ++it;
         }
     } else {
         selectedAlpaca = alpacas[0];
