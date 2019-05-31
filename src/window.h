@@ -37,8 +37,7 @@ struct FrameBufferAttachment {
 };
 
 struct UniformBufferObjectOffscreen {
-    glm::mat4 depthVP;
-	glm::mat4 model;
+    glm::mat4 depthMVP;
 };
 
 class Window {

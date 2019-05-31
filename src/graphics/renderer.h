@@ -10,6 +10,8 @@ class GUI;
 
 class Renderer {
 public:
+    static const uint32_t SHADOWMAP_DIMENSION = 2048;
+
 	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice);
 	~Renderer();
 
@@ -18,6 +20,12 @@ public:
 	std::vector<VkImageView> swapChainImageViews;
 
     VkFramebuffer offscreenFrameBuffer;
+    VkImageView offscreenDepthImageView;
+    VkDeviceMemory offscreenDepthImageMemory;
+    VkImage offscreenDepthImage;
+    VkSampler offscreenDepthSampler;
+    VkImageView offscreenImageView;
+    Image* offscreenImage;
 
     void setScene(Scene* scene);
 
@@ -32,6 +40,11 @@ public:
 
     bool recreateCommandBufferFlag;
 private:
+
+    const VkFilter SHADOWMAP_FILTER = VK_FILTER_LINEAR;
+    const VkFormat DEPTH_FORMAT = VK_FORMAT_D16_UNORM;
+    const glm::vec3 LIGHT_POSITION = glm::vec3(5, 5, 5);
+
     Window* window;
     Surface* surface;
     LogicalDevice* logicalDevice;
@@ -45,11 +58,7 @@ private:
     VkRenderPass renderPass;
     VkRenderPass offscreenRenderPass;
 
-	VkImageView offscreenDepthImageView;
-	Image* offscreenDepthImage;
-	VkSampler offscreenDepthSampler;
-	VkImageView offscreenImageView;
-	Image* offscreenImage;
+
 
     GUI* gui;
 
@@ -68,15 +77,16 @@ private:
 	VkFormat findDepthFormat();
 	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 	void createFramebuffers();
-	void createOffscreenFramebuffers();
 	void createImageViews();
 	void createDepthResources();
-	void createDepthResourcesOffscreen();
 
 	void createCommandbuffers();
     void recreateCommandBuffer();
 
 	void createSyncObjects();
+
+    void initializeOffscreenRendering();
+    void initializeOffscreenFramebuffer();
 
     void createGUI();
 };

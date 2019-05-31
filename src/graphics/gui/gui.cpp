@@ -76,7 +76,7 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
     );
 
-    stagingBuffer->copyFrom(fontData, uploadSize);
+    stagingBuffer->copyFrom(fontData);
     fontImage->transitionLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     fontImage->copyFromBuffer(stagingBuffer);
     fontImage->transitionLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -344,33 +344,33 @@ void GUI::updateBuffers()
 
     if (vertexBuffer == nullptr) {
         vertexBuffer = new Buffer(device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-        vertexBuffer->mapAll();
+        vertexBuffer->map();
         updated = true;
     }
     else if (vertexCount != imDrawData->TotalVtxCount) {
         vertexBuffer->~Buffer();
         vertexBuffer = new Buffer(device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         vertexCount = imDrawData->TotalVtxCount;
-        vertexBuffer->mapAll();
+        vertexBuffer->map();
         updated = true;
     }
 
     VkDeviceSize indexSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
     if (indexBuffer == nullptr) {
         indexBuffer = new Buffer(device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
-        indexBuffer->mapAll();
+        indexBuffer->map();
         updated = true;
     }
     else if (indexCount < imDrawData->TotalIdxCount) {
         indexBuffer->~Buffer();
         indexBuffer = new Buffer(device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         indexCount = imDrawData->TotalIdxCount;
-        indexBuffer->mapAll();
+        indexBuffer->map();
         updated = true;
     }
 
-    ImDrawVert* vtxDst = (ImDrawVert*)vertexBuffer->mapped;
-    ImDrawIdx* idxDst = (ImDrawIdx*)indexBuffer->mapped;
+    ImDrawVert* vtxDst = (ImDrawVert*)vertexBuffer->map();
+    ImDrawIdx* idxDst = (ImDrawIdx*)indexBuffer->map();
 
     for (int n = 0; n < imDrawData->CmdListsCount; n++) {
         const ImDrawList* cmd_list = imDrawData->CmdLists[n];

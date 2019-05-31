@@ -5,7 +5,7 @@
 Camera::Camera(Game* game, glm::vec3 position, float distance)
         : game(game), position(position), followDistance(distance), horizontalRotation(0) {
     auto extents = game->getGraphics()->getRenderer()->getExtents();
-    projection = glm::perspective(glm::radians(90.0f), (float)extents.width / extents.height, 0.1f, 20.0f);
+    projection = glm::perspective(glm::radians(90.0f), (float)extents.width / extents.height, 0.1f, 100.0f);
 
     auto window = game->getGraphics()->getWindow();
     auto onMoveCallback = std::bind(&Camera::onMouseMove, this, std::placeholders::_1, std::placeholders::_2);

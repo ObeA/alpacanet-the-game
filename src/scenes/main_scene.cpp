@@ -6,38 +6,26 @@
 #include "../materials/shadow_material.h"
 #include "../materials/particle_material.h"
 #include "scene_objects/alpaca.h"
+#include "../managers/material_manager.h"
 #include "../graphics/gui/gui.h"
 #include <glm/gtx/intersect.hpp>
 
 void MainScene::setup() {
+    auto& materialManager = MaterialManager::getInstance();
     auto graphics = game->getGraphics();
-    materials.push_back(new BasicMaterial(graphics, "basic"));
-    materials.push_back(new BasicTexturedMaterial(graphics, (char*) "assets/textures/texture.jpg"));
-    materials.push_back(new BasicTexturedMaterial(graphics,(char*) "assets/textures/banana.jpg"));
-    materials.push_back(new BasicTexturedMaterial(graphics, (char*) "assets/textures/chalet.jpg"));
-    materials.push_back(new ShadowMaterial(graphics));
-    //materials.push_back(new ShadowMaterial(graphics));
-    materials.push_back(new ParticleMaterial(graphics, "particle"));
-    for (auto& material : materials) {
-        material->initialize();
-    }
 
-    auto model = new ModelObject(game, materials[1], materials[4], (char*) "assets/models/cube.obj");
-    model->scale = glm::vec3(.5);
-    model->position = glm::vec3(0, -2, 1);
+    materialManager.registerMaterial("basic-material", std::make_shared<BasicMaterial>(graphics, "basic"));
+    materialManager.registerMaterial("textured-material", std::make_shared<BasicTexturedMaterial>(graphics, (char*) "assets/textures/texture.jpg"));
+    materialManager.registerMaterial("shadow-material", std::make_shared<ShadowMaterial>(graphics));
+    materialManager.registerMaterial("particle-material", std::make_shared<ParticleMaterial>(graphics, "particle"));
 
-    auto model2 = new ModelObject(game, materials[2], materials[4], (char*) "assets/models/cube.obj");
-    model2->scale = glm::vec3(20, 20, .2);
-    model2->position = glm::vec3(0, 0, -.5);
-    objects.push_back(model);
-    objects.push_back(model2);
+    auto world = new ModelObject(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get(), (char*) "assets/models/world.obj");
+    world->scale = glm::vec3(1);
+    world->position = glm::vec3(0, 0, 0);
+    objects.push_back(world);
 
-    auto test = new Alpaca(game, materials[1], materials[4]);
-    test->position = glm::vec3(0);
-    test->scale = glm::vec3(1, 0.5, 0.5);
-    test->start();
     for (size_t i = 0; i < 5; i++) {
-        auto alpaca = new Alpaca(game, materials[1], materials[4]);
+        auto alpaca = new Alpaca(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get());
         alpaca->position = glm::vec3(0);
         alpaca->scale = glm::vec3(1, 0.5, 0.5);
         objects.push_back(alpaca);
@@ -56,15 +44,11 @@ void MainScene::setup() {
                                        std::placeholders::_3);
     window->registerOnKeyDownCallback(onKeyDownCallback);
 
-    camera = new Camera(game, glm::vec3(0.0, 0.0, 0.0), 3.0f);
-    camera->lookAt(test);
+    camera = new Camera(game, glm::vec3(5.0, 5.0, 5.0), 15.0f);
+    camera->lookAt(glm::vec3(0));
 }
 
 MainScene::~MainScene() {
-    for (auto material : materials) {
-        material->cleanup();
-    }
-
     for (auto object : objects) {
         delete object;
     }
@@ -129,7 +113,7 @@ void MainScene::onKeyDown(int key, int scancode, int mods) {
     switch (key) {
         case GLFW_KEY_ESCAPE:
             camera->lookAt(glm::vec3(0));
-            camera->setFollowDistance(4.0f);
+            camera->setFollowDistance(15.0f);
             break;
         case GLFW_KEY_Z:
             loopAlpacas(false);
@@ -139,7 +123,8 @@ void MainScene::onKeyDown(int key, int scancode, int mods) {
                 auto wool = selectedAlpaca->shear();
                 score += wool;
                 if (wool > 0) {
-                    auto particles = new ParticleSystem(game, materials[5], materials[4]);
+                    auto& materialManager = MaterialManager::getInstance();
+                    auto particles = new ParticleSystem(game, materialManager.getMaterial("particle-material").get(), materialManager.getMaterial("shadow-material").get());
                     particles->amount = wool;
                     particles->position = selectedAlpaca->position += selectedAlpaca->scale.z;
                     particles->scale = glm::vec3(1);
@@ -173,6 +158,7 @@ void MainScene::loopAlpacas(bool nextOrPrevious) {
         selectedAlpaca = alpacas[0];
     }
     camera->lookAt(selectedAlpaca);
+    camera->setFollowDistance(2.0f);
 }
 
 void MainScene::drawUI() {

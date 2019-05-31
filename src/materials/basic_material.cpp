@@ -56,7 +56,7 @@ void BasicMaterial::createGraphicsPipeline() {
 }
 
 void BasicMaterial::createDescriptorSet(VkDescriptorBufferInfo& uniformBufferInfo, VkDescriptorSet& descriptorSet) {
-    std::array<VkWriteDescriptorSet, 1> descriptorWrites = {};
+    std::array<VkWriteDescriptorSet, 2> descriptorWrites = {};
 
     descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
     descriptorWrites[0].dstSet = descriptorSet;
@@ -65,6 +65,19 @@ void BasicMaterial::createDescriptorSet(VkDescriptorBufferInfo& uniformBufferInf
     descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
     descriptorWrites[0].descriptorCount = 1;
     descriptorWrites[0].pBufferInfo = &uniformBufferInfo;
+
+    VkDescriptorImageInfo shadowmapInfo = {};
+    shadowmapInfo.imageLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_READ_ONLY_OPTIMAL;
+    shadowmapInfo.imageView = graphics->getRenderer()->offscreenDepthImageView;
+    shadowmapInfo.sampler = graphics->getRenderer()->offscreenDepthSampler;
+
+    descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    descriptorWrites[1].dstSet = descriptorSet;
+    descriptorWrites[1].dstBinding = 1;
+    descriptorWrites[1].dstArrayElement = 0;
+    descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+    descriptorWrites[1].descriptorCount = 1;
+    descriptorWrites[1].pImageInfo = &shadowmapInfo;
 
     vkUpdateDescriptorSets(
             graphics->getLogicalDevice()->getDevice(),

@@ -5,7 +5,7 @@
 
 class Material {
 public:
-    Material(Graphics* graphics) : graphics(graphics) { }
+    explicit Material(Graphics* graphics) : graphics(graphics) { }
 
     virtual void initialize();
     virtual void cleanup();

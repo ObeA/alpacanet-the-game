@@ -1,7 +1,6 @@
 #include "window.h"
 #include "game_objects/game_object.h"
 #include "game_objects/model_object.h"
-#include "game_objects/cube.h"
 #include "materials/material.h"
 #include "materials/basic_material.h"
 #include "materials/basic_textured_material.h"

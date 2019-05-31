@@ -9,11 +9,21 @@ void ModelObject::loadModel() {
     std::vector<tinyobj::material_t> materials;
     std::string warn, err;
 
-    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, modelLocation.c_str())) {
+    if (!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, modelLocation.c_str(), "assets/models/")) {
         throw std::runtime_error(warn + err);
     }
 
+    bool useDefaultMaterial = materials.empty();
     for (const auto& shape : shapes) {
+        int faceId = 0;
+        tinyobj::material_t faceMaterial;
+        int verticesInFace = std::numeric_limits<int>::max();
+        int currentFaceVertexIndex = 0;
+
+        if (!useDefaultMaterial) {
+            faceMaterial = materials[shape.mesh.material_ids[faceId]];
+            verticesInFace = shape.mesh.num_face_vertices[faceId];
+        }
         for (const auto& index : shape.mesh.indices) {
             Vertex vertex = {};
 
@@ -38,10 +48,21 @@ void ModelObject::loadModel() {
                 };
             }
 
-            vertex.color = {1.0f, 1.0f, 1.0f};
+            if (useDefaultMaterial) {
+                vertex.color = glm::vec3(1.0f);
+            } else {
+                vertex.color = glm::vec3(faceMaterial.diffuse[0], faceMaterial.diffuse[1], faceMaterial.diffuse[2]);
+            }
 
             vertices.push_back(vertex);
             indices.push_back(indices.size());
+
+            currentFaceVertexIndex++;
+            if (currentFaceVertexIndex > verticesInFace - 1 && faceId + 1 < shape.mesh.num_face_vertices.size()) {
+                currentFaceVertexIndex = 0;
+                verticesInFace = shape.mesh.num_face_vertices[++faceId];
+                faceMaterial = materials[shape.mesh.material_ids[faceId]];
+            }
         }
     }
 }
