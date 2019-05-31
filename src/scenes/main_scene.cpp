@@ -40,7 +40,7 @@ void MainScene::setup() {
                                        std::placeholders::_3);
     window->registerOnKeyDownCallback(onKeyDownCallback);
 
-    camera = new Camera(game, glm::vec3(0.0, 0.0, 0.0), 15.0f);
+    camera = new Camera(game, glm::vec3(5.0, 5.0, 5.0), 15.0f);
     camera->lookAt(glm::vec3(0));
 }
 

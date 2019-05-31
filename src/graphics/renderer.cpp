@@ -125,7 +125,7 @@ void Renderer::initializeRenderPass() {
 
 void Renderer::initializeOffscreenRenderPass() {
     VkAttachmentDescription attachmentDescription = {};
-    attachmentDescription.format = DEPTH_FORMAT; // TODO: Determine dynamically
+    attachmentDescription.format = findDepthFormat();
     attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
     attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
@@ -176,11 +176,12 @@ void Renderer::initializeOffscreenRenderPass() {
 void Renderer::initializeOffscreenFramebuffer() {
     VkImageCreateInfo imageCreateInfo = {};
     imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+    imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     imageCreateInfo.extent.height = imageCreateInfo.extent.width = SHADOWMAP_DIMENSION;
     imageCreateInfo.arrayLayers = imageCreateInfo.mipLevels = imageCreateInfo.extent.depth = 1;
     imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    imageCreateInfo.format = DEPTH_FORMAT;
+    imageCreateInfo.format = findDepthFormat();
     imageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
     VK_CHECK_RESULT(vkCreateImage(logicalDevice->getDevice(), &imageCreateInfo, nullptr, &offscreenDepthImage))
 
@@ -198,7 +199,7 @@ void Renderer::initializeOffscreenFramebuffer() {
     VkImageViewCreateInfo depthStencilView = {};
     depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     depthStencilView.viewType = VK_IMAGE_VIEW_TYPE_2D;
-    depthStencilView.format = DEPTH_FORMAT;
+    depthStencilView.format = findDepthFormat();
     depthStencilView.subresourceRange = {};
     depthStencilView.subresourceRange.baseMipLevel = 0;
     depthStencilView.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
@@ -374,11 +375,11 @@ void Renderer::createCommandbuffers() {
 
             // Set depth bias (aka "Polygon offset")
             // Required to avoid shadow mapping artifacts
-//            vkCmdSetDepthBias(
-//                    commandBuffers[i],
-//                    1.25f,
-//                    0.0f,
-//                    1.75f);
+            vkCmdSetDepthBias(
+                    commandBuffers[i],
+                    1.25f,
+                    0.0f,
+                    1.75f);
 
             auto material = MaterialManager::getInstance().getMaterial("shadow-material");
             vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, material->graphicsPipeline);

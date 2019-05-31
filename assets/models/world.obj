@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 7) OBJ File: 'world.blend'
 # www.blender.org
-mtllib ./assets/models/world.mtl
+mtllib world.mtl
 o Icosphere.015_Icosphere.016
 v 5.104580 1.529635 -19.833782
 v 13.077135 1.539190 -13.458458

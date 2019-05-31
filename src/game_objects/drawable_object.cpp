@@ -120,21 +120,8 @@ void DrawableObject::createDescriptorSet(size_t swapChainImageSize) {
 }
 
 void DrawableObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos) {
-    // Offscreen rendering
-    float lightFOV = 45.0f;
-    float zNear = 1.0f;
-    float zFar = 96.0f;
-
-    auto projectionMatrix = glm::perspective(glm::radians(lightFOV), 1.0f, zNear, zFar);
-    auto viewMatrix = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0, 1, 0));
-    auto modelMatrix = glm::mat4(1.0f);
-
-    UniformBufferObjectOffscreen uboOffscreen = {};
-    uboOffscreen.depthMVP = projectionMatrix * viewMatrix * modelMatrix;
-    // end offscreen rendering
-
     UniformBufferObject ubo = {};
-    ubo.model = modelMatrix;
+    ubo.model = glm::mat4(1.0f);
     ubo.model = glm::translate(ubo.model, position);//position
     ubo.model = glm::rotate(ubo.model, rotation.y, glm::vec3(0.0f, 0.0f, 1.0f));//rotation
     ubo.model = glm::scale(ubo.model, scale);
@@ -142,6 +129,19 @@ void DrawableObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, 
     ubo.view = view;
     ubo.projection = projection;
     ubo.projection[1][1] *= -1;
+
+    // Offscreen rendering
+    float lightFOV = 90.0f;
+    float zNear = 1.0f;
+    float zFar = 96.0f;
+
+    auto projectionMatrix = glm::perspective(glm::radians(lightFOV), 1.0f, zNear, zFar);
+    auto viewMatrix = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0, 1, 0));
+    auto modelMatrix = ubo.model;
+
+    UniformBufferObjectOffscreen uboOffscreen = {};
+    uboOffscreen.depthMVP = projectionMatrix * viewMatrix * modelMatrix;
+    // end offscreen rendering
 
     //TODO: change when rendered from light
     ubo.lightPos = lightPos;
