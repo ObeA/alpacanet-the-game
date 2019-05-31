@@ -6,7 +6,7 @@ ParticleSystem::~ParticleSystem() {
 
 void ParticleSystem::setupParticles()
 {
-    for (size_t i = 0; i < 100; i++)
+    for (size_t i = 0; i < amount; i++)
     {
         Particle p;
         initParticle(&p);
@@ -14,16 +14,41 @@ void ParticleSystem::setupParticles()
     }
 }
 
+float moveTowards(float from, float to, float amount) {
+    float result = 0;
+    if (from < to)
+        result = std::min(from + amount, to);
+    else if (from > to)
+        result = std::max(from - amount, to);
+    else
+        result = to;
+    return result;
+}
+
 void ParticleSystem::updateParticles()
 {
+    bool allReady = true;
     for (auto& particle : particles)
     {
-        particle.pos.x = (std::rand() % 50) * .1f;
-        particle.pos.y = (std::rand() % 50) * .1f;
-        particle.pos.z = (std::rand() % 50) * .1f;
-
-        particle.pos += glm::vec4(position, 0.0f);
+        if (particle.pos.z >= -position.z + floorZ) {
+            particle.pos.x -= particle.direction.x / 10;
+            particle.pos.y -= particle.direction.y / 10;
+            particle.pos.z -= particle.direction.z / 10;
+            particle.direction.x = moveTowards(particle.direction.x, 0.0f, abs(particle.direction.x) / 100);
+            particle.direction.y = moveTowards(particle.direction.y, 0.0f, abs(particle.direction.y) / 100);
+            particle.direction.z = moveTowards(particle.direction.z, 1.0f, 0.01f);
+        }
+        else {
+            particle.alpha = moveTowards(particle.alpha, 0, 0.002f);
+        }
+        if (particle.alpha > 0) {
+            allReady = false;
+        }
     }
+    if (allReady) {
+        destroyFlag = true;
+    }
+
     size_t size = particles.size() * sizeof(Particle);
 
     VkDeviceSize bufferSize = particles.size() * sizeof(Particle);
@@ -41,26 +66,23 @@ void ParticleSystem::updateParticles()
 
 void ParticleSystem::initParticle(Particle *particle)
 {
-    particle->vel = glm::vec4(0.0f, 3.5f, 0.0f, 0.0f);
+    glm::vec2 direction2 = glm::normalize(glm::vec2(((std::rand() % 100 - 50)) * .01f, ((std::rand() % 100 - 50)) * .01f));
+    direction2 *= ((std::rand() % 50) + 50) * 0.01f;
+    auto directionZ = -(std::rand() % 50) * 0.01f;
+    particle->direction = glm::vec3(direction2.x, direction2.y, directionZ);
     particle->alpha = 1;
-    particle->size = 1;
+    particle->size = 1.5f;
     float r = (std::rand() % 100) * .01f;
     float g = (std::rand() % 100) * .01f;
     float b = (std::rand() % 100) * .01f;
     particle->color = glm::vec4(r, g, b, 1.0f);
-    particle->rotation = 1;
-    particle->rotationSpeed = 1;
+    particle->pos = glm::vec4(0);
 
-    particle->pos.x = std::rand() % 5;
-    particle->pos.y = std::rand() % 5;
-    particle->pos.z = std::rand() % 5;
-
-    particle->pos += glm::vec4(position, 0.0f);
+    //particle->pos += glm::vec4(position, 0.0f);
 }
 
 void ParticleSystem::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 viewPos)
 {
-    updateParticles();
     DrawableObject::updateUniformBuffer(currentImage, view, projection , lightPos, viewPos);
 }
 
@@ -101,4 +123,8 @@ void ParticleSystem::draw(VkCommandBuffer cmdbuffer, size_t bufferOffset) {
     vkCmdBindVertexBuffers(cmdbuffer, 0, 1, vertexBuffers, offsets);
 
     vkCmdDraw(cmdbuffer, static_cast<uint32_t>(particles.size()), 1, 0, 0);
+}
+
+void ParticleSystem::update() {
+    updateParticles();
 }

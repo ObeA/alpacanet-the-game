@@ -329,7 +329,7 @@ void GUI::newFrame()
     ImGui::Render();
 }
 
-bool GUI::updateBuffers()
+void GUI::updateBuffers()
 {
     ImDrawData* imDrawData = ImGui::GetDrawData();
 
@@ -337,7 +337,7 @@ bool GUI::updateBuffers()
     VkDeviceSize indexBufferSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
 
     if ((vertexBufferSize == 0) || (indexBufferSize == 0)) {
-        return false;
+        return;
     }
 
     bool updated = false;
@@ -383,7 +383,9 @@ bool GUI::updateBuffers()
     vertexBuffer->flush();
     indexBuffer->flush();
 
-    return updated;
+    if (updated) {
+        renderer->recreateCommandBufferFlag = true;
+    }
 }
 
 void GUI::drawFrame(VkCommandBuffer commandBuffer)

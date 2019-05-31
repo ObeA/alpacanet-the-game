@@ -13,7 +13,6 @@ public:
 	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice);
 	~Renderer();
 
-    void recreateCommandBuffer();
 
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	std::vector<VkImageView> swapChainImageViews;
@@ -30,6 +29,8 @@ public:
     const VkRenderPass& getOffscreenRenderPass() const;
     const VkExtent2D& getExtents() const;
     GUI* getGui();
+
+    bool recreateCommandBufferFlag;
 private:
     Window* window;
     Surface* surface;
@@ -73,6 +74,7 @@ private:
 	void createDepthResourcesOffscreen();
 
 	void createCommandbuffers();
+    void recreateCommandBuffer();
 
 	void createSyncObjects();
 

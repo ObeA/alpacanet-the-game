@@ -13,7 +13,7 @@ public:
     void init(float width, float height);
     void initResources(VkRenderPass renderPass, VkQueue copyQueue);
     void newFrame();
-    bool updateBuffers();
+    void updateBuffers();
     void drawFrame(VkCommandBuffer commandBuffer);
     void setScene(Scene* newScene);
 private:

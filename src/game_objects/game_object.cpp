@@ -6,3 +6,6 @@ GameObject::GameObject(Game* game)
 
 GameObject::~GameObject() {
 }
+
+void GameObject::update() {
+}

@@ -7,11 +7,10 @@ struct Particle {
     glm::vec4 color;
     float alpha;
     float size;
-    float rotation;
-    glm::vec4 vel;
-    float rotationSpeed;
+
+    glm::vec3 direction;
 
     static VkVertexInputBindingDescription getBindingDescription();
 
-    static std::array<VkVertexInputAttributeDescription, 5> getAttributeDescriptions();
+    static std::array<VkVertexInputAttributeDescription, 4> getAttributeDescriptions();
 };

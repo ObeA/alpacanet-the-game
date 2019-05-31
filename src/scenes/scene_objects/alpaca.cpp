@@ -19,19 +19,8 @@ void Alpaca::moveTo(glm::vec2 position)
     targetPositionReached = false;
 }
 
-float moveTowards(float from, float to, float amount) {
-    float result = 0;
-    if (from < to)
-        result = std::min(from + amount, to);
-    else if (from > to)
-        result = std::max(from - amount, to);
-    else
-        result = to;
-    return result;
-}
-
 void Alpaca::update() {
-    if (rand() % 500 == 1) {
+    if (rand() % 50 == 1) {
         wooliness++;
     }
 

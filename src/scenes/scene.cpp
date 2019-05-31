@@ -19,3 +19,11 @@ std::vector<DrawableObject*> Scene::getActiveDrawableObjects() {
 Camera* Scene::getCamera() {
     return camera;
 }
+
+void Scene::update() {
+    camera->update();
+    for (auto gameObject : objects)
+    {
+        gameObject->update();
+    }
+}

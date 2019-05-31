@@ -16,7 +16,7 @@ public:
     virtual ~Scene() { }
 
     virtual void setup() =0;
-    virtual void update() =0;
+    virtual void update();
 
     std::vector<GameObject*> getActiveObjects();
     std::vector<DrawableObject*> getActiveDrawableObjects();

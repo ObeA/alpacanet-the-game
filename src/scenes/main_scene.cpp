@@ -22,10 +22,6 @@ void MainScene::setup() {
         material->initialize();
     }
 
-    auto particles = new ParticleSystem(game, materials[5], materials[4]);
-    particles->scale = glm::vec3(.5);
-    particles->position = glm::vec3(0);
-
     auto model = new ModelObject(game, materials[1], materials[4], (char*) "assets/models/cube.obj");
     model->scale = glm::vec3(.5);
     model->position = glm::vec3(0, -2, 1);
@@ -35,7 +31,6 @@ void MainScene::setup() {
     model2->position = glm::vec3(0, 0, -.5);
     objects.push_back(model);
     objects.push_back(model2);
-    objects.push_back(particles);
 
     auto test = new Alpaca(game, materials[1], materials[4]);
     test->position = glm::vec3(0);
@@ -76,23 +71,30 @@ MainScene::~MainScene() {
 }
 
 void MainScene::update() {
+    Scene::update();
     auto currentTime = std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::system_clock::now().time_since_epoch()
     );
 
-    for (auto object : objects) {
-        auto casted = dynamic_cast<Alpaca*>(object);
-        if (casted != nullptr) {
-            casted->update();
-            if (currentTime > casted->nextMoveTime) {
-                casted->nextMoveTime = currentTime + std::chrono::seconds(5 + std::rand() % 10);
+    auto it = std::begin(objects);
+
+    while(it != std::end(objects)) {
+        auto castedAlpaca = dynamic_cast<Alpaca*>(*it);
+        if (castedAlpaca != nullptr) {
+            if (currentTime > castedAlpaca->nextMoveTime) {
+                castedAlpaca->nextMoveTime = currentTime + std::chrono::seconds(5 + std::rand() % 10);
                 auto newPosition = glm::vec3(glm::vec2((std::rand() % 20) - 10, (std::rand() % 20) - 10), 1.0);
-                casted->moveTo(newPosition);
+                castedAlpaca->moveTo(newPosition);
             }
         }
+        auto castedParticleSystem = dynamic_cast<ParticleSystem*>(*it);
+        if (castedParticleSystem != nullptr && castedParticleSystem->destroyFlag) {
+            it = objects.erase(it);
+        }
+        else {
+            ++it;
+        }
     }
-
-    camera->update();
 }
 
 void MainScene::onMouseButton(int button, int action, int mods) {
@@ -136,7 +138,15 @@ void MainScene::onKeyDown(int key, int scancode, int mods) {
             if (selectedAlpaca) {
                 auto wool = selectedAlpaca->shear();
                 score += wool;
-                std::cout << "sheared" << wool << "total is" << score << std::endl;
+                if (wool > 0) {
+                    auto particles = new ParticleSystem(game, materials[5], materials[4]);
+                    particles->amount = wool;
+                    particles->position = selectedAlpaca->position += selectedAlpaca->scale.z;
+                    particles->scale = glm::vec3(1);
+                    objects.push_back(particles);
+                    particles->start();
+                    game->getGraphics()->getRenderer()->recreateCommandBufferFlag = true;
+                }
             }
             break;
         case GLFW_KEY_C:

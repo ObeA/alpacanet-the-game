@@ -436,9 +436,9 @@ void Renderer::render() {
 	}
 
     gui->newFrame();
+    gui->updateBuffers();
 
-    bool update = gui->updateBuffers();
-    if (update) {
+    if (recreateCommandBufferFlag) {
         recreateCommandBuffer();
     }
 
