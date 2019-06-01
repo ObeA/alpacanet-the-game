@@ -15,7 +15,6 @@ public:
 	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice);
 	~Renderer();
 
-    void recreateCommandBuffer();
 
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	std::vector<VkImageView> swapChainImageViews;
@@ -36,6 +35,8 @@ public:
     const VkRenderPass& getOffscreenRenderPass() const;
     const VkExtent2D& getExtents() const;
     GUI* getGui();
+
+    bool recreateCommandBufferFlag;
 private:
     const VkFilter SHADOWMAP_FILTER = VK_FILTER_LINEAR;
 
@@ -73,6 +74,7 @@ private:
 	void createDepthResources();
 
 	void createCommandbuffers();
+    void recreateCommandBuffer();
 
 	void createSyncObjects();
 

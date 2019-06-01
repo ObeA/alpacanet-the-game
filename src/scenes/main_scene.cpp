@@ -3,9 +3,11 @@
 #include <glm/gtx/intersect.hpp>
 
 #include "../game_objects/model_object.h"
+#include "../game_objects/particlesystem.h"
 #include "../materials/basic_material.h"
 #include "../materials/basic_textured_material.h"
 #include "../materials/shadow_material.h"
+#include "../materials/particle_material.h"
 #include "scene_objects/alpaca.h"
 #include "../managers/material_manager.h"
 #include "../graphics/gui/gui.h"
@@ -14,9 +16,11 @@
 void MainScene::setup() {
     auto& materialManager = MaterialManager::getInstance();
     auto graphics = game->getGraphics();
-    materialManager.registerMaterial("basic-material", std::make_shared<BasicMaterial>(graphics));
+
+    materialManager.registerMaterial("basic-material", std::make_shared<BasicMaterial>(graphics, "basic"));
     materialManager.registerMaterial("textured-material", std::make_shared<BasicTexturedMaterial>(graphics, (char*) "assets/textures/texture.jpg"));
     materialManager.registerMaterial("shadow-material", std::make_shared<ShadowMaterial>(graphics));
+    materialManager.registerMaterial("particle-material", std::make_shared<ParticleMaterial>(graphics, "particle"));
 
     auto world = new ModelObject(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get(), (char*) "assets/models/world.obj");
     world->scale = glm::vec3(1);
@@ -56,23 +60,30 @@ MainScene::~MainScene() {
 }
 
 void MainScene::update() {
+    Scene::update();
     auto currentTime = std::chrono::duration_cast<std::chrono::seconds>(
             std::chrono::system_clock::now().time_since_epoch()
     );
 
-    for (auto object : objects) {
-        auto casted = dynamic_cast<Alpaca*>(object);
-        if (casted != nullptr) {
-            casted->update();
-            if (currentTime > casted->nextMoveTime) {
-                casted->nextMoveTime = currentTime + std::chrono::seconds(5 + std::rand() % 10);
+    auto it = std::begin(objects);
+
+    while(it != std::end(objects)) {
+        auto castedAlpaca = dynamic_cast<Alpaca*>(*it);
+        if (castedAlpaca != nullptr) {
+            if (currentTime > castedAlpaca->nextMoveTime) {
+                castedAlpaca->nextMoveTime = currentTime + std::chrono::seconds(5 + std::rand() % 10);
                 auto newPosition = glm::vec3(glm::vec2((std::rand() % 20) - 10, (std::rand() % 20) - 10), 1.0);
-                casted->moveTo(newPosition);
+                castedAlpaca->moveTo(newPosition);
             }
         }
+        auto castedParticleSystem = dynamic_cast<ParticleSystem*>(*it);
+        if (castedParticleSystem != nullptr && castedParticleSystem->destroyFlag) {
+            it = objects.erase(it);
+        }
+        else {
+            ++it;
+        }
     }
-
-    camera->update();
 }
 
 void MainScene::onMouseButton(int button, int action, int mods) {
@@ -116,7 +127,16 @@ void MainScene::onKeyDown(int key, int scancode, int mods) {
             if (selectedAlpaca) {
                 auto wool = selectedAlpaca->shear();
                 score += wool;
-                std::cout << "sheared" << wool << "total is" << score << std::endl;
+                if (wool > 0) {
+                    auto& materialManager = MaterialManager::getInstance();
+                    auto particles = new ParticleSystem(game, materialManager.getMaterial("particle-material").get(), materialManager.getMaterial("shadow-material").get());
+                    particles->amount = wool;
+                    particles->position = selectedAlpaca->position += selectedAlpaca->scale.z;
+                    particles->scale = glm::vec3(1);
+                    objects.push_back(particles);
+                    particles->start();
+                    game->getGraphics()->getRenderer()->recreateCommandBufferFlag = true;
+                }
             }
             break;
         case GLFW_KEY_C:
@@ -128,21 +148,26 @@ void MainScene::onKeyDown(int key, int scancode, int mods) {
 void MainScene::loopAlpacas(bool nextOrPrevious) {
     auto alpacas = getAlpacas();
     if (selectedAlpaca) {
-        for (size_t i = 0; i < alpacas.size(); i++) {
-            if (alpacas[i] == selectedAlpaca) {
-                if (i == 0 && !nextOrPrevious)
-                    selectedAlpaca = alpacas[alpacas.size() - 1];
-                else if (i == alpacas.size() - 1 && nextOrPrevious)
-                    selectedAlpaca = alpacas[0];
-                else {
-                    selectedAlpaca = nextOrPrevious ? alpacas[i + 1] : alpacas[i - 1];
-                }
+        auto it = std::begin(alpacas);
+
+        while (it != std::end(alpacas)) {
+            if (*it == selectedAlpaca) {
+                if (it == std::begin(alpacas) && !nextOrPrevious)
+                    it = std::prev(std::end(alpacas));
+                else if (std::next(it) == std::end(alpacas) && nextOrPrevious)
+                    it = (std::begin(alpacas));
+                else
+                    it = nextOrPrevious ? ++it : --it;
+                selectedAlpaca = dynamic_cast<Alpaca*>(*it);
+                break;
             }
+            ++it;
         }
     } else {
         selectedAlpaca = alpacas[0];
     }
     camera->lookAt(selectedAlpaca);
+    camera->setFollowDistance(2.0f);
 }
 
 void MainScene::drawUI() {

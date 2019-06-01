@@ -23,3 +23,10 @@ Camera* Scene::getCamera() {
 Light* Scene::getLight() {
     return light;
 }
+
+void Scene::update() {
+    camera->update();
+    for (auto gameObject : objects) {
+        gameObject->update();
+    }
+}

@@ -22,6 +22,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "models/vertex.h"
+#include "models/particle.h"
 #include "utils/file_utilities.h"
 
 const int WIDTH = 800;

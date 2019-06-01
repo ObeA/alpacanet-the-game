@@ -28,8 +28,8 @@ void BasicMaterial::createDescriptorSetLayout() {
 }
 
 void BasicMaterial::createGraphicsPipeline() {
-    auto vertShaderCode = FileUtilities::readFile("assets/shaders/basic/vert.spv");
-    auto fragShaderCode = FileUtilities::readFile("assets/shaders/basic/frag.spv");
+    auto vertShaderCode = FileUtilities::readFile("assets/shaders/" + shaderDirectory + "/vert.spv");
+    auto fragShaderCode = FileUtilities::readFile("assets/shaders/" + shaderDirectory + "/frag.spv");
 
     VkShaderModule vertShaderModule = graphics->getLogicalDevice()->createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = graphics->getLogicalDevice()->createShaderModule(fragShaderCode);

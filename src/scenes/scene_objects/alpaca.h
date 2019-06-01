@@ -11,7 +11,7 @@ public:
 
     void moveTo(glm::vec2 position);
 
-    void update();
+    void update() override;
 
     std::chrono::seconds nextMoveTime;
 

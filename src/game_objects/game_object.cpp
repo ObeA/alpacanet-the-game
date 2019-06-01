@@ -6,3 +6,6 @@ GameObject::GameObject(Game* game, glm::vec3 position) : game(game), position(po
 
 GameObject::~GameObject() {
 }
+
+void GameObject::update() {
+}
