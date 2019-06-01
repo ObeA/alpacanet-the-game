@@ -14,9 +14,9 @@ struct UniformBufferObject {
 class DrawableObject : public GameObject {
 public:
     DrawableObject(Game* game, Material* material, Material* shadowMaterial);
-    virtual ~DrawableObject() override;
+    ~DrawableObject() override;
 
-    void start();
+    void start() override;
 
     std::vector<VkDescriptorSet> descriptorSets{};
     std::vector<VkDescriptorSet> offscreenDescriptorSets{};
@@ -29,8 +29,8 @@ public:
 
     virtual void updateUniformBuffer(uint32_t currentImage, Camera* camera, Light* light);
 
-    Material *material;
-    Material *shadowMaterial;
+    Material *material = nullptr;
+    Material *shadowMaterial = nullptr;
 protected:
     Buffer* vertexBuffer = nullptr;
     Buffer* indexBuffer = nullptr;
