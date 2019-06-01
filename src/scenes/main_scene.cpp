@@ -30,7 +30,6 @@ void MainScene::setup() {
     for (size_t i = 0; i < 5; i++) {
         auto alpaca = new Alpaca(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get());
         alpaca->position = glm::vec3(0);
-        alpaca->scale = glm::vec3(1, 0.5, 0.5);
         objects.push_back(alpaca);
     }
 
@@ -50,7 +49,7 @@ void MainScene::setup() {
     camera = new Camera(game, glm::vec3(5.0, 5.0, 5.0), 15.0f);
     camera->lookAt(glm::vec3(0));
 
-    light = new Light(game, glm::vec3(25), glm::vec3(0), 90.0f, 1.0f, 96.0f);
+    light = new Light(game, glm::vec3(10, 10, 25), glm::vec3(0), 90.0f, 1.0f, 96.0f);
 }
 
 MainScene::~MainScene() {

@@ -4,7 +4,7 @@ void ParticleSystem::setupParticles()
 {
     for (size_t i = 0; i < amount; i++)
     {
-        Particle p;
+        Particle p{};
         initParticle(&p);
         particles.push_back(p);
     }
@@ -30,8 +30,8 @@ void ParticleSystem::updateParticles()
             particle.pos.x -= particle.direction.x / 10;
             particle.pos.y -= particle.direction.y / 10;
             particle.pos.z -= particle.direction.z / 10;
-            particle.direction.x = moveTowards(particle.direction.x, 0.0f, abs(particle.direction.x) / 100);
-            particle.direction.y = moveTowards(particle.direction.y, 0.0f, abs(particle.direction.y) / 100);
+            particle.direction.x = moveTowards(particle.direction.x, 0.0f, std::abs(particle.direction.x) / 100);
+            particle.direction.y = moveTowards(particle.direction.y, 0.0f, std::abs(particle.direction.y) / 100);
             particle.direction.z = moveTowards(particle.direction.z, 1.0f, 0.01f);
         }
         else {
