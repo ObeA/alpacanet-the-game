@@ -5,7 +5,7 @@
 #include "../../materials/shadow_material.h"
 
 Alpaca::Alpaca(Game* game, Material* material, Material* shadowMaterial)
-    : ModelObject(game, material, shadowMaterial, "assets/models/cube.obj") {
+    : ModelObject(game, material, shadowMaterial, "assets/models/alpaca.obj") {
 }
 
 void Alpaca::start() {

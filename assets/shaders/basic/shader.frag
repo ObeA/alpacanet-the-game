@@ -11,7 +11,7 @@ layout(location = 4) in vec4 inShadowCoord;
 
 layout(location = 0) out vec4 outColor;
 
-#define AMBIENT 0.2
+#define AMBIENT 0.3
 
 float textureProj(vec4 shadowCoord, vec2 off) {
     float shadow = 1.0;
