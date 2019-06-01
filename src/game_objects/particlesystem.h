@@ -8,7 +8,6 @@ public:
     ParticleSystem(Game* game, Material* material, Material* shadowMaterial)
         : DrawableObject(game, material, shadowMaterial) {
     }
-    ~ParticleSystem();
 
     void start() override;
     void createVertexBuffer() override;

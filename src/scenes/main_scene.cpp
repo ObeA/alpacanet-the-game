@@ -78,7 +78,9 @@ void MainScene::update() {
         }
         auto castedParticleSystem = dynamic_cast<ParticleSystem*>(*it);
         if (castedParticleSystem != nullptr && castedParticleSystem->destroyFlag) {
+            auto prevIt = *it;
             it = objects.erase(it);
+            delete prevIt;
         }
         else {
             ++it;

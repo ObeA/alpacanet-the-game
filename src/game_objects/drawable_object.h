@@ -14,7 +14,7 @@ struct UniformBufferObject {
 class DrawableObject : public GameObject {
 public:
     DrawableObject(Game* game, Material* material, Material* shadowMaterial);
-    ~DrawableObject();
+    virtual ~DrawableObject() override;
 
     void start();
 
@@ -32,8 +32,8 @@ public:
     Material *material;
     Material *shadowMaterial;
 protected:
-    Buffer* vertexBuffer;
-    Buffer* indexBuffer;
+    Buffer* vertexBuffer = nullptr;
+    Buffer* indexBuffer = nullptr;
 
     std::vector<Buffer*> uniformBuffers;
     std::vector<Buffer*> offscreenUniformBuffers;

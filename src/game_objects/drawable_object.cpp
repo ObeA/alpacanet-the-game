@@ -16,8 +16,13 @@ DrawableObject::~DrawableObject() {
         delete buffer;
     }
 
-    delete indexBuffer;
+    if (indexBuffer != nullptr) {
+        delete indexBuffer;
+    }
     delete vertexBuffer;
+
+    vkFreeDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), game->getGraphics()->getRenderer()->getDescriptorPool(), descriptorSets.size(), descriptorSets.data());
+    vkFreeDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), game->getGraphics()->getRenderer()->getDescriptorPool(), offscreenDescriptorSets.size(), offscreenDescriptorSets.data());
 }
 
 void DrawableObject::start() {

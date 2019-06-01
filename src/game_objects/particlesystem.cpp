@@ -1,9 +1,5 @@
 #include "particlesystem.h"
 
-ParticleSystem::~ParticleSystem() {
-    vertexBuffer->unmap();
-}
-
 void ParticleSystem::setupParticles()
 {
     for (size_t i = 0; i < amount; i++)
