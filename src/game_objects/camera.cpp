@@ -18,6 +18,10 @@ Camera::Camera(Game* game, glm::vec3 position, float distance)
     auto onKeyUpCallback = std::bind(&Camera::onKeyUp, this, std::placeholders::_1, std::placeholders::_2,
                                      std::placeholders::_3);
     window->registerOnKeyUpCallback(onKeyUpCallback);
+
+    auto onMouseButtonCallback = std::bind(&Camera::onMouseButton, this, std::placeholders::_1,
+                                           std::placeholders::_2, std::placeholders::_3);
+    window->registerOnMouseButtonCallback(onMouseButtonCallback);
 }
 
 const glm::mat4& Camera::getViewMatrix() const {
@@ -41,7 +45,12 @@ void Camera::update() {
     position.y = std::sin(horizontalRotation) * followDistance + std::cos(horizontalRotation) * followDistance + targetPosition.y;
     position.z = targetPosition.z + followDistance;
 
-    horizontalRotation += 0.01f;
+    if (isDragging) {
+        auto delta = currentMousePosition - dragPosition;
+
+        horizontalRotation += delta.x * 0.01f;
+        dragPosition = currentMousePosition;
+    }
 
     view = glm::lookAt(position, targetPosition, glm::vec3(0, 0, 1));
 }
@@ -64,34 +73,24 @@ void Camera::onMouseMove(double x, double y) {
     currentMousePosition.y = y;
 }
 
-void Camera::onKeyDown(int key, int scancode, int mods) {
-    switch (key) {
-        case GLFW_KEY_W:
-            moveDirection.y = 1;
-            break;
-        case GLFW_KEY_S:
-            moveDirection.y = -1;
-            break;
-        case GLFW_KEY_A:
-            moveDirection.x = -1;
-            break;
-        case GLFW_KEY_D:
-            moveDirection.x = 1;
-            break;
+void Camera::onMouseButton(int button, int action, int mods) {
+    if (button != GLFW_MOUSE_BUTTON_LEFT) {
+        return;
+    }
+
+    isDragging = action == GLFW_PRESS;
+    std::cout << (isDragging ? "dragging" : "not dragging") << std::endl;
+    if (isDragging) {
+        dragPosition = currentMousePosition;
     }
 }
 
+void Camera::onKeyDown(int key, int scancode, int mods) {
+
+}
+
 void Camera::onKeyUp(int key, int scancode, int mods) {
-    switch (key) {
-        case GLFW_KEY_W:
-        case GLFW_KEY_S:
-            moveDirection.y = 0;
-            break;
-        case GLFW_KEY_A:
-        case GLFW_KEY_D:
-            moveDirection.x = 0;
-            break;
-    }
+
 }
 
 void Camera::lookAt(const GameObject* object) {

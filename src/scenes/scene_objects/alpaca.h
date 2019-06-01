@@ -23,6 +23,6 @@ private:
     glm::vec2 targetPosition;
     bool targetPositionReached = false;
     bool bounceCompleted = false;
-    std::chrono::high_resolution_clock::time_point bounceStartTime;
+    float bouncyBoi;
     int wooliness;
 };

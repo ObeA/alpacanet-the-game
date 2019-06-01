@@ -36,8 +36,9 @@ private:
     float followDistance;
     float horizontalRotation;
 
-    glm::vec2 currentMousePosition{};
-    glm::vec3 moveDirection{};
+    bool isDragging;
+    glm::vec2 dragPosition;
+    glm::vec2 currentMousePosition;
 
     const GameObject* followedObject = nullptr;
     glm::vec3 targetPosition;
@@ -47,5 +48,7 @@ private:
     void onKeyDown(int key, int scancode, int mods);
 
     void onKeyUp(int key, int scancode, int mods);
+
+    void onMouseButton(int button, int action, int mods);
 };
 

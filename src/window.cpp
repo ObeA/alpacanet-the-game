@@ -86,12 +86,10 @@ void Window::cursorPositionCallback(GLFWwindow* window, double xoffset, double y
 }
 
 void Window::mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        auto self = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+    auto self = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 
-        for (const auto& callback : self->onMouseButtonCallbacks) {
-            callback(button, action, mods);
-        }
+    for (const auto& callback : self->onMouseButtonCallbacks) {
+        callback(button, action, mods);
     }
 }
 

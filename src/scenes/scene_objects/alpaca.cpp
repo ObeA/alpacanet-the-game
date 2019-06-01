@@ -10,22 +10,21 @@ Alpaca::Alpaca(Game* game, Material* material, Material* shadowMaterial)
 
 void Alpaca::start() {
     ModelObject::start();
-    wooliness = (rand() % 50);
+    wooliness = (std::rand() % 50);
 }
 
-void Alpaca::moveTo(glm::vec2 position)
-{
+void Alpaca::moveTo(glm::vec2 position) {
     targetPosition = position;
     targetPositionReached = false;
 }
 
 void Alpaca::update() {
-    if (rand() % 50 == 1) {
+    if (std::rand() % 50 == 1) {
         wooliness++;
     }
 
     auto angle = std::atan2(targetPosition.y - position.y, targetPosition.x - position.x);
-    rotation.y = angle;
+    rotation.z = angle;
 
     if (!targetPositionReached) {
         if (glm::distance(glm::vec2(position), targetPosition) < 0.1) {
@@ -38,14 +37,13 @@ void Alpaca::update() {
         }
         if (bounceCompleted) {
             bounceCompleted = false;
-            bounceStartTime = std::chrono::high_resolution_clock::now();
+            bouncyBoi = 0;
         }
     }
 
     if (!bounceCompleted) {
-        auto currentTime = std::chrono::high_resolution_clock::now();
-        float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - bounceStartTime).count();
-        float newPos = std::sin(time * 2);
+        bouncyBoi += 0.05f;
+        float newPos = std::sin(bouncyBoi);
         if (newPos < 0) {
             newPos = 0;
             bounceCompleted = true;

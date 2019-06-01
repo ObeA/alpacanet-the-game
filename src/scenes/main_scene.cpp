@@ -71,7 +71,7 @@ void MainScene::update() {
         if (castedAlpaca != nullptr) {
             if (currentTime > castedAlpaca->nextMoveTime) {
                 castedAlpaca->nextMoveTime = currentTime + std::chrono::seconds(5 + std::rand() % 10);
-                auto newPosition = glm::vec3(glm::vec2((std::rand() % 20) - 10, (std::rand() % 20) - 10), 1.0);
+                auto newPosition = glm::vec3(glm::vec2((std::rand() % 20) - 10, (std::rand() % 20) - 10), 0.0);
                 castedAlpaca->moveTo(newPosition);
             }
         }

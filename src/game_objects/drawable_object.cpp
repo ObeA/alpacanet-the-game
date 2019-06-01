@@ -129,7 +129,7 @@ void DrawableObject::updateUniformBuffer(uint32_t currentImage, Camera* camera, 
     UniformBufferObject ubo = {};
     ubo.model = glm::mat4(1.0f);                             // identity
     ubo.model = glm::translate(ubo.model, position);            // position
-    ubo.model = glm::rotate(ubo.model, rotation.y, camera->up); // rotation
+    ubo.model = glm::rotate(ubo.model, rotation.z, camera->up); // rotation
     ubo.model = glm::scale(ubo.model, scale);                   // scale
 
     ubo.view = camera->getViewMatrix();
