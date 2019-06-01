@@ -12,6 +12,8 @@ class DrawableObject;
 
 class Scene {
 public:
+    static constexpr glm::vec3 UP = glm::vec3(0, 0, 1.0f);
+
     explicit Scene(Game* game) : game(game) { }
     virtual ~Scene() { }
 

@@ -3,13 +3,13 @@
 #include <glm/glm.hpp>
 #include "../game.h"
 
-constexpr glm::vec3 WORLD_UP{0.0, 0.0, 1.0};
-
 class Game;
 class GameObject;
 
 class Camera {
 public:
+    const glm::vec3 up = glm::vec3(0, 0, 1);
+
     Camera(Game* game, glm::vec3 position, float followDistance);
 
     void lookAt(const GameObject* object);

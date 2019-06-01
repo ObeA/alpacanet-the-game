@@ -459,7 +459,7 @@ void Renderer::render() {
     auto& view = camera->getViewMatrix();
     auto& projection = camera->getProjectionMatrix();
     for (auto& object : scene->getActiveDrawableObjects()) {
-        object->updateUniformBuffer(imageIndex, view, projection, LIGHT_POSITION, camera->getPosition());
+        object->updateUniformBuffer(imageIndex, camera, LIGHT_POSITION);
     }
 
     VkSubmitInfo submitInfo = {};

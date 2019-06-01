@@ -10,7 +10,7 @@ class GUI;
 
 class Renderer {
 public:
-    static const uint32_t SHADOWMAP_DIMENSION = 2048;
+    static const uint32_t SHADOWMAP_DIMENSION = 2048 * 4;
 
 	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice);
 	~Renderer();
@@ -39,10 +39,8 @@ public:
     const VkExtent2D& getExtents() const;
     GUI* getGui();
 private:
-
     const VkFilter SHADOWMAP_FILTER = VK_FILTER_LINEAR;
-    const VkFormat DEPTH_FORMAT = VK_FORMAT_D16_UNORM;
-    const glm::vec3 LIGHT_POSITION = glm::vec3(5, 5, 5);
+    const glm::vec3 LIGHT_POSITION = glm::vec3(25, 25, 25);
 
     Window* window;
     Surface* surface;
@@ -56,8 +54,6 @@ private:
 
     VkRenderPass renderPass;
     VkRenderPass offscreenRenderPass;
-
-
 
     GUI* gui;
 

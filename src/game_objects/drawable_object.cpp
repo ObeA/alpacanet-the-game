@@ -119,15 +119,15 @@ void DrawableObject::createDescriptorSet(size_t swapChainImageSize) {
     }
 }
 
-void DrawableObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 cameraPos) {
+void DrawableObject::updateUniformBuffer(uint32_t currentImage, Camera* camera, glm::vec3 lightPos) {
     UniformBufferObject ubo = {};
-    ubo.model = glm::mat4(1.0f);
-    ubo.model = glm::translate(ubo.model, position);//position
-    ubo.model = glm::rotate(ubo.model, rotation.y, glm::vec3(0.0f, 0.0f, 1.0f));//rotation
-    ubo.model = glm::scale(ubo.model, scale);
+    ubo.model = glm::mat4(1.0f);                                // identity
+    ubo.model = glm::translate(ubo.model, position);            // position
+    ubo.model = glm::rotate(ubo.model, rotation.y, camera->up); // rotation
+    ubo.model = glm::scale(ubo.model, scale);                   // scake
 
-    ubo.view = view;
-    ubo.projection = projection;
+    ubo.view = camera->getViewMatrix();
+    ubo.projection = camera->getProjectionMatrix();
     ubo.projection[1][1] *= -1;
 
     // Offscreen rendering
@@ -136,7 +136,7 @@ void DrawableObject::updateUniformBuffer(uint32_t currentImage, glm::mat4 view, 
     float zFar = 96.0f;
 
     auto projectionMatrix = glm::perspective(glm::radians(lightFOV), 1.0f, zNear, zFar);
-    auto viewMatrix = glm::lookAt(lightPos, glm::vec3(0.0f), glm::vec3(0, 1, 0));
+    auto viewMatrix = glm::lookAt(lightPos, glm::vec3(0.0f), camera->up);
     auto modelMatrix = ubo.model;
 
     UniformBufferObjectOffscreen uboOffscreen = {};

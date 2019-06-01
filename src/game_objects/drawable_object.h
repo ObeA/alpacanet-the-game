@@ -29,7 +29,7 @@ public:
 
     virtual std::vector<uint32_t> getIndices();
 
-    virtual void updateUniformBuffer(uint32_t currentImage, glm::mat4 view, glm::mat4 projection, glm::vec3 lightPos, glm::vec3 viewPos);
+    virtual void updateUniformBuffer(uint32_t currentImage, Camera* camera, glm::vec3 lightPos);
 
     Material *material;
     Material *shadowMaterial;
