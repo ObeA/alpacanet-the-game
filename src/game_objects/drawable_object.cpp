@@ -1,6 +1,7 @@
 #include "drawable_object.h"
 #include "../graphics/buffers/uniform_buffer.h"
 #include "../graphics/vulkan_utilities.h"
+#include "light.h"
 
 DrawableObject::DrawableObject(Game* game, Material* material, Material* shadowMaterial)
     : GameObject(game), material(material), shadowMaterial(shadowMaterial) {
@@ -119,32 +120,25 @@ void DrawableObject::createDescriptorSet(size_t swapChainImageSize) {
     }
 }
 
-void DrawableObject::updateUniformBuffer(uint32_t currentImage, Camera* camera, glm::vec3 lightPos) {
+void DrawableObject::updateUniformBuffer(uint32_t currentImage, Camera* camera, Light* light) {
     UniformBufferObject ubo = {};
-    ubo.model = glm::mat4(1.0f);                                // identity
+    ubo.model = glm::mat4(1.0f);                             // identity
     ubo.model = glm::translate(ubo.model, position);            // position
     ubo.model = glm::rotate(ubo.model, rotation.y, camera->up); // rotation
-    ubo.model = glm::scale(ubo.model, scale);                   // scake
+    ubo.model = glm::scale(ubo.model, scale);                   // scale
 
     ubo.view = camera->getViewMatrix();
     ubo.projection = camera->getProjectionMatrix();
     ubo.projection[1][1] *= -1;
 
     // Offscreen rendering
-    float lightFOV = 90.0f;
-    float zNear = 1.0f;
-    float zFar = 96.0f;
-
-    auto projectionMatrix = glm::perspective(glm::radians(lightFOV), 1.0f, zNear, zFar);
-    auto viewMatrix = glm::lookAt(lightPos, glm::vec3(0.0f), camera->up);
-    auto modelMatrix = ubo.model;
 
     UniformBufferObjectOffscreen uboOffscreen = {};
-    uboOffscreen.depthMVP = projectionMatrix * viewMatrix * modelMatrix;
+    uboOffscreen.depthMVP = light->getProjectionMatrix() * light->getViewMatrix(camera->up) * ubo.model;
     // end offscreen rendering
 
     //TODO: change when rendered from light
-    ubo.lightPos = lightPos;
+    ubo.lightPos = light->position;
     ubo.lightSpace = uboOffscreen.depthMVP;
 
     auto device = game->getGraphics()->getLogicalDevice()->getDevice();

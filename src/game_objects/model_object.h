@@ -22,7 +22,6 @@
 
 class ModelObject : public DrawableObject {
 public:
-
     ModelObject(Game* game, Material* material, Material* shadowMaterial, std::string location)
             : DrawableObject(game, material, shadowMaterial),
               modelLocation(std::move(location)) {

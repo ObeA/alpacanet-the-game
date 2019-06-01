@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game_object.h"
+#include "../materials/material.h"
 
 struct UniformBufferObject {
     glm::mat4 model;
@@ -9,9 +10,6 @@ struct UniformBufferObject {
     glm::mat4 lightSpace;
     glm::vec3 lightPos;
 };
-
-class Material;
-class Buffer;
 
 class DrawableObject : public GameObject {
 public:
@@ -29,7 +27,7 @@ public:
 
     virtual std::vector<uint32_t> getIndices();
 
-    virtual void updateUniformBuffer(uint32_t currentImage, Camera* camera, glm::vec3 lightPos);
+    virtual void updateUniformBuffer(uint32_t currentImage, Camera* camera, Light* light);
 
     Material *material;
     Material *shadowMaterial;

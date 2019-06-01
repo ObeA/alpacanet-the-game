@@ -1,15 +1,10 @@
 #pragma once
 
-#include "window.h"
 #include "scenes/scene.h"
-#include "graphics/instance.h"
-#include "graphics/surface.h"
-#include "graphics/physical_device.h"
-#include "graphics/logical_device.h"
 #include "graphics/graphics.h"
 
-class Graphics;
 class Scene;
+class Graphics;
 
 class Game {
 public:

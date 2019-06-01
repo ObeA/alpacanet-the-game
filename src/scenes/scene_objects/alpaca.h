@@ -1,10 +1,10 @@
 #pragma once
+
 #include "../../game_objects/model_object.h"
 #include <algorithm>
 
 class Alpaca: public ModelObject {
 public:
-
     Alpaca(Game * game, Material * material, Material * shadowMaterial);
 
     void start() override;

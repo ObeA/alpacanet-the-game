@@ -19,3 +19,7 @@ std::vector<DrawableObject*> Scene::getActiveDrawableObjects() {
 Camera* Scene::getCamera() {
     return camera;
 }
+
+Light* Scene::getLight() {
+    return light;
+}

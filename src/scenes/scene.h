@@ -6,14 +6,13 @@
 #include "../game_objects/camera.h"
 
 class Camera;
+class Light;
 class Game;
 class GameObject;
 class DrawableObject;
 
 class Scene {
 public:
-    static constexpr glm::vec3 UP = glm::vec3(0, 0, 1.0f);
-
     explicit Scene(Game* game) : game(game) { }
     virtual ~Scene() { }
 
@@ -23,6 +22,7 @@ public:
     std::vector<GameObject*> getActiveObjects();
     std::vector<DrawableObject*> getActiveDrawableObjects();
     Camera* getCamera();
+    Light* getLight();
     virtual void drawUI() = 0;
 
 protected:
@@ -30,5 +30,6 @@ protected:
 
     std::vector<GameObject*> objects;
     Camera* camera{};
+    Light* light{};
 };
 

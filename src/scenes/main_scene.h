@@ -1,9 +1,7 @@
 #pragma once
 
 #include "scene.h"
-
-class Material;
-class Alpaca;
+#include "scene_objects/alpaca.h"
 
 class MainScene : public Scene {
 public:

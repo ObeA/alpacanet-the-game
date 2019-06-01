@@ -25,8 +25,6 @@ public:
     VkDeviceMemory offscreenDepthImageMemory;
     VkImage offscreenDepthImage;
     VkSampler offscreenDepthSampler;
-    VkImageView offscreenImageView;
-    Image* offscreenImage;
 
     void setScene(Scene* scene);
 
@@ -40,7 +38,6 @@ public:
     GUI* getGui();
 private:
     const VkFilter SHADOWMAP_FILTER = VK_FILTER_LINEAR;
-    const glm::vec3 LIGHT_POSITION = glm::vec3(25, 25, 25);
 
     Window* window;
     Surface* surface;

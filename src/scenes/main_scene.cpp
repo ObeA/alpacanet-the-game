@@ -1,4 +1,7 @@
 #include "main_scene.h"
+
+#include <glm/gtx/intersect.hpp>
+
 #include "../game_objects/model_object.h"
 #include "../materials/basic_material.h"
 #include "../materials/basic_textured_material.h"
@@ -6,7 +9,7 @@
 #include "scene_objects/alpaca.h"
 #include "../managers/material_manager.h"
 #include "../graphics/gui/gui.h"
-#include <glm/gtx/intersect.hpp>
+#include "../game_objects/light.h"
 
 void MainScene::setup() {
     auto& materialManager = MaterialManager::getInstance();
@@ -42,6 +45,8 @@ void MainScene::setup() {
 
     camera = new Camera(game, glm::vec3(5.0, 5.0, 5.0), 15.0f);
     camera->lookAt(glm::vec3(0));
+
+    light = new Light(game, glm::vec3(25), glm::vec3(0), 90.0f, 1.0f, 96.0f);
 }
 
 MainScene::~MainScene() {

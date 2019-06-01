@@ -456,10 +456,11 @@ void Renderer::render() {
     }
 
     auto camera = scene->getCamera();
+    auto light = scene->getLight();
     auto& view = camera->getViewMatrix();
     auto& projection = camera->getProjectionMatrix();
     for (auto& object : scene->getActiveDrawableObjects()) {
-        object->updateUniformBuffer(imageIndex, camera, LIGHT_POSITION);
+        object->updateUniformBuffer(imageIndex, camera, light);
     }
 
     VkSubmitInfo submitInfo = {};

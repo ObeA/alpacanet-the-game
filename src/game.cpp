@@ -2,9 +2,6 @@
 #include "game.h"
 #include "scenes/main_scene.h"
 #include "managers/material_manager.h"
-#include "graphics/instance.h"
-#include "graphics/surface.h"
-#include "graphics/physical_device.h"
 #include "graphics/logical_device.h"
 
 Game::Game() : current_scene(nullptr) {

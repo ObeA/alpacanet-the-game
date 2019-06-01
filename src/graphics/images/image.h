@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "../logical_device.h"
 #include "../buffers/buffer.h"
 

@@ -4,8 +4,6 @@
 #include "../renderer.h"
 #include <string>
 
-class Alpaca;
-
 class GUI {
 public:
     GUI(Renderer* renderer, LogicalDevice* device, Window* window);
