@@ -68,7 +68,7 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     fontView = device->createImageView(fontImage->getImage(), VK_FORMAT_R8G8B8A8_UNORM,
         VK_IMAGE_ASPECT_COLOR_BIT);
 
-    Buffer* stagingBuffer = new Buffer(
+    auto* stagingBuffer = new Buffer(
         device,
         uploadSize,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -215,7 +215,7 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
 
     VkPipelineMultisampleStateCreateInfo pipelineMultisampleStateCreateInfo{};
     pipelineMultisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    pipelineMultisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    pipelineMultisampleStateCreateInfo.rasterizationSamples = device->getSampleCount();
     pipelineMultisampleStateCreateInfo.flags = 0;
 
     std::vector<VkDynamicState> dynamicStateEnables = {
