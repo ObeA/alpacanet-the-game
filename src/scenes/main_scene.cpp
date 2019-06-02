@@ -88,6 +88,10 @@ void MainScene::update() {
 }
 
 void MainScene::onMouseButton(int button, int action, int mods) {
+    if (button != GLFW_MOUSE_BUTTON_LEFT && action != GLFW_PRESS) {
+        return;
+    }
+
     auto ray = camera->getRay();
 
     for (auto object : objects) {
