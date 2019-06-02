@@ -99,7 +99,7 @@ bool Alpaca::hasReachedTargetPosition() const {
 }
 
 void Alpaca::postprocessMaterials(std::vector<tinyobj::material_t>& materials) {
-    auto color = COLORS[RandomUtilities::getInstance().getRandomBetween(0, COLORS.size())];
+    auto color = COLORS[RandomUtilities::getInstance().getRandomBetween(0, COLORS.size() - 1)];
     for (auto& material : materials) {
         if (material.name != "Body") {
             continue;

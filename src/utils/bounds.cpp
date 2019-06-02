@@ -5,6 +5,11 @@ Bounds::Bounds(glm::vec3 min, glm::vec3 max)
     update();
 }
 
+Bounds::Bounds(const Bounds &bounds)
+    : min(bounds.min), max(bounds.max), center() {
+    update();
+}
+
 const glm::vec3& Bounds::getCenter() const {
     return center;
 }
@@ -23,4 +28,17 @@ void Bounds::extend(const glm::vec3& point) {
 
 void Bounds::update() {
     center = ((max - min) * 0.5f) + min;
+}
+
+Bounds& Bounds::getScaledCopy(glm::vec3 scale) {
+    auto copy = Bounds(*this);
+    auto normalizedMin = copy.min - copy.center;
+    auto normalizedMax = copy.max - copy.center;
+    normalizedMin *= scale;
+    normalizedMax *= scale;
+    //copy.min = normalizedMin + copy.center;
+    copy.max = normalizedMax + copy.center;
+
+    copy.update();
+    return copy;
 }

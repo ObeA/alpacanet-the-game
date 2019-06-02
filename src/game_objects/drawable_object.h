@@ -2,6 +2,7 @@
 
 #include "game_object.h"
 #include "../materials/material.h"
+#include "../utils/bounds.h"
 
 struct UniformBufferObject {
     glm::mat4 model;
@@ -29,6 +30,8 @@ public:
 
     virtual void updateUniformBuffer(uint32_t currentImage, Camera* camera, Light* light);
 
+    Bounds& getBounds();
+
     Material *material = nullptr;
     Material *shadowMaterial = nullptr;
 protected:
@@ -45,6 +48,8 @@ protected:
     void createDescriptorSet(size_t swapChainImageSize);
 
     void createUniformBuffers(size_t swapChainImageSize);
+
+    Bounds bounds{};
 
     std::vector<Vertex> vertices;
     std::vector<uint32_t> indices;

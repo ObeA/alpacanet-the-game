@@ -63,8 +63,8 @@ void ParticleSystem::updateParticles()
 void ParticleSystem::initParticle(Particle *particle)
 {
     glm::vec2 direction2 = glm::normalize(glm::vec2(((std::rand() % 100 - 50)) * .01f, ((std::rand() % 100 - 50)) * .01f));
-    direction2 *= ((std::rand() % 50) + 50) * 0.01f;
-    auto directionZ = -(std::rand() % 50) * 0.01f;
+    direction2 *= ((std::rand() % 50) + 50) * 0.005f;
+    auto directionZ = -(std::rand() % 50) * 0.0075f;
     particle->direction = glm::vec3(direction2.x, direction2.y, directionZ);
     particle->alpha = 1;
     particle->size = 1.5f;

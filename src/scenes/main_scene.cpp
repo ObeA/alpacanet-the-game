@@ -202,7 +202,8 @@ void MainScene::shearSelectedAlpaca() {
         auto& materialManager = MaterialManager::getInstance();
         auto particles = new ParticleSystem(game, materialManager.getMaterial("particle-material").get(), nullptr);
         particles->amount = wool;
-        particles->position = selectedAlpaca->position += selectedAlpaca->scale.z;
+        auto center = selectedAlpaca->getBounds().getCenter();
+        particles->position = selectedAlpaca->position + glm::vec3(center.x, center.y, center.z * .75);
         particles->scale = glm::vec3(1);
         objects.push_back(particles);
         particles->start();

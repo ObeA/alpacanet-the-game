@@ -22,7 +22,9 @@ DrawableObject::~DrawableObject() {
     delete vertexBuffer;
 
     vkFreeDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), game->getGraphics()->getRenderer()->getDescriptorPool(), descriptorSets.size(), descriptorSets.data());
-    vkFreeDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), game->getGraphics()->getRenderer()->getDescriptorPool(), offscreenDescriptorSets.size(), offscreenDescriptorSets.data());
+    if (offscreenDescriptorSets.size() > 0) {
+        vkFreeDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), game->getGraphics()->getRenderer()->getDescriptorPool(), offscreenDescriptorSets.size(), offscreenDescriptorSets.data());
+    }
 }
 
 void DrawableObject::start() {
@@ -193,8 +195,7 @@ std::vector<Vertex> DrawableObject::getVertices() {
 std::vector<uint32_t> DrawableObject::getIndices() {
     return indices;
 }
-/*
-const Bounds& DrawableObject::getBounds() const {
-    return bounds;
+
+Bounds& DrawableObject::getBounds() {
+    return bounds.getScaledCopy(scale);
 }
-*/
