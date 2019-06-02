@@ -170,7 +170,7 @@ void MainScene::drawUI() {
     ImGui::Begin("Huidige alpaca", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
     if (selectedAlpaca != nullptr) {
-        ImGui::TextUnformatted(("Wol: " + std::to_string(selectedAlpaca->getWooliness())).c_str());
+        ImGui::TextUnformatted(("Wol: " + std::to_string(selectedAlpaca->getWooliness()) + "\t Blij: " + std::to_string(selectedAlpaca->getHappiness())).c_str());
     }
     else {
         ImGui::TextUnformatted("Geen alpaca geselecteerd");

@@ -17,21 +17,30 @@ public:
 
     int shear();
 
-    int getWooliness();
+    int getWooliness() const;
+    int getHappiness() const;
 
     bool hasReachedTargetPosition() const;
 
 private:
-    const float MIN_AGE = 0.5;
-    const float MAX_AGE = 2;
-    const glm::vec3 BASE_SIZE = glm::vec3(0.25, 0.25, 0.25);
+    static constexpr float MIN_AGE = 0.5;
+    static constexpr float MAX_AGE = 2;
+    static constexpr float MAX_WOOL = 100;
+    static constexpr glm::vec3 BASE_SIZE = glm::vec3(0.25, 0.25, 0.25);
 
     glm::vec2 targetPosition;
     bool targetPositionReached;
     bool bounceCompleted = false;
     float bouncyBoi;
-    int wooliness;
+
+    float happiness;
+    float wooliness;
     float age;
 
     void updateAge();
+    void updateWool();
+
+    float getAgeScale() const;
+
+    void updateHappiness();
 };
