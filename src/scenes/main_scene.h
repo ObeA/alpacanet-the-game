@@ -18,5 +18,9 @@ private:
     Alpaca* selectedAlpaca = nullptr;
     int score = 0;
     void loopAlpacas(bool nextOrPrevious);
+
+    void shearSelectedAlpaca();
+
+    void lookAtWorld();
 };
 

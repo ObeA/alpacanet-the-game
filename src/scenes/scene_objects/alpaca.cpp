@@ -6,6 +6,7 @@
 
 Alpaca::Alpaca(Game* game, Material* material, Material* shadowMaterial)
     : ModelObject(game, material, shadowMaterial, "assets/models/alpaca.obj") {
+    randomizeAge();
 }
 
 void Alpaca::start() {
@@ -50,6 +51,8 @@ void Alpaca::update() {
         }
         position.z = newPos;
     }
+
+    updateAge();
 }
 
 int Alpaca::shear() {
@@ -60,4 +63,14 @@ int Alpaca::shear() {
 
 int Alpaca::getWooliness() {
     return wooliness;
+}
+
+void Alpaca::randomizeAge() {
+    age = MIN_AGE + ((float)std::rand() / RAND_MAX) * (MAX_AGE - MIN_AGE);
+    updateAge();
+}
+
+void Alpaca::updateAge() {
+    age = std::min(age + 0.01f, MAX_AGE);
+    scale = BASE_SIZE * age;
 }

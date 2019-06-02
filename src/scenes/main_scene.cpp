@@ -47,7 +47,7 @@ void MainScene::setup() {
     window->registerOnKeyDownCallback(onKeyDownCallback);
 
     camera = new Camera(game, glm::vec3(5.0, 5.0, 5.0), 15.0f);
-    camera->lookAt(glm::vec3(0));
+    lookAtWorld();
 
     light = new Light(game, glm::vec3(10, 10, 25), glm::vec3(0), 90.0f, 1.0f, 96.0f);
 }
@@ -122,27 +122,13 @@ std::vector<Alpaca*> MainScene::getAlpacas() {
 void MainScene::onKeyDown(int key, int scancode, int mods) {
     switch (key) {
         case GLFW_KEY_ESCAPE:
-            camera->lookAt(glm::vec3(0));
-            camera->setFollowDistance(15.0f);
+            lookAtWorld();
             break;
         case GLFW_KEY_Z:
             loopAlpacas(false);
             break;
         case GLFW_KEY_X:
-            if (selectedAlpaca) {
-                auto wool = selectedAlpaca->shear();
-                score += wool;
-                if (wool > 0) {
-                    auto& materialManager = MaterialManager::getInstance();
-                    auto particles = new ParticleSystem(game, materialManager.getMaterial("particle-material").get(), nullptr);
-                    particles->amount = wool;
-                    particles->position = selectedAlpaca->position += selectedAlpaca->scale.z;
-                    particles->scale = glm::vec3(1);
-                    objects.push_back(particles);
-                    particles->start();
-                    game->getGraphics()->getRenderer()->recreateCommandBufferFlag = true;
-                }
-            }
+            shearSelectedAlpaca();
             break;
         case GLFW_KEY_C:
             loopAlpacas(true);
@@ -191,4 +177,28 @@ void MainScene::drawUI() {
     ImGui::ProgressBar(score / (float)1000, ImVec2(-1, 0), (std::to_string(score) + "/1000").c_str());
 
     ImGui::End();
+}
+
+void MainScene::lookAtWorld() {
+    camera->lookAt(glm::vec3(0));
+    camera->setFollowDistance(15.0f);
+}
+
+void MainScene::shearSelectedAlpaca() {
+    if (selectedAlpaca == nullptr) {
+        return;
+    }
+
+    auto wool = selectedAlpaca->shear();
+    score += wool;
+    if (wool > 0) {
+        auto& materialManager = MaterialManager::getInstance();
+        auto particles = new ParticleSystem(game, materialManager.getMaterial("particle-material").get(), nullptr);
+        particles->amount = wool;
+        particles->position = selectedAlpaca->position += selectedAlpaca->scale.z;
+        particles->scale = glm::vec3(1);
+        objects.push_back(particles);
+        particles->start();
+        game->getGraphics()->getRenderer()->recreateCommandBufferFlag = true;
+    }
 }
