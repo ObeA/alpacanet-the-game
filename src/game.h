@@ -17,6 +17,8 @@ public:
 
     Scene* getCurrentScene();
     Graphics* getGraphics();
+
+    unsigned long long currentTick() const;
 private:
     Graphics* graphics;
 
@@ -24,4 +26,6 @@ private:
     Scene* current_scene;
 
     void setup();
+
+    unsigned long long tick;
 };

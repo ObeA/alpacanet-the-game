@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_norm.dir/gtx_norm.cpp.o  -o ../../../out/test-gtx_norm 

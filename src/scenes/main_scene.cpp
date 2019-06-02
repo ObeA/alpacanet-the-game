@@ -12,6 +12,7 @@
 #include "../managers/material_manager.h"
 #include "../graphics/gui/gui.h"
 #include "../game_objects/light.h"
+#include "../utils/random_utilities.h"
 
 void MainScene::setup() {
     auto& materialManager = MaterialManager::getInstance();
@@ -23,13 +24,12 @@ void MainScene::setup() {
     materialManager.registerMaterial("particle-material", std::make_shared<ParticleMaterial>(graphics, "particle"));
 
     auto world = new ModelObject(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get(), (char*) "assets/models/world.obj");
-    world->scale = glm::vec3(1);
     world->position = glm::vec3(0, 0, 0);
     objects.push_back(world);
 
     for (size_t i = 0; i < 5; i++) {
         auto alpaca = new Alpaca(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get());
-        alpaca->position = glm::vec3(0);
+        alpaca->position = glm::vec3(getRandomPositionOnField(), 0.0);
         objects.push_back(alpaca);
     }
 
@@ -60,19 +60,15 @@ MainScene::~MainScene() {
 
 void MainScene::update() {
     Scene::update();
-    auto currentTime = std::chrono::duration_cast<std::chrono::seconds>(
-            std::chrono::system_clock::now().time_since_epoch()
-    );
 
     auto it = std::begin(objects);
 
     while(it != std::end(objects)) {
         auto castedAlpaca = dynamic_cast<Alpaca*>(*it);
         if (castedAlpaca != nullptr) {
-            if (currentTime > castedAlpaca->nextMoveTime) {
-                castedAlpaca->nextMoveTime = currentTime + std::chrono::seconds(5 + std::rand() % 10);
-                auto newPosition = glm::vec3(glm::vec2((std::rand() % 20) - 10, (std::rand() % 20) - 10), 0.0);
-                castedAlpaca->moveTo(newPosition);
+            if (game->currentTick() > castedAlpaca->nextMoveTick) {
+                castedAlpaca->nextMoveTick = game->currentTick() + 250; // 250 ticks = 4 seconds
+                castedAlpaca->moveTo(getRandomPositionOnField());
             }
         }
         auto castedParticleSystem = dynamic_cast<ParticleSystem*>(*it);
@@ -201,4 +197,12 @@ void MainScene::shearSelectedAlpaca() {
         particles->start();
         game->getGraphics()->getRenderer()->recreateCommandBufferFlag = true;
     }
+}
+
+glm::vec2 MainScene::getRandomPositionOnField() {
+    auto& random = RandomUtilities::getInstance();
+    float x = random.getRandomBetween(-9, 9);
+    float y = random.getRandomBetween(-9, 9);
+
+    return glm::vec2(x, y);
 }

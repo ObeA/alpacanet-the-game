@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/obe/dev/projects/school/graphics/alpacanet-the-game/glm/test/core/core_func_integer_bit_count.cpp
+stdio.h
+-
+stdlib.h
+-
+ctime
+-
+

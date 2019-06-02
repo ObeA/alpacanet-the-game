@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-core_force_pure.dir/core_force_pure.cpp.o  -o ../../../out/test-core_force_pure 

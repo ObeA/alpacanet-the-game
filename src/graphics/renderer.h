@@ -15,7 +15,6 @@ public:
 	Renderer(Window* window, Surface* surface, LogicalDevice* logicalDevice);
 	~Renderer();
 
-
 	std::vector<VkFramebuffer> swapChainFramebuffers;
 	std::vector<VkImageView> swapChainImageViews;
 

@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_type_ptr.dir/gtc_type_ptr.cpp.o  -o ../../../out/test-gtc_type_ptr 

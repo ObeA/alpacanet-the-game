@@ -24,6 +24,7 @@ void ModelObject::loadModel() {
             faceMaterial = materials[shape.mesh.material_ids[faceId]];
             verticesInFace = shape.mesh.num_face_vertices[faceId];
         }
+
         for (const auto& index : shape.mesh.indices) {
             Vertex vertex = {};
 

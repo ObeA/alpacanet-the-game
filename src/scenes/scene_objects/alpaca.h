@@ -13,7 +13,7 @@ public:
 
     void update() override;
 
-    std::chrono::seconds nextMoveTime;
+    unsigned long long nextMoveTick;
 
     int shear();
 
@@ -31,6 +31,5 @@ private:
     int wooliness;
     float age;
 
-    void randomizeAge();
     void updateAge();
 };

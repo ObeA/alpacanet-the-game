@@ -52,7 +52,7 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
 {
     ImGuiIO& io = ImGui::GetIO();
 
-    ImFont* pFont = io.Fonts->AddFontFromFileTTF("assets/fonts/COMIC.TTF", 25.0f);
+    io.Fonts->AddFontFromFileTTF("assets/fonts/COMIC.TTF", 25.0f);
 
     unsigned char* fontData;
     int texWidth, texHeight;

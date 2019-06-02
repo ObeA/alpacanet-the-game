@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_compatibility.dir/gtx_compatibility.cpp.o  -o ../../../out/test-gtx_compatibility 

@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-bug_ms_vec_static.dir/bug_ms_vec_static.cpp.o  -o ../../../out/test-bug_ms_vec_static 

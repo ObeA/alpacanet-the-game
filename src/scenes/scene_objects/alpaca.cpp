@@ -3,15 +3,16 @@
 #include "../../materials/basic_material.h"
 #include "../../materials/basic_textured_material.h"
 #include "../../materials/shadow_material.h"
+#include "../../utils/random_utilities.h"
 
 Alpaca::Alpaca(Game* game, Material* material, Material* shadowMaterial)
-    : ModelObject(game, material, shadowMaterial, "assets/models/alpaca.obj") {
-    randomizeAge();
+    : ModelObject(game, material, shadowMaterial, "assets/models/alpaca.obj"), nextMoveTick(0), wooliness(0), bouncyBoi(0) {
+    age = RandomUtilities::getInstance().getRandomBetween(MIN_AGE, MAX_AGE);
+    updateAge();
 }
 
 void Alpaca::start() {
     ModelObject::start();
-    wooliness = (std::rand() % 50);
 }
 
 void Alpaca::moveTo(glm::vec2 position) {
@@ -25,17 +26,17 @@ void Alpaca::update() {
     }
 
     auto angle = std::atan2(targetPosition.y - position.y, targetPosition.x - position.x);
-    rotation.z = angle;
+    rotation.z = angle + M_PI;
 
     if (!targetPositionReached) {
         if (glm::distance(glm::vec2(position), targetPosition) < 0.1) {
             targetPositionReached = true;
-        }
-        else {
+        } else {
             auto heading = glm::vec2(std::cos(angle), std::sin(angle));
-            position.x += heading.x * 0.01;
-            position.y += heading.y * 0.01;
+            position.x += heading.x * 0.01f;
+            position.y += heading.y * 0.01f;
         }
+
         if (bounceCompleted) {
             bounceCompleted = false;
             bouncyBoi = 0;
@@ -49,6 +50,7 @@ void Alpaca::update() {
             newPos = 0;
             bounceCompleted = true;
         }
+
         position.z = newPos;
     }
 
@@ -65,12 +67,7 @@ int Alpaca::getWooliness() {
     return wooliness;
 }
 
-void Alpaca::randomizeAge() {
-    age = MIN_AGE + ((float)std::rand() / RAND_MAX) * (MAX_AGE - MIN_AGE);
-    updateAge();
-}
-
 void Alpaca::updateAge() {
-    age = std::min(age + 0.01f, MAX_AGE);
+    age = std::min(age + 0.001f, MAX_AGE);
     scale = BASE_SIZE * age;
 }

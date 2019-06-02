@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_polar_coordinates.dir/gtx_polar_coordinates.cpp.o  -o ../../../out/test-gtx_polar_coordinates 

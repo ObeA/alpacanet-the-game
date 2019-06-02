@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_extend.dir/gtx_extend.cpp.o  -o ../../../out/test-gtx_extend 

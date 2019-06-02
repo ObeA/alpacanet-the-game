@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_quaternion.dir/gtx_quaternion.cpp.o  -o ../../../out/test-gtx_quaternion 
