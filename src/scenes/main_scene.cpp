@@ -66,11 +66,18 @@ void MainScene::update() {
     while(it != std::end(objects)) {
         auto castedAlpaca = dynamic_cast<Alpaca*>(*it);
         if (castedAlpaca != nullptr) {
-            if (game->currentTick() > castedAlpaca->nextMoveTick) {
-                castedAlpaca->nextMoveTick = game->currentTick() + 250; // 250 ticks = 4 seconds
-                castedAlpaca->moveTo(getRandomPositionOnField());
+            if (castedAlpaca->hasReachedTargetPosition()) {
+                if (castedAlpaca->nextMoveTick == -1) {
+                    // Alpaca has reached target position. Let it idle there for a while.
+                    castedAlpaca->nextMoveTick = game->currentTick() + RandomUtilities::getInstance().getRandomBetween(200, 1000);
+                } else if (game->currentTick() > castedAlpaca->nextMoveTick) {
+                    // Send alpaca to the next position
+                    castedAlpaca->moveTo(getRandomPositionOnField());
+                    castedAlpaca->nextMoveTick = -1;
+                }
             }
         }
+
         auto castedParticleSystem = dynamic_cast<ParticleSystem*>(*it);
         if (castedParticleSystem != nullptr && castedParticleSystem->destroyFlag) {
             auto prevIt = *it;
@@ -201,8 +208,8 @@ void MainScene::shearSelectedAlpaca() {
 
 glm::vec2 MainScene::getRandomPositionOnField() {
     auto& random = RandomUtilities::getInstance();
-    float x = random.getRandomBetween(-9, 9);
-    float y = random.getRandomBetween(-9, 9);
+    float x = random.getRandomBetween(-8.5f, 8.5f);
+    float y = random.getRandomBetween(-8.5f, 8.5f);
 
     return glm::vec2(x, y);
 }

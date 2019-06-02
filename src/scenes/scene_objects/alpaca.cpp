@@ -6,7 +6,8 @@
 #include "../../utils/random_utilities.h"
 
 Alpaca::Alpaca(Game* game, Material* material, Material* shadowMaterial)
-    : ModelObject(game, material, shadowMaterial, "assets/models/alpaca.obj"), nextMoveTick(0), wooliness(0), bouncyBoi(0) {
+    : ModelObject(game, material, shadowMaterial, "assets/models/alpaca.obj"),
+      targetPositionReached(true), nextMoveTick(0), wooliness(0), bouncyBoi(0) {
     age = RandomUtilities::getInstance().getRandomBetween(MIN_AGE, MAX_AGE);
     updateAge();
 }
@@ -70,4 +71,8 @@ int Alpaca::getWooliness() {
 void Alpaca::updateAge() {
     age = std::min(age + 0.001f, MAX_AGE);
     scale = BASE_SIZE * age;
+}
+
+bool Alpaca::hasReachedTargetPosition() const {
+    return targetPositionReached;
 }
