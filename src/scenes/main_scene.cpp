@@ -130,7 +130,7 @@ void MainScene::onKeyDown(int key, int scancode, int mods) {
                 score += wool;
                 if (wool > 0) {
                     auto& materialManager = MaterialManager::getInstance();
-                    auto particles = new ParticleSystem(game, materialManager.getMaterial("particle-material").get(), materialManager.getMaterial("shadow-material").get());
+                    auto particles = new ParticleSystem(game, materialManager.getMaterial("particle-material").get(), nullptr);
                     particles->amount = wool;
                     particles->position = selectedAlpaca->position += selectedAlpaca->scale.z;
                     particles->scale = glm::vec3(1);

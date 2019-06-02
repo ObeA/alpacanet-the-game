@@ -79,7 +79,6 @@ void Camera::onMouseButton(int button, int action, int mods) {
     }
 
     isDragging = action == GLFW_PRESS;
-    std::cout << (isDragging ? "dragging" : "not dragging") << std::endl;
     if (isDragging) {
         dragPosition = currentMousePosition;
     }

@@ -105,6 +105,10 @@ void DrawableObject::createDescriptorSet(size_t swapChainImageSize) {
         material->createDescriptorSet(bufferInfo, descriptorSets[i]);
     }
 
+    if (shadowMaterial == nullptr) {
+        return;
+    }
+
     std::vector<VkDescriptorSetLayout> offscreenLayouts(swapChainImageSize, shadowMaterial->descriptorSetLayout);
     VkDescriptorSetAllocateInfo offscreenAllocInfo = {};
     offscreenAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
@@ -127,7 +131,7 @@ void DrawableObject::createDescriptorSet(size_t swapChainImageSize) {
 
 void DrawableObject::updateUniformBuffer(uint32_t currentImage, Camera* camera, Light* light) {
     UniformBufferObject ubo = {};
-    ubo.model = glm::mat4(1.0f);                             // identity
+    ubo.model = glm::mat4(1.0f);                                // identity
     ubo.model = glm::translate(ubo.model, position);            // position
     ubo.model = glm::rotate(ubo.model, rotation.z, camera->up); // rotation
     ubo.model = glm::scale(ubo.model, scale);                   // scale
@@ -137,7 +141,6 @@ void DrawableObject::updateUniformBuffer(uint32_t currentImage, Camera* camera, 
     ubo.projection[1][1] *= -1;
 
     // Offscreen rendering
-
     UniformBufferObjectOffscreen uboOffscreen = {};
     uboOffscreen.depthMVP = light->getProjectionMatrix() * light->getViewMatrix(camera->up) * ubo.model;
     // end offscreen rendering
@@ -152,6 +155,10 @@ void DrawableObject::updateUniformBuffer(uint32_t currentImage, Camera* camera, 
     memcpy(data, &ubo, sizeof(ubo));
     vkUnmapMemory(device, uniformBuffers[currentImage]->getMemory());
 
+    if (shadowMaterial == nullptr) {
+        return;
+    }
+
     // Update offscreen ubo
     void* offscreenData;
     vkMapMemory(device, offscreenUniformBuffers[currentImage]->getMemory(), 0, sizeof(UniformBufferObjectOffscreen), 0, &offscreenData);
@@ -161,13 +168,20 @@ void DrawableObject::updateUniformBuffer(uint32_t currentImage, Camera* camera, 
 
 void DrawableObject::createUniformBuffers(size_t swapChainImageSize) {
     VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-    VkDeviceSize offscreenBufferSize = sizeof(UniformBufferObjectOffscreen);
     uniformBuffers.resize(swapChainImageSize);
-    offscreenUniformBuffers.resize(swapChainImageSize);
 
     auto device = game->getGraphics()->getLogicalDevice();
     for (size_t i = 0; i < swapChainImageSize; i++) {
         uniformBuffers[i] = new UniformBuffer(device, bufferSize);
+    }
+
+    if (shadowMaterial == nullptr) {
+        return;
+    }
+
+    VkDeviceSize offscreenBufferSize = sizeof(UniformBufferObjectOffscreen);
+    offscreenUniformBuffers.resize(swapChainImageSize);
+    for (size_t i = 0; i < swapChainImageSize; i++) {
         offscreenUniformBuffers[i] = new UniformBuffer(device, offscreenBufferSize);
     }
 }

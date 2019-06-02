@@ -381,13 +381,14 @@ void Renderer::createCommandbuffers() {
                     0.0f,
                     1.75f);
 
-            auto material = MaterialManager::getInstance().getMaterial("shadow-material");
-            vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, material->graphicsPipeline);
-
             for (auto& object : scene->getActiveDrawableObjects()) {
-                //TODO: Group objects by pipeline, bind pipeline and draw grouped objects
+                if (object->shadowMaterial == nullptr) {
+                    continue;
+                }
+
+                vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, object->shadowMaterial->graphicsPipeline);
                 vkCmdBindDescriptorSets(commandBuffers[i],
-                        VK_PIPELINE_BIND_POINT_GRAPHICS, material->pipelineLayout, 0, 1,
+                        VK_PIPELINE_BIND_POINT_GRAPHICS, object->shadowMaterial->pipelineLayout, 0, 1,
                                         &object->offscreenDescriptorSets[i], 0, nullptr);
                 object->draw(commandBuffers[i], i);
             }
@@ -440,11 +441,7 @@ void Renderer::render() {
 	uint32_t imageIndex;
 	VkResult result = vkAcquireNextImageKHR(logicalDevice->getDevice(), swapchain.getSwapchain(), std::numeric_limits<uint64_t>::max(), imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
-	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-		//recreateSwapChain();
-		//return;
-	}
-	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+	if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
 		throw std::runtime_error("failed to acquire swap chain image!");
 	}
 
