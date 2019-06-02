@@ -5,7 +5,7 @@
 
 class ShadowMaterial : public Material {
 public:
-	ShadowMaterial(Graphics* graphics) : Material(graphics) {
+	ShadowMaterial(Graphics* graphics) : Material(graphics, "shadow") {
 	}
 
 	void createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet);

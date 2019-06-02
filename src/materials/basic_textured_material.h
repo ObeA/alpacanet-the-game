@@ -4,7 +4,7 @@
 
 class BasicTexturedMaterial: public Material {
 public:
-    BasicTexturedMaterial(Graphics* graphics, char* texture) : Material(graphics), textureLocation(texture) {
+    BasicTexturedMaterial(Graphics* graphics, char* texture, std::string shaderDirectory) : Material(graphics, shaderDirectory), textureLocation(texture) {
     }
 
 	void initialize();

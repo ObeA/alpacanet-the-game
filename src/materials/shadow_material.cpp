@@ -34,8 +34,8 @@ void ShadowMaterial::createDescriptorSetLayout() {
 }
 
 void ShadowMaterial::createGraphicsPipeline() {
-	auto vertShaderCode = FileUtilities::readFile("assets/shaders/shadow/vert.spv");
-	auto fragShaderCode = FileUtilities::readFile("assets/shaders/shadow/frag.spv");
+    auto vertShaderCode = FileUtilities::readFile("assets/shaders/" + shaderDirectory + "/vert.spv");
+    auto fragShaderCode = FileUtilities::readFile("assets/shaders/" + shaderDirectory + "/frag.spv");
 
 	VkShaderModule vertShaderModule = graphics->getLogicalDevice()->createShaderModule(vertShaderCode);
 	VkShaderModule fragShaderModule = graphics->getLogicalDevice()->createShaderModule(fragShaderCode);
