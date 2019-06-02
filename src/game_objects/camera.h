@@ -36,7 +36,7 @@ private:
     float followDistance;
     float horizontalRotation;
 
-    bool isDragging;
+    bool isDragging = false;
     glm::vec2 dragPosition;
     glm::vec2 currentMousePosition;
 
