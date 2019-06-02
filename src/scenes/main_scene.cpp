@@ -188,7 +188,7 @@ void MainScene::drawUI() {
 
 void MainScene::lookAtWorld() {
     camera->lookAt(glm::vec3(0));
-    camera->setFollowDistance(15.0f);
+    camera->setFollowDistance(10.0f);
 }
 
 void MainScene::shearSelectedAlpaca() {

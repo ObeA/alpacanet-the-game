@@ -13,6 +13,8 @@ void ModelObject::loadModel() {
         throw std::runtime_error(warn + err);
     }
 
+    postprocessMaterials(materials);
+
     bool useDefaultMaterial = materials.empty();
     for (const auto& shape : shapes) {
         int faceId = 0;

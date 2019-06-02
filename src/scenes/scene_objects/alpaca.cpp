@@ -12,45 +12,13 @@ Alpaca::Alpaca(Game* game, Material* material, Material* shadowMaterial)
     updateAge();
 }
 
-void Alpaca::start() {
-    ModelObject::start();
-}
-
 void Alpaca::moveTo(glm::vec2 position) {
     targetPosition = position;
     targetPositionReached = false;
 }
 
 void Alpaca::update() {
-    auto angle = std::atan2(targetPosition.y - position.y, targetPosition.x - position.x);
-    rotation.z = angle;
-
-    if (!targetPositionReached) {
-        if (glm::distance(glm::vec2(position), targetPosition) < 0.1) {
-            targetPositionReached = true;
-        } else {
-            auto heading = glm::vec2(std::cos(angle), std::sin(angle));
-            position.x += heading.x * 0.01f;
-            position.y += heading.y * 0.01f;
-        }
-
-        if (bounceCompleted) {
-            bounceCompleted = false;
-            bouncyBoi = 0;
-        }
-    }
-
-    if (!bounceCompleted) {
-        bouncyBoi += 0.05f;
-        float newPos = std::sin(bouncyBoi) * getAgeScale();
-        if (newPos < 0) {
-            newPos = 0;
-            bounceCompleted = true;
-        }
-
-        position.z = newPos;
-    }
-
+    updatePosition();
     updateWool();
     updateAge();
     updateHappiness();
@@ -91,10 +59,56 @@ void Alpaca::updateHappiness() {
     happiness = std::min(1.0f, std::max(0.0f, happiness));
 }
 
+void Alpaca::updatePosition() {
+    auto angle = std::atan2(targetPosition.y - position.y, targetPosition.x - position.x);
+    rotation.z = angle;
+
+    if (!targetPositionReached) {
+        if (glm::distance(glm::vec2(position), targetPosition) < 0.1) {
+            targetPositionReached = true;
+        } else {
+            auto heading = glm::vec2(std::cos(angle), std::sin(angle));
+            position.x += heading.x * 0.01f;
+            position.y += heading.y * 0.01f;
+        }
+
+        if (bounceCompleted) {
+            bounceCompleted = false;
+            bouncyBoi = 0;
+        }
+    }
+
+    if (!bounceCompleted) {
+        bouncyBoi += 0.05f;
+        float newPos = std::sin(bouncyBoi) * getAgeScale();
+        if (newPos < 0) {
+            newPos = 0;
+            bounceCompleted = true;
+        }
+
+        position.z = newPos;
+    }
+}
+
 float Alpaca::getAgeScale() const {
     return (age - MIN_AGE) / (MAX_AGE - MIN_AGE);
 }
 
 bool Alpaca::hasReachedTargetPosition() const {
     return targetPositionReached;
+}
+
+void Alpaca::postprocessMaterials(std::vector<tinyobj::material_t>& materials) {
+    auto color = COLORS[RandomUtilities::getInstance().getRandomBetween(0, COLORS.size())];
+    for (auto& material : materials) {
+        if (material.name != "Body") {
+            continue;
+        }
+
+        material.diffuse[0] = color.r;
+        material.diffuse[1] = color.g;
+        material.diffuse[2] = color.b;
+
+        break;
+    }
 }

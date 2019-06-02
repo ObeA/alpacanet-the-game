@@ -17,6 +17,7 @@
 #include <chrono>
 #include <algorithm>
 #include <cstring>
+#include <tiny_obj_loader.h>
 
 #include "drawable_object.h"
 
@@ -28,6 +29,9 @@ public:
     }
 
     void start() override;
+
+protected:
+    virtual void postprocessMaterials(std::vector<tinyobj::material_t>& materials) { }
 
 private:
     const std::string modelLocation;
