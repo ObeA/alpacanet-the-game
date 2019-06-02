@@ -60,8 +60,8 @@ void BasicTexturedMaterial::createDescriptorSetLayout() {
 }
 
 void BasicTexturedMaterial::createGraphicsPipeline() {
-    auto vertShaderCode = FileUtilities::readFile("assets/shaders/basictextured/vert.spv");
-    auto fragShaderCode = FileUtilities::readFile("assets/shaders/basictextured/frag.spv");
+    auto vertShaderCode = FileUtilities::readFile("assets/shaders/" + shaderDirectory + "/vert.spv");
+    auto fragShaderCode = FileUtilities::readFile("assets/shaders/" + shaderDirectory + "/frag.spv");
 
     VkShaderModule vertShaderModule = graphics->getLogicalDevice()->createShaderModule(vertShaderCode);
     VkShaderModule fragShaderModule = graphics->getLogicalDevice()->createShaderModule(fragShaderCode);

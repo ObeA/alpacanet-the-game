@@ -18,14 +18,18 @@ void MainScene::setup() {
     auto graphics = game->getGraphics();
 
     materialManager.registerMaterial("basic-material", std::make_shared<BasicMaterial>(graphics, "basic"));
-    materialManager.registerMaterial("textured-material", std::make_shared<BasicTexturedMaterial>(graphics, (char*) "assets/textures/texture.jpg"));
     materialManager.registerMaterial("shadow-material", std::make_shared<ShadowMaterial>(graphics));
     materialManager.registerMaterial("particle-material", std::make_shared<ParticleMaterial>(graphics, "particle"));
+    materialManager.registerMaterial("skybox-material", std::make_shared<BasicTexturedMaterial>(graphics, (char*) "assets/textures/cube.png", "basictexturedambient"));
 
     auto world = new ModelObject(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get(), (char*) "assets/models/world.obj");
     world->scale = glm::vec3(1);
     world->position = glm::vec3(0, 0, 0);
     objects.push_back(world);
+
+    auto skybox = new ModelObject(game, materialManager.getMaterial("skybox-material").get(), materialManager.getMaterial("shadow-material").get(), (char*) "assets/models/cubemap.obj");
+    skybox->scale = glm::vec3(50);
+    objects.push_back(skybox);
 
     for (size_t i = 0; i < 5; i++) {
         auto alpaca = new Alpaca(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get());

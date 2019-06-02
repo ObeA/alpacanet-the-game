@@ -5,7 +5,7 @@
 
 class Material {
 public:
-    explicit Material(Graphics* graphics) : graphics(graphics) { }
+    explicit Material(Graphics* graphics, std::string shaderDirectory) : graphics(graphics), shaderDirectory(shaderDirectory) { }
 
     virtual void initialize();
     virtual void cleanup();
@@ -25,4 +25,5 @@ protected:
     virtual void createDescriptorSetLayout() = 0;
 
 	virtual void createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shaderStages[]);
+    std::string shaderDirectory;
 };
