@@ -54,15 +54,6 @@ void Buffer::createBuffer() {
     vkBindBufferMemory(device->getDevice(), buffer, memory, 0);
 }
 
-VkResult Buffer::flush() {
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = memory;
-    mappedRange.offset = 0;
-    mappedRange.size = size;
-    return vkFlushMappedMemoryRanges(device->getDevice(), 1, &mappedRange);
-}
-
 void Buffer::copyFrom(void* data) {
     void* mappedMemory = map();
     memcpy(mappedMemory, data, static_cast<uint64_t>(size));

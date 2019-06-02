@@ -14,7 +14,7 @@ public:
     void draw(VkCommandBuffer cmdbuffer, size_t bufferOffset) override;
     void update() override;
     bool destroyFlag = false;
-    float floorZ = 0;
+    float floorZ = 0.1;
     int amount = 0;
 private:
     std::vector<Particle> particles;

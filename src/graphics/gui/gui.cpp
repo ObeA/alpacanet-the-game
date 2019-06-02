@@ -380,9 +380,6 @@ void GUI::updateBuffers()
         idxDst += cmd_list->IdxBuffer.Size;
     }
 
-    vertexBuffer->flush();
-    indexBuffer->flush();
-
     if (updated) {
         renderer->recreateCommandBufferFlag = true;
     }

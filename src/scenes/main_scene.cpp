@@ -169,6 +169,16 @@ void MainScene::loopAlpacas(bool nextOrPrevious) {
 }
 
 void MainScene::drawUI() {
+    ImGui::SetNextWindowPos(ImVec2(25, 25), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(350, 200), ImGuiCond_Always);
+    ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoResize);
+    ImGui::TextUnformatted("Beweeg de camera met de muis");
+    ImGui::TextUnformatted("Klik op een alpaca voor selecteren");
+    ImGui::TextUnformatted("Z: Selecteer vorige alpaca");
+    ImGui::TextUnformatted("C: Selecteer volgende alpaca");
+    ImGui::TextUnformatted("X: Scheer alpaca");
+    ImGui::End();
+
     ImGui::SetNextWindowPos(ImVec2(525, 425), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(250, 150), ImGuiCond_Always);
     ImGui::Begin("Huidige alpaca", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
