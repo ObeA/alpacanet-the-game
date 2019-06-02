@@ -169,7 +169,8 @@ void MainScene::loopAlpacas(bool nextOrPrevious) {
 }
 
 void MainScene::drawUI() {
-    ImGui::SetNextWindowPos(ImVec2(25, 25), ImGuiCond_Always);
+    auto padding = 25;
+    ImGui::SetNextWindowPos(ImVec2(padding, padding), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(350, 200), ImGuiCond_Always);
     ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoResize);
     ImGui::TextUnformatted("Beweeg de camera met de muis");
@@ -179,8 +180,11 @@ void MainScene::drawUI() {
     ImGui::TextUnformatted("X: Scheer alpaca");
     ImGui::End();
 
-    ImGui::SetNextWindowPos(ImVec2(525, 425), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(250, 150), ImGuiCond_Always);
+    auto windowSize = game->getGraphics()->getWindow()->getExtents();
+    auto width = 250;
+    auto height = 150;
+    ImGui::SetNextWindowPos(ImVec2(windowSize.width - padding - width, windowSize.height - padding - height), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(width, height), ImGuiCond_Always);
     ImGui::Begin("Huidige alpaca", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
     if (selectedAlpaca != nullptr) {
