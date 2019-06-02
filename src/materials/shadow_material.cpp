@@ -104,8 +104,7 @@ void ShadowMaterial::createGraphicsPipeline() {
 
 	VkPipelineMultisampleStateCreateInfo multisampling = {};
 	multisampling.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-	multisampling.sampleShadingEnable = VK_TRUE;
-	multisampling.minSampleShading = 0.25f;
+	multisampling.sampleShadingEnable = VK_FALSE;
 	multisampling.rasterizationSamples = graphics->getLogicalDevice()->getSampleCount();
 
 	VkPipelineColorBlendStateCreateInfo colorBlending = {};
