@@ -30,12 +30,6 @@ const int HEIGHT = 600;
 
 const int MAX_FRAMES_IN_FLIGHT = 2;
 
-struct FrameBufferAttachment {
-	VkImage image;
-	VkDeviceMemory mem;
-	VkImageView view;
-};
-
 struct UniformBufferObjectOffscreen {
     glm::mat4 depthMVP;
 };
@@ -46,8 +40,6 @@ public:
     ~Window();
 
     GLFWwindow* window;
-
-	VkDescriptorPool descriptorPool;
 
 	VkExtent2D getExtents() const;
 
@@ -61,14 +53,7 @@ public:
     void registerOnMouseButtonCallback(std::function<void(int, int, int)> callback);
 
 private:
-    VkExtent2D extents;
-	std::vector<VkCommandBuffer> commandBuffers;
-
-    glm::vec3 lightPos = glm::vec3(0.0f);
-
     void initWindow();
-
-	bool framebufferResized = false;
 
     std::vector<std::function<void(double, double)>> onCursorMoveCallbacks;
     std::vector<std::function<void(int, int, int)>> onKeyDownCallbacks;

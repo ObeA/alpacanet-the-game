@@ -30,7 +30,7 @@ void Bounds::update() {
     center = ((max - min) * 0.5f) + min;
 }
 
-Bounds& Bounds::getScaledCopy(glm::vec3 scale) {
+Bounds Bounds::getScaledCopy(glm::vec3 scale) const {
     auto copy = Bounds(*this);
     auto normalizedMin = copy.min - copy.center;
     auto normalizedMax = copy.max - copy.center;

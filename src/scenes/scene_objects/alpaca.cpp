@@ -31,7 +31,7 @@ int Alpaca::shear() {
 }
 
 int Alpaca::getWooliness() const {
-    return (int)std::round(wooliness * (10.0f * getAgeScale()));
+    return (int)std::round(wooliness * (20.0f * getAgeScale()));
 }
 
 int Alpaca::getHappiness() const {

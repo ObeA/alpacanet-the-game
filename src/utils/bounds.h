@@ -10,7 +10,7 @@ public:
 
     void extend(const glm::vec3& point);
     const glm::vec3& getCenter() const;
-    Bounds& getScaledCopy(glm::vec3 scale);
+    Bounds getScaledCopy(glm::vec3 scale) const;
 private:
     glm::vec3 min;
     glm::vec3 max;

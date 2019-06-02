@@ -8,7 +8,7 @@ class Buffer;
 class Image {
 public:
     Image(LogicalDevice* logicalDevice, VkExtent2D extents, VkFormat format, VkImageTiling tiling,
-          VkImageUsageFlags usage, VkMemoryPropertyFlags properties);
+          VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkSampleCountFlagBits samples);
     ~Image();
 
     void transitionLayout(VkImageLayout oldLayout, VkImageLayout newLayout);
@@ -25,6 +25,6 @@ private:
     VkImage image;
     VkDeviceMemory memory;
 
-    void createImage(VkImageTiling tiling,  VkImageUsageFlags usage, VkMemoryPropertyFlags properties);
+    void createImage(VkImageTiling tiling,  VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkSampleCountFlagBits samples);
 };
 

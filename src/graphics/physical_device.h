@@ -22,6 +22,7 @@ public:
 
     uint32_t getGraphicsFamilyIndex() const;
     uint32_t getPresentFamilyIndex() const;
+    VkSampleCountFlagBits getMaxUsableSampleCount() const;
 
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties) const;
 
@@ -30,10 +31,15 @@ public:
 private:
     Instance* instance;
     QueueFamilyIndices indices;
+    VkSampleCountFlagBits sampleCount;
 
     VkPhysicalDevice physicalDevice;
 
     void pickPhysicalDevice();
     QueueFamilyIndices findQueueFamilies(VkSurfaceKHR surface);
+
+
+
+    VkSampleCountFlagBits findMaxUsableSampleCount();
 };
 

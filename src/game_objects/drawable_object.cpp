@@ -196,6 +196,6 @@ std::vector<uint32_t> DrawableObject::getIndices() {
     return indices;
 }
 
-Bounds& DrawableObject::getBounds() {
+Bounds DrawableObject::getBounds() const {
     return bounds.getScaledCopy(scale);
 }
