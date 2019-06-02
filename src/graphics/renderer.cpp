@@ -116,7 +116,7 @@ void Renderer::initializeRenderPass() {
     subpass.pDepthStencilAttachment = &depthAttachmentRef;
     subpass.pResolveAttachments = &colorAttachmentResolveRef;
 
-    std::array<VkSubpassDependency, 2> dependencies;
+    std::array<VkSubpassDependency, 2> dependencies{};
 
     dependencies[0].srcSubpass = VK_SUBPASS_EXTERNAL;
     dependencies[0].dstSubpass = 0;
@@ -152,7 +152,7 @@ void Renderer::initializeRenderPass() {
 void Renderer::initializeOffscreenRenderPass() {
     VkAttachmentDescription attachmentDescription = {};
     attachmentDescription.format = findDepthFormat();
-    attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
+    attachmentDescription.samples = logicalDevice->getSampleCount();
     attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -205,7 +205,7 @@ void Renderer::initializeOffscreenFramebuffer() {
     imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     imageCreateInfo.extent.height = imageCreateInfo.extent.width = SHADOWMAP_DIMENSION;
     imageCreateInfo.arrayLayers = imageCreateInfo.mipLevels = imageCreateInfo.extent.depth = 1;
-    imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageCreateInfo.samples = logicalDevice->getSampleCount();
     imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     imageCreateInfo.format = findDepthFormat();
     imageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;

@@ -31,7 +31,7 @@ void MainScene::setup() {
     skybox->scale = glm::vec3(50);
     objects.push_back(skybox);
 
-    for (size_t i = 0; i < 5; i++) {
+    for (size_t i = 0; i < 10; i++) {
         auto alpaca = new Alpaca(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get());
         alpaca->position = glm::vec3(getRandomPositionOnField(), 0.0);
         objects.push_back(alpaca);
@@ -95,7 +95,7 @@ void MainScene::update() {
 }
 
 void MainScene::onMouseButton(int button, int action, int mods) {
-    if (button != GLFW_MOUSE_BUTTON_LEFT && action != GLFW_PRESS) {
+    if (button != GLFW_MOUSE_BUTTON_LEFT || action != GLFW_PRESS) {
         return;
     }
 
@@ -173,7 +173,7 @@ void MainScene::drawUI() {
     ImGui::SetNextWindowPos(ImVec2(padding, padding), ImGuiCond_Always);
     ImGui::SetNextWindowSize(ImVec2(350, 200), ImGuiCond_Always);
     ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoResize);
-    ImGui::TextUnformatted("Beweeg de camera met de muis");
+    ImGui::TextUnformatted("Beweeg de camera met de rechtermuisknop");
     ImGui::TextUnformatted("Klik op een alpaca voor selecteren");
     ImGui::TextUnformatted("Z: Selecteer vorige alpaca");
     ImGui::TextUnformatted("C: Selecteer volgende alpaca");
@@ -188,7 +188,7 @@ void MainScene::drawUI() {
     ImGui::Begin("Huidige alpaca", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoCollapse);
 
     if (selectedAlpaca != nullptr) {
-        ImGui::TextUnformatted(("Wol: " + std::to_string(selectedAlpaca->getWooliness()) + "\t Blij: " + std::to_string(selectedAlpaca->getHappiness())).c_str());
+        ImGui::TextUnformatted(("Wol: " + std::to_string(selectedAlpaca->getWooliness()) + "\t\tBlij: " + std::to_string(selectedAlpaca->getHappiness())).c_str());
     }
     else {
         ImGui::TextUnformatted("Geen alpaca geselecteerd");

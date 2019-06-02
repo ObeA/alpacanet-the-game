@@ -68,8 +68,9 @@ void Alpaca::updatePosition() {
             targetPositionReached = true;
         } else {
             auto heading = glm::vec2(std::cos(angle), std::sin(angle));
-            position.x += heading.x * 0.01f;
-            position.y += heading.y * 0.01f;
+            auto speed = 0.01f * happiness * getAgeScale();
+            position.x += heading.x * speed;
+            position.y += heading.y * speed;
         }
 
         if (bounceCompleted) {
@@ -80,7 +81,7 @@ void Alpaca::updatePosition() {
 
     if (!bounceCompleted) {
         bouncyBoi += 0.05f;
-        float newPos = std::sin(bouncyBoi) * getAgeScale();
+        float newPos = std::sin(bouncyBoi) * getAgeScale() * happiness;
         if (newPos < 0) {
             newPos = 0;
             bounceCompleted = true;
@@ -101,14 +102,14 @@ bool Alpaca::hasReachedTargetPosition() const {
 void Alpaca::postprocessMaterials(std::vector<tinyobj::material_t>& materials) {
     auto color = COLORS[RandomUtilities::getInstance().getRandomBetween(0, COLORS.size() - 1)];
     for (auto& material : materials) {
-        if (material.name != "Body") {
-            continue;
+        if (material.name == "Body") {
+            material.diffuse[0] = color.body.r;
+            material.diffuse[1] = color.body.g;
+            material.diffuse[2] = color.body.b;
+        } else if (material.name == "Cloth") {
+            material.diffuse[0] = color.cloth.r;
+            material.diffuse[1] = color.cloth.g;
+            material.diffuse[2] = color.cloth.b;
         }
-
-        material.diffuse[0] = color.r;
-        material.diffuse[1] = color.g;
-        material.diffuse[2] = color.b;
-
-        break;
     }
 }
