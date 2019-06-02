@@ -193,3 +193,8 @@ std::vector<Vertex> DrawableObject::getVertices() {
 std::vector<uint32_t> DrawableObject::getIndices() {
     return indices;
 }
+/*
+const Bounds& DrawableObject::getBounds() const {
+    return bounds;
+}
+*/

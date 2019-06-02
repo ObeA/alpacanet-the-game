@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_log_base.dir/gtx_log_base.cpp.o  -o ../../../out/test-gtx_log_base 

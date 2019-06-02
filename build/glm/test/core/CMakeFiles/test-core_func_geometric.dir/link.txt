@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-core_func_geometric.dir/core_func_geometric.cpp.o  -o ../../../out/test-core_func_geometric 

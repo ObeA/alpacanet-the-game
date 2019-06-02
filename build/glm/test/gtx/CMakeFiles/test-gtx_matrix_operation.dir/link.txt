@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_matrix_operation.dir/gtx_matrix_operation.cpp.o  -o ../../../out/test-gtx_matrix_operation 

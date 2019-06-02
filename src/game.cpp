@@ -38,6 +38,7 @@ void Game::run() {
 
             while (lag >= Timestep) {
                 getCurrentScene()->update();
+                tick++;
                 lag -= Timestep;
             }
 
@@ -69,4 +70,8 @@ Scene* Game::getCurrentScene() {
 
 Graphics* Game::getGraphics() {
     return graphics;
+}
+
+unsigned long long Game::currentTick() const {
+    return tick;
 }

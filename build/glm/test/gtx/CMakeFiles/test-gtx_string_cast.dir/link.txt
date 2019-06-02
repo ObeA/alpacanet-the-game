@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_string_cast.dir/gtx_string_cast.cpp.o  -o ../../../out/test-gtx_string_cast 

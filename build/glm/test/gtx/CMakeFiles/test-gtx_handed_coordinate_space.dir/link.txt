@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_handed_coordinate_space.dir/gtx_handed_coordinate_space.cpp.o  -o ../../../out/test-gtx_handed_coordinate_space 

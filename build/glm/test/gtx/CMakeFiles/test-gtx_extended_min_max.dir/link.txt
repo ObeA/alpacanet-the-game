@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_extended_min_max.dir/gtx_extended_min_max.cpp.o  -o ../../../out/test-gtx_extended_min_max 

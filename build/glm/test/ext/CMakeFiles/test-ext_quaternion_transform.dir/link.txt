@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-ext_quaternion_transform.dir/ext_quaternion_transform.cpp.o  -o ../../../out/test-ext_quaternion_transform 

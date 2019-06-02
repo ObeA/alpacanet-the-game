@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_constants.dir/gtc_constants.cpp.o  -o ../../../out/test-gtc_constants 

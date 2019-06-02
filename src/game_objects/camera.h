@@ -41,6 +41,7 @@ private:
     glm::vec2 currentMousePosition;
 
     const GameObject* followedObject = nullptr;
+    glm::vec3 offset{};
     glm::vec3 targetPosition;
 
     void onMouseMove(double x, double y);

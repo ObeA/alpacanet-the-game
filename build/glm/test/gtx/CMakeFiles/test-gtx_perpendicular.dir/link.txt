@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_perpendicular.dir/gtx_perpendicular.cpp.o  -o ../../../out/test-gtx_perpendicular 

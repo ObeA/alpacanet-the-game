@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-core_setup_precision.dir/core_setup_precision.cpp.o  -o ../../../out/test-core_setup_precision 

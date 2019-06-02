@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_optimum_pow.dir/gtx_optimum_pow.cpp.o  -o ../../../out/test-gtx_optimum_pow 

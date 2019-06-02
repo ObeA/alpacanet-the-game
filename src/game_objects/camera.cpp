@@ -1,6 +1,7 @@
 #include "camera.h"
 #include <glm/gtx/norm.hpp>
 #include "../game_objects/game_object.h"
+#include "../game_objects/drawable_object.h"
 
 Camera::Camera(Game* game, glm::vec3 position, float distance)
         : game(game), position(position), followDistance(distance), horizontalRotation(0) {
@@ -38,7 +39,7 @@ const glm::vec3& Camera::getPosition() const {
 
 void Camera::update() {
     if (followedObject != nullptr) {
-        targetPosition = followedObject->position;
+        targetPosition = followedObject->position + offset;
     }
 
     position.x = std::cos(horizontalRotation) * followDistance - std::sin(horizontalRotation) * followDistance + targetPosition.x;
@@ -52,7 +53,7 @@ void Camera::update() {
         dragPosition = currentMousePosition;
     }
 
-    view = glm::lookAt(position, targetPosition, glm::vec3(0, 0, 1));
+    view = glm::lookAt(position, targetPosition, up);
 }
 
 glm::vec3 Camera::getRay() {
@@ -94,6 +95,12 @@ void Camera::onKeyUp(int key, int scancode, int mods) {
 
 void Camera::lookAt(const GameObject* object) {
     followedObject = object;
+    offset = glm::vec3(0);
+
+    /*auto drawable = dynamic_cast<const DrawableObject*>(object);
+    if (drawable != nullptr) {
+        offset = drawable->getBounds().getCenter();
+    }*/
 }
 
 void Camera::lookAt(const glm::vec3& newTargetPosition) {

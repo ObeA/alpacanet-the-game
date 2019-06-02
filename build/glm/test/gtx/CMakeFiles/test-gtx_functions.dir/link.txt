@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_functions.dir/gtx_functions.cpp.o  -o ../../../out/test-gtx_functions 

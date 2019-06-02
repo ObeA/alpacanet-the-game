@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_random.dir/gtc_random.cpp.o  -o ../../../out/test-gtc_random 

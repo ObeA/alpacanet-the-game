@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_vec1.dir/gtc_vec1.cpp.o  -o ../../../out/test-gtc_vec1 

@@ -1,0 +1,1 @@
+/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_vec_swizzle.dir/gtx_vec_swizzle.cpp.o  -o ../../../out/test-gtx_vec_swizzle 

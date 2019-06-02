@@ -22,5 +22,7 @@ private:
     void shearSelectedAlpaca();
 
     void lookAtWorld();
+
+    glm::vec2 getRandomPositionOnField();
 };
 
