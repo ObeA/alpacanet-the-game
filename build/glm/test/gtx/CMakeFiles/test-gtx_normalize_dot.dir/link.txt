@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_normalize_dot.dir/gtx_normalize_dot.cpp.o  -o ../../../out/test-gtx_normalize_dot 

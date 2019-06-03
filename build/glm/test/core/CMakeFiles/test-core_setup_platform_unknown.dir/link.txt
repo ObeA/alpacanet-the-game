@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-core_setup_platform_unknown.dir/core_setup_platform_unknown.cpp.o  -o ../../../out/test-core_setup_platform_unknown 

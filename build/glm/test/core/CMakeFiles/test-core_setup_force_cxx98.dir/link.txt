@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-core_setup_force_cxx98.dir/core_setup_force_cxx98.cpp.o  -o ../../../out/test-core_setup_force_cxx98 

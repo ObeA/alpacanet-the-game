@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_bitfield.dir/gtc_bitfield.cpp.o  -o ../../../out/test-gtc_bitfield 

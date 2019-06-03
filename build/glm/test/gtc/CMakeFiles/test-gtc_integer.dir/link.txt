@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_integer.dir/gtc_integer.cpp.o  -o ../../../out/test-gtc_integer 

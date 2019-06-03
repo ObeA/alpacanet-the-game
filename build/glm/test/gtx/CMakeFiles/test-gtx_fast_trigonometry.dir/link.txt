@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_fast_trigonometry.dir/gtx_fast_trigonometry.cpp.o  -o ../../../out/test-gtx_fast_trigonometry 

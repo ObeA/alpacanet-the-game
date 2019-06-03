@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-ext_scalar_relational.dir/ext_scalar_relational.cpp.o  -o ../../../out/test-ext_scalar_relational 

@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_round.dir/gtc_round.cpp.o  -o ../../../out/test-gtc_round 

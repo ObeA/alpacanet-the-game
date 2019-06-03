@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_easing.dir/gtx_easing.cpp.o  -o ../../../out/test-gtx_easing 

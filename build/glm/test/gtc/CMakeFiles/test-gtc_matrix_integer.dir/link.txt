@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_matrix_integer.dir/gtc_matrix_integer.cpp.o  -o ../../../out/test-gtc_matrix_integer 

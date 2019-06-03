@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-perf_matrix_mul_vector.dir/perf_matrix_mul_vector.cpp.o  -o ../../../out/test-perf_matrix_mul_vector 

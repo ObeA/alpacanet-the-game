@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-core_setup_message.dir/core_setup_message.cpp.o  -o ../../../out/test-core_setup_message 
