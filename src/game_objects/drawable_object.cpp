@@ -12,17 +12,17 @@ DrawableObject::~DrawableObject() {
     for (auto buffer : uniformBuffers) {
         delete buffer;
     }
+
     for (auto buffer : offscreenUniformBuffers) {
         delete buffer;
     }
 
-    if (indexBuffer != nullptr) {
-        delete indexBuffer;
-    }
+
+    delete indexBuffer;
     delete vertexBuffer;
 
     vkFreeDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), game->getGraphics()->getRenderer()->getDescriptorPool(), descriptorSets.size(), descriptorSets.data());
-    if (offscreenDescriptorSets.size() > 0) {
+    if (!offscreenDescriptorSets.empty()) {
         vkFreeDescriptorSets(game->getGraphics()->getLogicalDevice()->getDevice(), game->getGraphics()->getRenderer()->getDescriptorPool(), offscreenDescriptorSets.size(), offscreenDescriptorSets.data());
     }
 }
@@ -147,7 +147,6 @@ void DrawableObject::updateUniformBuffer(uint32_t currentImage, Camera* camera, 
     uboOffscreen.depthMVP = light->getProjectionMatrix() * light->getViewMatrix(camera->up) * ubo.model;
     // end offscreen rendering
 
-    //TODO: change when rendered from light
     ubo.lightPos = light->position;
     ubo.lightSpace = uboOffscreen.depthMVP;
 
@@ -196,6 +195,6 @@ std::vector<uint32_t> DrawableObject::getIndices() {
     return indices;
 }
 
-Bounds& DrawableObject::getBounds() {
+Bounds DrawableObject::getBounds() const {
     return bounds.getScaledCopy(scale);
 }

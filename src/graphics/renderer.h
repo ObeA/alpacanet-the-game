@@ -46,6 +46,9 @@ private:
 
     Swapchain swapchain;
 
+    VkImageView colorImageView;
+    Image* colorImage;
+
 	VkImageView depthImageView;
 	Image* depthImage;
 
@@ -70,6 +73,7 @@ private:
 	VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 	void createFramebuffers();
 	void createImageViews();
+	void createColorResources();
 	void createDepthResources();
 
 	void createCommandbuffers();

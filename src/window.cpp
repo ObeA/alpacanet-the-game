@@ -12,8 +12,6 @@ Window::Window() : onCursorMoveCallbacks{} {
 }
 
 Window::~Window() {
-    //cleanupSwapChain();
-
     glfwDestroyWindow(window);
 
     glfwTerminate();
@@ -27,13 +25,10 @@ void Window::initWindow() {
 
 	window = glfwCreateWindow(WIDTH, HEIGHT, "AlpacaWeb: The Game", nullptr, nullptr);
 	glfwSetWindowUserPointer(window, this);
-	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 
 	glfwSetCursorPosCallback(window, cursorPositionCallback);
 	glfwSetKeyCallback(window, keyCallback);
     glfwSetMouseButtonCallback(window, mouseButtonCallback);
-
-    //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 bool Window::shouldClose() {
@@ -42,11 +37,6 @@ bool Window::shouldClose() {
 
 void Window::pollEvents() {
 	glfwPollEvents();
-}
-
-void Window::framebufferResizeCallback(GLFWwindow* window, int width, int height) {
-	auto self = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	self->framebufferResized = true;
 }
 
 VkExtent2D Window::getExtents() const {

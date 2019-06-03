@@ -21,6 +21,7 @@ Buffer::Buffer(LogicalDevice* device,
 }
 
 Buffer::~Buffer() {
+    vkQueueWaitIdle(device->getGraphicsQueue());
     vkDestroyBuffer(device->getDevice(), buffer, nullptr);
     vkFreeMemory(device->getDevice(), memory, nullptr);
 }

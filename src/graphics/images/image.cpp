@@ -3,12 +3,12 @@
 #include "../commands/command_buffer.h"
 
 Image::Image(LogicalDevice* logicalDevice, VkExtent2D extents, VkFormat format, VkImageTiling tiling,
-             VkImageUsageFlags usage, VkMemoryPropertyFlags properties)
+             VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkSampleCountFlagBits samples)
         : device(logicalDevice), extents(extents), format(format) {
-    createImage(tiling, usage, properties);
+    createImage(tiling, usage, properties, samples);
 }
 
-void Image::createImage(VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties) {
+void Image::createImage(VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkSampleCountFlagBits samples) {
     VkImageCreateInfo imageInfo = {};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -21,7 +21,7 @@ void Image::createImage(VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryP
     imageInfo.tiling = tiling;
     imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
     imageInfo.usage = usage;
-    imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+    imageInfo.samples = samples;
     imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
     if (vkCreateImage(device->getDevice(), &imageInfo, nullptr, &image) != VK_SUCCESS) {
@@ -135,6 +135,11 @@ void Image::transitionLayout(VkImageLayout oldLayout, VkImageLayout newLayout) {
 
         sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
         destinationStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+    } else if (oldLayout == VK_IMAGE_LAYOUT_UNDEFINED && newLayout == VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL) {
+        barrier.srcAccessMask = 0;
+        barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+        sourceStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+        destinationStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
     } else {
         throw std::invalid_argument("unsupported layout transition!");
     }

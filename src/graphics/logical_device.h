@@ -15,9 +15,11 @@ public:
     const VkQueue& getGraphicsQueue() const;
     const VkQueue& getPresentQueue() const;
     const VkCommandPool& getCommandPool() const;
+
     VkImageView createImageView(const VkImage& image, VkFormat format, VkImageAspectFlags aspectFlags) const;
     VkShaderModule createShaderModule(const std::vector<char>& code);
 
+    VkSampleCountFlagBits getSampleCount() const;
 private:
     Instance* instance;
     PhysicalDevice* physicalDevice;

@@ -62,26 +62,23 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     extent.width = texWidth;
     extent.height = texHeight;
 
-
     fontImage = new Image(device, extent, VK_FORMAT_R8G8B8A8_UNORM,
-        VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, VK_SAMPLE_COUNT_1_BIT);
 
     fontView = device->createImageView(fontImage->getImage(), VK_FORMAT_R8G8B8A8_UNORM,
         VK_IMAGE_ASPECT_COLOR_BIT);
 
-    Buffer* stagingBuffer = new Buffer(
+    Buffer stagingBuffer(
         device,
         uploadSize,
         VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
     );
 
-    stagingBuffer->copyFrom(fontData);
+    stagingBuffer.copyFrom(fontData);
     fontImage->transitionLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-    fontImage->copyFromBuffer(stagingBuffer);
+    fontImage->copyFromBuffer(&stagingBuffer);
     fontImage->transitionLayout(VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-    delete stagingBuffer;
 
     VkSamplerCreateInfo samplerInfo = {};
     samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -216,7 +213,7 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
 
     VkPipelineMultisampleStateCreateInfo pipelineMultisampleStateCreateInfo{};
     pipelineMultisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
-    pipelineMultisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    pipelineMultisampleStateCreateInfo.rasterizationSamples = device->getSampleCount();
     pipelineMultisampleStateCreateInfo.flags = 0;
 
     std::vector<VkDynamicState> dynamicStateEnables = {
@@ -348,29 +345,28 @@ void GUI::updateBuffers()
         updated = true;
     }
     else if (vertexCount != imDrawData->TotalVtxCount) {
-        vertexBuffer->~Buffer();
+        delete vertexBuffer;
         vertexBuffer = new Buffer(device, vertexBufferSize, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         vertexCount = imDrawData->TotalVtxCount;
         vertexBuffer->map();
         updated = true;
     }
 
-    VkDeviceSize indexSize = imDrawData->TotalIdxCount * sizeof(ImDrawIdx);
     if (indexBuffer == nullptr) {
         indexBuffer = new Buffer(device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         indexBuffer->map();
         updated = true;
     }
     else if (indexCount < imDrawData->TotalIdxCount) {
-        indexBuffer->~Buffer();
+        delete indexBuffer;
         indexBuffer = new Buffer(device, indexBufferSize, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
         indexCount = imDrawData->TotalIdxCount;
         indexBuffer->map();
         updated = true;
     }
 
-    ImDrawVert* vtxDst = (ImDrawVert*)vertexBuffer->map();
-    ImDrawIdx* idxDst = (ImDrawIdx*)indexBuffer->map();
+    auto* vtxDst = (ImDrawVert*)vertexBuffer->map();
+    auto* idxDst = (ImDrawIdx*)indexBuffer->map();
 
     for (int n = 0; n < imDrawData->CmdListsCount; n++) {
         const ImDrawList* cmd_list = imDrawData->CmdLists[n];

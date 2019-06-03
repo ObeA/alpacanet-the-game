@@ -30,7 +30,7 @@ public:
 
     virtual void updateUniformBuffer(uint32_t currentImage, Camera* camera, Light* light);
 
-    Bounds& getBounds();
+    Bounds getBounds() const;
 
     Material *material = nullptr;
     Material *shadowMaterial = nullptr;
