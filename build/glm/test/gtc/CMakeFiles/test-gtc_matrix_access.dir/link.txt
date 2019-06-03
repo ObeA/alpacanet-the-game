@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_matrix_access.dir/gtc_matrix_access.cpp.o  -o ../../../out/test-gtc_matrix_access 

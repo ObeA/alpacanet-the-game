@@ -152,7 +152,7 @@ void Renderer::initializeRenderPass() {
 void Renderer::initializeOffscreenRenderPass() {
     VkAttachmentDescription attachmentDescription = {};
     attachmentDescription.format = findDepthFormat();
-    attachmentDescription.samples = logicalDevice->getSampleCount();
+    attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
     attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -205,7 +205,7 @@ void Renderer::initializeOffscreenFramebuffer() {
     imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
     imageCreateInfo.extent.height = imageCreateInfo.extent.width = SHADOWMAP_DIMENSION;
     imageCreateInfo.arrayLayers = imageCreateInfo.mipLevels = imageCreateInfo.extent.depth = 1;
-    imageCreateInfo.samples = logicalDevice->getSampleCount();
+    imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
     imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
     imageCreateInfo.format = findDepthFormat();
     imageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
@@ -249,7 +249,7 @@ void Renderer::initializeOffscreenFramebuffer() {
     VK_CHECK_RESULT(vkCreateSampler(logicalDevice->getDevice(), &samplerCreateInfo, nullptr, &offscreenDepthSampler))
 
     VkFramebufferCreateInfo bufferCreateInfo = {};
-    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     bufferCreateInfo.renderPass = offscreenRenderPass;
     bufferCreateInfo.attachmentCount = 1;
     bufferCreateInfo.pAttachments = &offscreenDepthImageView;

@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_ulp.dir/gtc_ulp.cpp.o  -o ../../../out/test-gtc_ulp 

@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtc_matrix_transform.dir/gtc_matrix_transform.cpp.o  -o ../../../out/test-gtc_matrix_transform 

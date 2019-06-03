@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-core_func_exponential.dir/core_func_exponential.cpp.o  -o ../../../out/test-core_func_exponential 

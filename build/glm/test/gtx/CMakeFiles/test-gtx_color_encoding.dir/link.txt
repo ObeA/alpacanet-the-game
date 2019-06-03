@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_color_encoding.dir/gtx_color_encoding.cpp.o  -o ../../../out/test-gtx_color_encoding 

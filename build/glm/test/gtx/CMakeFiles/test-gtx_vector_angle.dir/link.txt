@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-gtx_vector_angle.dir/gtx_vector_angle.cpp.o  -o ../../../out/test-gtx_vector_angle 

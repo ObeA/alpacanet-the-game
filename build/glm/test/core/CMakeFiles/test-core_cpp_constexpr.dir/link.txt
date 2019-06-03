@@ -1,1 +1,0 @@
-/usr/bin/clang++    -static-libgcc -static-libstdc++ -rdynamic CMakeFiles/test-core_cpp_constexpr.dir/core_cpp_constexpr.cpp.o  -o ../../../out/test-core_cpp_constexpr 
