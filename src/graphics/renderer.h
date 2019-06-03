@@ -20,8 +20,7 @@ public:
 
     VkFramebuffer offscreenFrameBuffer;
     VkImageView offscreenDepthImageView;
-    VkDeviceMemory offscreenDepthImageMemory;
-    VkImage offscreenDepthImage;
+    Image* offscreenDepthImage;
     VkSampler offscreenDepthSampler;
 
     void setScene(Scene* scene);

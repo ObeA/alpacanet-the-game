@@ -29,9 +29,7 @@ bool MaterialManager::hasMaterial(const std::string& key) const {
 }
 
 void MaterialManager::cleanup() {
-    for (const auto& kvp : materials) {
-        kvp.second->cleanup();
-    }
+    materials.clear();
 }
 
 

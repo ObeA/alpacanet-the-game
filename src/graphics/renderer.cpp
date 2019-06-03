@@ -36,11 +36,19 @@ Renderer::~Renderer() {
                          commandBuffers.data());
     vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 
-    //vkDestroySampler(device, offscreenDepthSampler, nullptr);
-    //vkDestroyImageView(device, offscreenDepthImageView, nullptr);
-    //vkDestroyFramebuffer(device, offscreenFrameBuffer, nullptr);
-    //vkDestroyRenderPass(device, offscreenRenderPass, nullptr);
 
+    delete gui;
+
+    delete colorImage;
+    vkDestroyImageView(device, colorImageView, nullptr);
+
+    delete offscreenDepthImage;
+    vkDestroySampler(device, offscreenDepthSampler, nullptr);
+    vkDestroyImageView(device, offscreenDepthImageView, nullptr);
+    vkDestroyFramebuffer(device, offscreenFrameBuffer, nullptr);
+    vkDestroyRenderPass(device, offscreenRenderPass, nullptr);
+
+    delete depthImage;
     vkDestroyImageView(device, depthImageView, nullptr);
 
     for (auto& swapChainFramebuffer : swapChainFramebuffers) {
@@ -200,27 +208,17 @@ void Renderer::initializeOffscreenRenderPass() {
 }
 
 void Renderer::initializeOffscreenFramebuffer() {
-    VkImageCreateInfo imageCreateInfo = {};
-    imageCreateInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-    imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-    imageCreateInfo.extent.height = imageCreateInfo.extent.width = SHADOWMAP_DIMENSION;
-    imageCreateInfo.arrayLayers = imageCreateInfo.mipLevels = imageCreateInfo.extent.depth = 1;
-    imageCreateInfo.samples = VK_SAMPLE_COUNT_1_BIT;
-    imageCreateInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
-    imageCreateInfo.format = findDepthFormat();
-    imageCreateInfo.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-    VK_CHECK_RESULT(vkCreateImage(logicalDevice->getDevice(), &imageCreateInfo, nullptr, &offscreenDepthImage))
+    VkExtent2D extents = {};
+    extents.height = extents.width = SHADOWMAP_DIMENSION;
 
-    VkMemoryAllocateInfo memoryAllocateInfo = {};
-    memoryAllocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
-    VkMemoryRequirements memoryRequirements;
-    vkGetImageMemoryRequirements(logicalDevice->getDevice(), offscreenDepthImage, &memoryRequirements);
-    memoryAllocateInfo.allocationSize = memoryRequirements.size;
-    memoryAllocateInfo.memoryTypeIndex = logicalDevice->getPhysicalDevice()->findMemoryType(
-            memoryRequirements.memoryTypeBits, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-    VK_CHECK_RESULT(
-            vkAllocateMemory(logicalDevice->getDevice(), &memoryAllocateInfo, nullptr, &offscreenDepthImageMemory))
-    VK_CHECK_RESULT(vkBindImageMemory(logicalDevice->getDevice(), offscreenDepthImage, offscreenDepthImageMemory, 0))
+    offscreenDepthImage = new Image(logicalDevice,
+            extents,
+            findDepthFormat(),
+            VK_IMAGE_TILING_OPTIMAL,
+            VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT,
+            VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
+            VK_SAMPLE_COUNT_1_BIT
+    );
 
     VkImageViewCreateInfo depthStencilView = {};
     depthStencilView.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -232,7 +230,7 @@ void Renderer::initializeOffscreenFramebuffer() {
     depthStencilView.subresourceRange.levelCount = 1;
     depthStencilView.subresourceRange.baseArrayLayer = 0;
     depthStencilView.subresourceRange.layerCount = 1;
-    depthStencilView.image = offscreenDepthImage;
+    depthStencilView.image = offscreenDepthImage->getImage();
     VK_CHECK_RESULT(vkCreateImageView(logicalDevice->getDevice(), &depthStencilView, nullptr, &offscreenDepthImageView))
 
     VkSamplerCreateInfo samplerCreateInfo = {};

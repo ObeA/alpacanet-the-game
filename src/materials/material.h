@@ -6,11 +6,9 @@
 class Material {
 public:
     explicit Material(Graphics* graphics, std::string shaderDirectory) : graphics(graphics), shaderDirectory(shaderDirectory) { }
+    virtual ~Material();
 
     virtual void initialize();
-    virtual void cleanup();
-
-    void cleanupSwapChain();
 
     VkDescriptorSetLayout descriptorSetLayout;
     VkPipelineLayout pipelineLayout;

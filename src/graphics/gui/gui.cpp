@@ -308,6 +308,9 @@ void GUI::initResources(VkRenderPass renderPass, VkQueue copyQueue)
     if (vkCreateGraphicsPipelines(device->getDevice(), pipelineCache, 1, &pipelineCreateInfo, nullptr, &pipeline) != VK_SUCCESS) {
         throw std::runtime_error("failed to create GUI pipeline!");
     }
+
+    vkDestroyShaderModule(device->getDevice(), fragShaderModule, nullptr);
+    vkDestroyShaderModule(device->getDevice(), vertShaderModule, nullptr);
 }
 
 void GUI::newFrame()

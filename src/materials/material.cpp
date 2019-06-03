@@ -5,17 +5,6 @@ void Material::initialize() {
     createGraphicsPipeline();
 }
 
-void Material::cleanup() {
-    vkDestroyDescriptorSetLayout(graphics->getLogicalDevice()->getDevice(), descriptorSetLayout, nullptr);
-}
-
-void Material::cleanupSwapChain() {
-    auto& device = graphics->getLogicalDevice()->getDevice();
-
-    vkDestroyPipeline(device, graphicsPipeline, nullptr);
-    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
-}
-
 void Material::createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shaderStages[]) {
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo = {};
 	vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -138,4 +127,11 @@ void Material::createBasicGraphicsPipeline(VkPipelineShaderStageCreateInfo shade
 	if (vkCreateGraphicsPipelines(graphics->getLogicalDevice()->getDevice(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create graphics pipeline!");
 	}
+}
+
+Material::~Material() {
+    auto device = graphics->getLogicalDevice()->getDevice();
+    vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+    vkDestroyPipeline(device, graphicsPipeline, nullptr);
+    vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
 }

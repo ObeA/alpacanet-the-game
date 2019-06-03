@@ -6,14 +6,12 @@
 
 #include <stb_image.h>
 
-void BasicTexturedMaterial::cleanup() {
+BasicTexturedMaterial::~BasicTexturedMaterial() {
     auto device = graphics->getLogicalDevice()->getDevice();
     vkDestroySampler(device, textureSampler, nullptr);
     vkDestroyImageView(device, textureImageView, nullptr);
 
     delete textureImage;
-
-    Material::cleanup();
 }
 
 void BasicTexturedMaterial::initialize() {

@@ -6,20 +6,19 @@ class BasicTexturedMaterial: public Material {
 public:
     BasicTexturedMaterial(Graphics* graphics, char* texture, std::string shaderDirectory) : Material(graphics, shaderDirectory), textureLocation(texture) {
     }
+    ~BasicTexturedMaterial() override;
 
-	void initialize();
+	void initialize() override;
 
-    void createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet);
-
-	void cleanup();
+    void createDescriptorSet(VkDescriptorBufferInfo &uniformBufferInfo, VkDescriptorSet &descriptorSet) override;
 protected:
 	char* textureLocation;
 	VkImageView textureImageView;
 	VkSampler textureSampler;
 	Image* textureImage;
 
-    void createGraphicsPipeline();
-    virtual void createDescriptorSetLayout();
+    void createGraphicsPipeline() override;
+    void createDescriptorSetLayout() override;
 	void createTextureImage();
 	void createTextureImageView();
 	void createTextureSampler();

@@ -11,10 +11,10 @@ Graphics::Graphics() {
 }
 
 Graphics::~Graphics() {
-    delete window;
     delete physicalDevice;
+    delete renderer;
     delete surface;
-	delete renderer;
+    delete window;
     delete logicalDevice;
     delete instance;
 }
