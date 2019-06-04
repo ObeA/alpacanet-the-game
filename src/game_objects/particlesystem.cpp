@@ -98,6 +98,7 @@ void ParticleSystem::createVertexBuffer() {
         particles.data()
     );
 
+    delete vertexBuffer;
     vertexBuffer = new Buffer(
         game->getGraphics()->getLogicalDevice(),
         bufferSize,

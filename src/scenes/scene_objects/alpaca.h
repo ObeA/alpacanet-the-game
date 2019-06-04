@@ -41,7 +41,7 @@ private:
             ColorScheme{glm::vec3(0.396, 0.18, 0.1), glm::vec3(0.8, 0.062, 0.0)}        // Brown
     };
 
-    glm::vec2 targetPosition;
+    glm::vec2 targetPosition{};
     bool targetPositionReached;
     bool bounceCompleted = false;
     float bouncyBoi;

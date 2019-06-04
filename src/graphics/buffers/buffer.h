@@ -12,7 +12,6 @@ public:
 
     void* map();
     void unmap();
-    VkResult flush();
 
     const VkBuffer& getBuffer() const;
     const VkDeviceMemory& getMemory() const;

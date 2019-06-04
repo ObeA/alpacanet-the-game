@@ -17,7 +17,6 @@ DrawableObject::~DrawableObject() {
         delete buffer;
     }
 
-
     delete indexBuffer;
     delete vertexBuffer;
 
@@ -60,6 +59,7 @@ void DrawableObject::createVertexBuffer() {
         getVertices().data()
     );
 
+    delete vertexBuffer;
     vertexBuffer = new Buffer(
         game->getGraphics()->getLogicalDevice(),
         bufferSize,
@@ -81,6 +81,7 @@ void DrawableObject::createIndexBuffer() {
         getIndices().data()
     );
 
+    delete indexBuffer;
     indexBuffer = new Buffer(
         game->getGraphics()->getLogicalDevice(),
         bufferSize,
@@ -177,6 +178,7 @@ void DrawableObject::createUniformBuffers(size_t swapChainImageSize) {
 
     auto device = game->getGraphics()->getLogicalDevice();
     for (size_t i = 0; i < swapChainImageSize; i++) {
+        delete uniformBuffers[i];
         uniformBuffers[i] = new UniformBuffer(device, bufferSize);
     }
 
@@ -187,6 +189,7 @@ void DrawableObject::createUniformBuffers(size_t swapChainImageSize) {
     VkDeviceSize offscreenBufferSize = sizeof(UniformBufferObjectOffscreen);
     offscreenUniformBuffers.resize(swapChainImageSize);
     for (size_t i = 0; i < swapChainImageSize; i++) {
+        delete offscreenUniformBuffers[i];
         offscreenUniformBuffers[i] = new UniformBuffer(device, offscreenBufferSize);
     }
 }

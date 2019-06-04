@@ -31,7 +31,7 @@ void MainScene::setup() {
     skybox->scale = glm::vec3(50);
     objects.push_back(skybox);
 
-    for (size_t i = 0; i < 10; i++) {
+    for (size_t i = 0; i < 8; i++) {
         SpawnAlpaca();
     }
 
@@ -55,6 +55,8 @@ void MainScene::setup() {
 }
 
 MainScene::~MainScene() {
+    delete camera;
+    delete light;
     for (auto object : objects) {
         delete object;
     }
