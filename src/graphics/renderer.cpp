@@ -603,3 +603,7 @@ void Renderer::createColorResources() {
 
     colorImage->transitionLayout(VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 }
+
+void Renderer::triggerRecreateCommandBuffer() {
+    recreateCommandBufferFlag = true;
+}

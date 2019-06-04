@@ -5,6 +5,11 @@ Bounds::Bounds(glm::vec3 min, glm::vec3 max)
     update();
 }
 
+Bounds::Bounds(glm::vec2 min, glm::vec2 max)
+        : min(glm::vec3(min, 0)), max(glm::vec3(max, 0)), center() {
+    update();
+}
+
 Bounds::Bounds(const Bounds &bounds)
     : min(bounds.min), max(bounds.max), center() {
     update();
@@ -41,4 +46,16 @@ Bounds Bounds::getScaledCopy(glm::vec3 scale) const {
 
     copy.update();
     return copy;
+}
+
+const glm::vec3 &Bounds::getMin() const {
+    return min;
+}
+
+const glm::vec3 &Bounds::getMax() const {
+    return max;
+}
+
+float Bounds::getDistance() const {
+    return glm::distance(max, min);
 }

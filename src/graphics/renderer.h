@@ -34,7 +34,7 @@ public:
     const VkExtent2D& getExtents() const;
     GUI* getGui();
 
-    bool recreateCommandBufferFlag;
+    void triggerRecreateCommandBuffer();
 private:
     const VkFilter SHADOWMAP_FILTER = VK_FILTER_LINEAR;
 
@@ -63,6 +63,8 @@ private:
 	std::vector<VkSemaphore> renderFinishedSemaphores;
 	std::vector<VkFence> inFlightFences;
 	size_t currentFrame = 0;
+
+    bool recreateCommandBufferFlag = false;
 
     void createDescriptorPool();
 

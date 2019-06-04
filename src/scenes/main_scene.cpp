@@ -32,9 +32,7 @@ void MainScene::setup() {
     objects.push_back(skybox);
 
     for (size_t i = 0; i < 10; i++) {
-        auto alpaca = new Alpaca(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get());
-        alpaca->position = glm::vec3(getRandomPositionOnField(), 0.0);
-        objects.push_back(alpaca);
+        SpawnAlpaca();
     }
 
     for (auto object : objects) {
@@ -65,6 +63,23 @@ MainScene::~MainScene() {
 void MainScene::update() {
     Scene::update();
 
+    if (score >= goal) {
+        lookAtWorld();
+
+        auto numberOfWoolCollected = goal - previousGoal;
+        auto position = glm::vec3(0, 0, 2.0);
+        SpawnParticleSystem(position, numberOfWoolCollected);
+
+        goalsReached++;
+        goal *= 2;
+        Bounds spawnBounds(glm::vec2(-1, -1), glm::vec2(1, 1));
+        for (size_t i = 0; i < std::min(goalsReached, 4); i++) {
+            SpawnAlpaca(spawnBounds);
+        }
+
+        game->getGraphics()->getRenderer()->triggerRecreateCommandBuffer();
+    }
+
     auto it = std::begin(objects);
 
     while(it != std::end(objects)) {
@@ -76,7 +91,7 @@ void MainScene::update() {
                     castedAlpaca->nextMoveTick = game->currentTick() + RandomUtilities::getInstance().getRandomBetween(200, 1000);
                 } else if (game->currentTick() > castedAlpaca->nextMoveTick) {
                     // Send alpaca to the next position
-                    castedAlpaca->moveTo(getRandomPositionOnField());
+                    castedAlpaca->moveTo(getRandomPositionWithIn(FIELD_BOUNDS));
                     castedAlpaca->nextMoveTick = -1;
                 }
             }
@@ -101,17 +116,28 @@ void MainScene::onMouseButton(int button, int action, int mods) {
 
     auto ray = camera->getRay();
 
+    Alpaca* closest = nullptr;
+    auto closestDistance = std::numeric_limits<float>::max();
     for (auto object : objects) {
         float distance;
-        auto intersected = glm::intersectRaySphere(camera->getPosition(), ray, object->position, 2, distance);
-        if (intersected) {
-            auto casted = dynamic_cast<Alpaca*>(object);
-            if (casted != nullptr) {
-                selectedAlpaca = casted;
-                camera->lookAt(casted);
-                camera->setFollowDistance(2.0f);
+        auto casted = dynamic_cast<Alpaca*>(object);
+        if (casted != nullptr) {
+            auto intersected = glm::intersectRaySphere(camera->getPosition(), ray, object->position, casted->getBounds().getDistance(), distance);
+            if (!intersected) {
+                continue;
+            }
+
+            if (closest == nullptr || closestDistance > distance) {
+                closest = casted;
+                closestDistance = distance;
             }
         }
+    }
+
+    if (closest != nullptr) {
+        selectedAlpaca = closest;
+        camera->lookAt(selectedAlpaca);
+        camera->setFollowDistance(2.0f);
     }
 }
 
@@ -171,7 +197,7 @@ void MainScene::loopAlpacas(bool nextOrPrevious) {
 void MainScene::drawUI() {
     auto padding = 25;
     ImGui::SetNextWindowPos(ImVec2(padding, padding), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(350, 200), ImGuiCond_Always);
+    ImGui::SetNextWindowSize(ImVec2(375, 200), ImGuiCond_Always);
     ImGui::Begin("Controls", nullptr, ImGuiWindowFlags_NoResize);
     ImGui::TextUnformatted("Beweeg de camera met de rechtermuisknop");
     ImGui::TextUnformatted("Klik op een alpaca voor selecteren");
@@ -195,7 +221,7 @@ void MainScene::drawUI() {
     }
 
     ImGui::TextUnformatted("Wool-O-Meter");
-    ImGui::ProgressBar(score / (float)1000, ImVec2(-1, 0), (std::to_string(score) + "/1000").c_str());
+    ImGui::ProgressBar(score / (float)goal, ImVec2(-1, 0), (std::to_string(score) + "/" + std::to_string(goal)).c_str());
 
     ImGui::End();
 }
@@ -203,6 +229,7 @@ void MainScene::drawUI() {
 void MainScene::lookAtWorld() {
     camera->lookAt(glm::vec3(0));
     camera->setFollowDistance(10.0f);
+    selectedAlpaca = nullptr;
 }
 
 void MainScene::shearSelectedAlpaca() {
@@ -213,22 +240,35 @@ void MainScene::shearSelectedAlpaca() {
     auto wool = selectedAlpaca->shear();
     score += wool;
     if (wool > 0) {
-        auto& materialManager = MaterialManager::getInstance();
-        auto particles = new ParticleSystem(game, materialManager.getMaterial("particle-material").get(), nullptr);
-        particles->amount = wool;
         auto center = selectedAlpaca->getBounds().getCenter();
-        particles->position = selectedAlpaca->position + glm::vec3(center.x, center.y, center.z * .75);
-        particles->scale = glm::vec3(1);
-        objects.push_back(particles);
-        particles->start();
-        game->getGraphics()->getRenderer()->recreateCommandBufferFlag = true;
+        auto spawnPosition = selectedAlpaca->position + glm::vec3(center.x, center.y, center.z * .75);
+        SpawnParticleSystem(spawnPosition, wool);
+        game->getGraphics()->getRenderer()->triggerRecreateCommandBuffer();
     }
 }
 
-glm::vec2 MainScene::getRandomPositionOnField() {
+glm::vec2 MainScene::getRandomPositionWithIn(const Bounds& bounds) const {
     auto& random = RandomUtilities::getInstance();
-    float x = random.getRandomBetween(-8.5f, 8.5f);
-    float y = random.getRandomBetween(-8.5f, 8.5f);
+    float x = random.getRandomBetween(bounds.getMin().x, bounds.getMax().x);
+    float y = random.getRandomBetween(bounds.getMin().y, bounds.getMax().y);
 
     return glm::vec2(x, y);
+}
+
+void MainScene::SpawnAlpaca(const Bounds& bounds) {
+    auto& materialManager = MaterialManager::getInstance();
+    auto alpaca = new Alpaca(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get());
+    alpaca->position = glm::vec3(getRandomPositionWithIn(bounds), 0.0);
+    objects.push_back(alpaca);
+    alpaca->start();
+}
+
+void MainScene::SpawnParticleSystem(const glm::vec3& position, int count) {
+    auto& materialManager = MaterialManager::getInstance();
+    auto particles = new ParticleSystem(game, materialManager.getMaterial("particle-material").get(), nullptr);
+    particles->amount = count;
+    particles->position = position;
+    particles->scale = glm::vec3(1);
+    objects.push_back(particles);
+    particles->start();
 }

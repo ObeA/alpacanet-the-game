@@ -8,7 +8,7 @@
 Alpaca::Alpaca(Game* game, Material* material, Material* shadowMaterial)
     : ModelObject(game, material, shadowMaterial, "assets/models/alpaca.obj"),
       targetPositionReached(true), nextMoveTick(0), wooliness(0), happiness(0.5), bouncyBoi(0) {
-    age = RandomUtilities::getInstance().getRandomBetween(MIN_AGE, MAX_AGE);
+    age = RandomUtilities::getInstance().getRandomBetween(MIN_AGE, MIN_AGE + (MAX_AGE - MIN_AGE) * 0.5f);
     updateAge();
 }
 
@@ -40,7 +40,7 @@ int Alpaca::getHappiness() const {
 
 void Alpaca::updateAge() {
     age = std::min(age + 0.0005f * happiness, MAX_AGE);
-    scale = BASE_SIZE * age;
+    scale = BASE_SIZE + glm::vec3(0.25) * getAgeScale();
 }
 
 void Alpaca::updateWool() {

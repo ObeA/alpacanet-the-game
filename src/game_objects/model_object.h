@@ -29,6 +29,7 @@ public:
     }
 
     void start() override;
+    void update() override { }
 
 protected:
     virtual void postprocessMaterials(std::vector<tinyobj::material_t>& materials) { }

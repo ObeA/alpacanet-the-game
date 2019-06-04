@@ -28,6 +28,10 @@ DrawableObject::~DrawableObject() {
 }
 
 void DrawableObject::start() {
+    if (isStarted()) {
+        return;
+    }
+
     createVertexBuffer();
     createIndexBuffer();
 

@@ -380,7 +380,7 @@ void GUI::updateBuffers()
     }
 
     if (updated) {
-        renderer->recreateCommandBufferFlag = true;
+        renderer->triggerRecreateCommandBuffer();
     }
 }
 

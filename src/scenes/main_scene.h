@@ -15,14 +15,22 @@ public:
     void drawUI() override;
     std::vector<Alpaca*> getAlpacas();
 private:
+    inline static Bounds FIELD_BOUNDS = Bounds(glm::vec3(-8.5, -8.5, 0.0f), glm::vec3(8.5, 8.5, 0.0f));
+
     Alpaca* selectedAlpaca = nullptr;
     int score = 0;
+    int goal = 500;
+    int previousGoal = 0;
+    int goalsReached = 0;
     void loopAlpacas(bool nextOrPrevious);
 
     void shearSelectedAlpaca();
 
     void lookAtWorld();
 
-    glm::vec2 getRandomPositionOnField();
-};
+    glm::vec2 getRandomPositionWithIn(const Bounds& bounds) const;
 
+    void SpawnParticleSystem(const glm::vec3 &position, int count);
+
+    void SpawnAlpaca(const Bounds &bounds = FIELD_BOUNDS);
+};

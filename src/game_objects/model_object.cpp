@@ -73,6 +73,10 @@ void ModelObject::loadModel() {
 }
 
 void ModelObject::start() {
+    if (isStarted()) {
+        return;
+    }
+
     loadModel();
 
     DrawableObject::start();
