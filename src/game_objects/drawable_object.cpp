@@ -178,7 +178,6 @@ void DrawableObject::createUniformBuffers(size_t swapChainImageSize) {
 
     auto device = game->getGraphics()->getLogicalDevice();
     for (size_t i = 0; i < swapChainImageSize; i++) {
-        delete uniformBuffers[i];
         uniformBuffers[i] = new UniformBuffer(device, bufferSize);
     }
 

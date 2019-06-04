@@ -70,13 +70,13 @@ void MainScene::update() {
 
         auto numberOfWoolCollected = goal - previousGoal;
         auto position = glm::vec3(0, 0, 2.0);
-        SpawnParticleSystem(position, numberOfWoolCollected);
+        SpawnParticleSystem(position, numberOfWoolCollected)->start();
 
         goalsReached++;
         goal *= 2;
         Bounds spawnBounds(glm::vec2(-1, -1), glm::vec2(1, 1));
         for (size_t i = 0; i < std::min(goalsReached, 4); i++) {
-            SpawnAlpaca(spawnBounds);
+            SpawnAlpaca(spawnBounds)->start();
         }
 
         game->getGraphics()->getRenderer()->triggerRecreateCommandBuffer();
@@ -244,7 +244,7 @@ void MainScene::shearSelectedAlpaca() {
     if (wool > 0) {
         auto center = selectedAlpaca->getBounds().getCenter();
         auto spawnPosition = selectedAlpaca->position + glm::vec3(center.x, center.y, center.z * .75);
-        SpawnParticleSystem(spawnPosition, wool);
+        SpawnParticleSystem(spawnPosition, wool)->start();
         game->getGraphics()->getRenderer()->triggerRecreateCommandBuffer();
     }
 }
@@ -257,20 +257,20 @@ glm::vec2 MainScene::getRandomPositionWithIn(const Bounds& bounds) const {
     return glm::vec2(x, y);
 }
 
-void MainScene::SpawnAlpaca(const Bounds& bounds) {
+Alpaca* MainScene::SpawnAlpaca(const Bounds& bounds) {
     auto& materialManager = MaterialManager::getInstance();
     auto alpaca = new Alpaca(game, materialManager.getMaterial("basic-material").get(), materialManager.getMaterial("shadow-material").get());
     alpaca->position = glm::vec3(getRandomPositionWithIn(bounds), 0.0);
     objects.push_back(alpaca);
-    alpaca->start();
+    return alpaca;
 }
 
-void MainScene::SpawnParticleSystem(const glm::vec3& position, int count) {
+ParticleSystem* MainScene::SpawnParticleSystem(const glm::vec3& position, int count) {
     auto& materialManager = MaterialManager::getInstance();
     auto particles = new ParticleSystem(game, materialManager.getMaterial("particle-material").get(), nullptr);
     particles->amount = count;
     particles->position = position;
     particles->scale = glm::vec3(1);
     objects.push_back(particles);
-    particles->start();
+    return particles;
 }

@@ -2,6 +2,7 @@
 
 #include "scene.h"
 #include "scene_objects/alpaca.h"
+#include "../game_objects/particlesystem.h"
 
 class MainScene : public Scene {
 public:
@@ -30,7 +31,7 @@ private:
 
     glm::vec2 getRandomPositionWithIn(const Bounds& bounds) const;
 
-    void SpawnParticleSystem(const glm::vec3 &position, int count);
+    ParticleSystem* SpawnParticleSystem(const glm::vec3 &position, int count);
 
-    void SpawnAlpaca(const Bounds &bounds = FIELD_BOUNDS);
+    Alpaca* SpawnAlpaca(const Bounds &bounds = FIELD_BOUNDS);
 };
